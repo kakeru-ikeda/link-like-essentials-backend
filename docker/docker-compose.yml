@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   app:
+    container_name: link-like-essentials-backend
     build:
       context: ..
       dockerfile: docker/Dockerfile
@@ -23,8 +24,10 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+      - jenkins
 
   redis:
+    container_name: link-like-essentials-redis
     image: redis:7-alpine
     ports:
       - '6379:6379'
@@ -46,3 +49,5 @@ volumes:
 networks:
   app-network:
     driver: bridge
+  jenkins:
+    external: true
