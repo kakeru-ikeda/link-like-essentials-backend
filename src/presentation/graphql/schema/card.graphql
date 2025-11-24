@@ -10,6 +10,7 @@ type Card {
   createdAt: DateTime!
   updatedAt: DateTime!
   detail: CardDetail
+  accessories: [Accessory!]!
 }
 
 type CardConnection {
