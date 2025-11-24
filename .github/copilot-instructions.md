@@ -4,7 +4,7 @@
 
 Link Like Essentials Backend - GraphQLバックエンドシステム
 
-**目的**: link-like-scraperで収集したカードデータをWebフロントエンドに提供する
+**目的**: 収集したカードデータをWebフロントエンドに提供する
 
 **詳細設計**: `docs/DESIGN.md`を参照
 
@@ -24,7 +24,8 @@ src/
 
 **依存方向**: Presentation → Application → Domain ← Infrastructure
 
-**重要**: 
+**重要**:
+
 - Domainは他の層に依存しない
 - InfrastructureはDomainのインターフェースを実装
 - 上位層が下位層のインターフェースに依存（DIP）
@@ -55,7 +56,7 @@ export class CardService {
     private readonly cardRepository: ICardRepository,
     private readonly cacheStrategy: CardCacheStrategy
   ) {}
-  
+
   async findById(id: number): Promise<Card | null> {
     // implementation
   }
@@ -69,6 +70,7 @@ constructor(public cardRepository: ICardRepository) {}
 ```
 
 **必須**:
+
 - `strict: true`
 - `any`型禁止（`unknown`を使用）
 - `!`（non-null assertion）は最小限に
@@ -78,8 +80,8 @@ constructor(public cardRepository: ICardRepository) {}
 
 ```typescript
 // ファイル名: PascalCase (クラス・型), camelCase (関数・変数)
-CardService.ts
-cardResolver.ts
+CardService.ts;
+cardResolver.ts;
 
 // クラス: PascalCase
 class CardService {}
@@ -88,7 +90,7 @@ class CardService {}
 interface ICardRepository {}
 
 // 型: PascalCase
-type CardFilterInput = {}
+type CardFilterInput = {};
 
 // 変数・関数: camelCase
 const cardService = new CardService();
@@ -100,7 +102,7 @@ const MAX_CACHE_TTL = 3600;
 // Enum: PascalCase (型), UPPER_CASE (値)
 enum Rarity {
   UR = 'UR',
-  SR = 'SR'
+  SR = 'SR',
 }
 ```
 
@@ -141,6 +143,7 @@ throw new Error('Not found');
 ```
 
 **エラークラス**: `domain/errors/AppError.ts`
+
 - `AppError` - 基底クラス
 - `NotFoundError` - 404
 - `ValidationError` - 400
@@ -158,7 +161,7 @@ model Card {
   id            Int       @id @default(autoincrement())
   cardName      String    @map("card_name")
   characterName String    @map("character_name")
-  
+
   @@map("cards")  // テーブル名
 }
 ```
@@ -171,8 +174,8 @@ const card = await prisma.card.findUnique({
   where: { id },
   include: {
     detail: true,
-    accessories: true
-  }
+    accessories: true,
+  },
 });
 
 // ✅ Good - トランザクション
@@ -184,7 +187,9 @@ await prisma.$transaction(async (tx) => {
 // ❌ Bad - N+1問題
 const cards = await prisma.card.findMany();
 for (const card of cards) {
-  const detail = await prisma.cardDetail.findUnique({ where: { cardId: card.id } });
+  const detail = await prisma.cardDetail.findUnique({
+    where: { cardId: card.id },
+  });
 }
 ```
 
@@ -196,10 +201,10 @@ for (const card of cards) {
 
 ```typescript
 const TTL = {
-  CARD: 24 * 60 * 60,        // 24時間
-  CARD_LIST: 60 * 60,        // 1時間
-  CARD_DETAIL: 6 * 60 * 60,  // 6時間
-  STATS: 30 * 60             // 30分
+  CARD: 24 * 60 * 60, // 24時間
+  CARD_LIST: 60 * 60, // 1時間
+  CARD_DETAIL: 6 * 60 * 60, // 6時間
+  STATS: 30 * 60, // 30分
 };
 ```
 
@@ -207,11 +212,10 @@ const TTL = {
 
 ```typescript
 // パターン: {entity}:{identifier}
-`card:${id}`                    // 単一
+`card:${id}` // 単一
 `card:name:${cardName}:${char}` // 複合キー
-`cards:list:${hash}`            // 一覧（フィルターのハッシュ）
-`cardDetail:${cardId}`
-`stats:cards`
+`cards:list:${hash}` // 一覧（フィルターのハッシュ）
+`cardDetail:${cardId}``stats:cards`;
 ```
 
 ### 実装パターン
@@ -221,15 +225,15 @@ async findById(id: number): Promise<Card | null> {
   // 1. キャッシュチェック
   const cached = await this.cache.get<Card>(`card:${id}`);
   if (cached) return cached;
-  
+
   // 2. DB取得
   const card = await this.repository.findById(id);
-  
+
   // 3. キャッシュ保存
   if (card) {
     await this.cache.set(`card:${id}`, card, TTL.CARD);
   }
-  
+
   return card;
 }
 ```
@@ -253,9 +257,9 @@ enum Rarity {
 
 # Nullable vs Non-nullable
 type Card {
-  id: ID!              # 必須
-  cardName: String!    # 必須
-  rarity: Rarity       # オプショナル（NULL許容）
+  id: ID! # 必須
+  cardName: String! # 必須
+  rarity: Rarity # オプショナル（NULL許容）
 }
 
 # Connection pattern（ページネーション）
@@ -273,7 +277,7 @@ type CardConnection {
 export const cardResolvers: QueryResolvers = {
   card: async (_, { id }, context) => {
     return await context.dataSources.cardService.findById(parseInt(id));
-  }
+  },
 };
 
 // ✅ Good - フィールドリゾルバー（遅延ロード）
@@ -281,13 +285,13 @@ export const cardFieldResolvers: CardResolvers = {
   detail: async (parent, _, context) => {
     if (parent.detail) return parent.detail;
     return await context.dataSources.cardDetailService.findByCardId(parent.id);
-  }
+  },
 };
 
 // ❌ Bad - Resolver内でDBアクセス
 card: async (_, { id }, context) => {
   return await prisma.card.findUnique({ where: { id } });
-}
+};
 ```
 
 ---
@@ -316,9 +320,9 @@ const mockRepository: jest.Mocked<ICardRepository> = {
 describe('CardService', () => {
   it('should return card from cache', async () => {
     mockCache.get.mockResolvedValue(mockCard);
-    
+
     const result = await service.findById(1);
-    
+
     expect(result).toEqual(mockCard);
     expect(mockRepository.findById).not.toHaveBeenCalled();
   });
@@ -396,6 +400,7 @@ const url = process.env.DATABASE_URL;
 ```
 
 **必須環境変数**:
+
 ```env
 DATABASE_URL          # Neon PostgreSQL
 REDIS_HOST
@@ -414,9 +419,9 @@ NODE_ENV
 // ✅ Good - バッチロード
 const loader = new DataLoader(async (ids: number[]) => {
   const cards = await prisma.card.findMany({
-    where: { id: { in: [...ids] } }
+    where: { id: { in: [...ids] } },
   });
-  return ids.map(id => cards.find(c => c.id === id) || null);
+  return ids.map((id) => cards.find((c) => c.id === id) || null);
 });
 ```
 
@@ -436,8 +441,8 @@ const cards = await prisma.card.findMany({
   select: {
     id: true,
     cardName: true,
-    characterName: true
-  }
+    characterName: true,
+  },
 });
 ```
 

@@ -3,9 +3,11 @@
 ## 1. プロジェクト概要
 
 ### 1.1 目的
-link-like-scraperで収集・保管したカードデータをWebフロントエンドに提供するGraphQLバックエンドシステム。
+
+保管したカードデータをWebフロントエンドに提供するGraphQLバックエンドシステム。
 
 ### 1.2 主要機能
+
 - GraphQL APIによるカードデータの柔軟な取得
 - Firebase Authenticationによる認証基盤
 - Prisma + Redisによるキャッシュ戦略
@@ -13,6 +15,7 @@ link-like-scraperで収集・保管したカードデータをWebフロントエ
 - Dockerによるコンテナ化
 
 ### 1.3 技術スタック
+
 - **言語**: TypeScript (最新版)
 - **ランタイム**: Node.js 20+
 - **GraphQLサーバー**: Apollo Server
@@ -151,42 +154,42 @@ link-like-essentials-backend/
 ### 3.1 データベーススキーマ（既存）
 
 #### cards テーブル
+
 - 基本的なカード情報を格納
-- スクレイパーで収集した一覧データ
 
 ```typescript
 interface Card {
   id: number;
-  rarity: string | null;           // UR, SR, R
-  limited: string | null;          // 恒常/限定
-  cardName: string;                // カード名
-  cardUrl: string | null;          // Wiki URL
-  characterName: string;           // キャラクター名
-  styleType: string | null;        // スタイルタイプ
-  isLocked: boolean;               // 手動更新保護フラグ
+  rarity: string | null; // UR, SR, R
+  limited: string | null; // 恒常/限定
+  cardName: string; // カード名
+  cardUrl: string | null; // Wiki URL
+  characterName: string; // キャラクター名
+  styleType: string | null; // スタイルタイプ
+  isLocked: boolean; // 手動更新保護フラグ
   createdAt: Date;
   updatedAt: Date;
 }
 ```
 
 #### card_details テーブル
+
 - カードの詳細情報を格納
-- スクレイパーで収集した詳細データ
 
 ```typescript
 interface CardDetail {
   id: number;
-  cardId: number;                  // cards.id への外部キー
-  favoriteMode: string | null;     // お気に入りモード
+  cardId: number; // cards.id への外部キー
+  favoriteMode: string | null; // お気に入りモード
   acquisitionMethod: string | null; // 入手方法
-  awakeBeforeUrl: string | null;   // 覚醒前画像URL
-  awakeAfterUrl: string | null;    // 覚醒後画像URL
+  awakeBeforeUrl: string | null; // 覚醒前画像URL
+  awakeAfterUrl: string | null; // 覚醒後画像URL
   awakeBeforeStorageUrl: string | null; // Firebase Storage URL
-  awakeAfterStorageUrl: string | null;  // Firebase Storage URL
-  smileMaxLevel: string | null;    // スマイル最大値
-  pureMaxLevel: string | null;     // ピュア最大値
-  coolMaxLevel: string | null;     // クール最大値
-  mentalMaxLevel: string | null;   // メンタル最大値
+  awakeAfterStorageUrl: string | null; // Firebase Storage URL
+  smileMaxLevel: string | null; // スマイル最大値
+  pureMaxLevel: string | null; // ピュア最大値
+  coolMaxLevel: string | null; // クール最大値
+  mentalMaxLevel: string | null; // メンタル最大値
   specialAppealName: string | null;
   specialAppealAp: string | null;
   specialAppealEffect: string | null;
@@ -202,13 +205,14 @@ interface CardDetail {
 ```
 
 #### card_accessories テーブル
+
 - アクセサリーカード情報を格納
 
 ```typescript
 interface CardAccessory {
   id: number;
-  cardId: number;                  // cards.id への外部キー
-  parentType: string;              // special_appeal, skill, trait, accessory
+  cardId: number; // cards.id への外部キー
+  parentType: string; // special_appeal, skill, trait, accessory
   name: string;
   ap: string | null;
   effect: string | null;
@@ -232,54 +236,54 @@ scalar DateTime
 # レアリティ（実データから取得）
 # UR: 247件, SR: 138件, R: 46件, DR: 23件, BR: 14件, LR: 3件
 enum Rarity {
-  UR  # Ultra Rare
-  SR  # Super Rare
-  R   # Rare
-  DR  # Dream Rare
-  BR  # Birthday Rare
-  LR  # Limited Rare
+  UR # Ultra Rare
+  SR # Super Rare
+  R # Rare
+  DR # Dream Rare
+  BR # Birthday Rare
+  LR # Limited Rare
 }
 
 # 限定区分（実データから取得）
 # 14種類の限定タイプが存在
 enum LimitedType {
-  PERMANENT        # 恒常
-  LIMITED          # 限定
-  SPRING_LIMITED   # 春限定
-  SUMMER_LIMITED   # 夏限定
-  AUTUMN_LIMITED   # 秋限定
-  WINTER_LIMITED   # 冬限定
+  PERMANENT # 恒常
+  LIMITED # 限定
+  SPRING_LIMITED # 春限定
+  SUMMER_LIMITED # 夏限定
+  AUTUMN_LIMITED # 秋限定
+  WINTER_LIMITED # 冬限定
   BIRTHDAY_LIMITED # 誕限定
-  LEG_LIMITED      # LEG限定
-  BATTLE_LIMITED   # 撃限定
-  PARTY_LIMITED    # 宴限定
+  LEG_LIMITED # LEG限定
+  BATTLE_LIMITED # 撃限定
+  PARTY_LIMITED # 宴限定
   ACTIVITY_LIMITED # 活限定
   GRADUATE_LIMITED # 卒限定
-  LOGIN_BONUS      # ログボ
-  REWARD           # 報酬
+  LOGIN_BONUS # ログボ
+  REWARD # 報酬
 }
 
 # スタイルタイプ（実データから取得）
 enum StyleType {
-  CHEERLEADER   # チアリーダー
-  TRICKSTER     # トリックスター
-  PERFORMER     # パフォーマー
-  MOODMAKER     # ムードメーカー
+  CHEERLEADER # チアリーダー
+  TRICKSTER # トリックスター
+  PERFORMER # パフォーマー
+  MOODMAKER # ムードメーカー
 }
 
 # お気に入りモード（実データから取得）
 enum FavoriteMode {
-  HAPPY    # ハッピー
-  MELLOW   # メロウ
-  NEUTRAL  # ニュートラル
-  NONE     # --（データなし）
+  HAPPY # ハッピー
+  MELLOW # メロウ
+  NEUTRAL # ニュートラル
+  NONE # --（データなし）
 }
 
 # アクセサリーの親タイプ（実データから取得）
 enum ParentType {
-  SPECIAL_APPEAL  # special_appeal - スペシャルアピール
-  SKILL           # skill - スキル
-  TRAIT           # trait - 特性
+  SPECIAL_APPEAL # special_appeal - スペシャルアピール
+  SKILL # skill - スキル
+  TRAIT # trait - 特性
 }
 
 type Stats {
@@ -312,7 +316,7 @@ type Card {
   isLocked: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
-  
+
   # リレーション
   detail: CardDetail
 }
@@ -378,7 +382,7 @@ type CardDetail {
   isLocked: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
-  
+
   # リレーション
   card: Card!
   accessories: [Accessory!]!
@@ -397,7 +401,7 @@ type Accessory {
   isLocked: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
-  
+
   # リレーション
   card: Card!
 }
@@ -411,17 +415,17 @@ type Query {
     filter: CardFilterInput
     sort: CardSortInput
   ): CardConnection!
-  
+
   # 単一カード取得
   card(id: ID!): Card
   cardByName(cardName: String!, characterName: String!): Card
-  
+
   # カード詳細取得
   cardDetail(cardId: ID!): CardDetail
-  
+
   # アクセサリー一覧取得
   accessories(cardId: ID!, parentType: ParentType): [Accessory!]!
-  
+
   # 統計情報
   cardStats: CardStats!
 }
@@ -466,7 +470,7 @@ export enum Rarity {
   R = 'R',
   DR = 'DR',
   BR = 'BR',
-  LR = 'LR'
+  LR = 'LR',
 }
 
 // domain/valueObjects/LimitedType.ts
@@ -484,7 +488,7 @@ export enum LimitedType {
   ACTIVITY_LIMITED = '活限定',
   GRADUATE_LIMITED = '卒限定',
   LOGIN_BONUS = 'ログボ',
-  REWARD = '報酬'
+  REWARD = '報酬',
 }
 
 // domain/valueObjects/StyleType.ts
@@ -493,7 +497,7 @@ export enum StyleType {
   TRICKSTER = 'トリックスター',
   PERFORMER = 'パフォーマー',
   MOODMAKER = 'ムードメーカー',
-  MOODOMAKER = 'ムードーメーカー'  // 誤字版も対応
+  MOODOMAKER = 'ムードーメーカー', // 誤字版も対応
 }
 
 // domain/valueObjects/FavoriteMode.ts
@@ -501,14 +505,14 @@ export enum FavoriteMode {
   HAPPY = 'ハッピー',
   MELLOW = 'メロウ',
   NEUTRAL = 'ニュートラル',
-  NONE = '--'
+  NONE = '--',
 }
 
 // domain/valueObjects/ParentType.ts
 export enum ParentType {
   SPECIAL_APPEAL = 'special_appeal',
   SKILL = 'skill',
-  TRAIT = 'trait'
+  TRAIT = 'trait',
 }
 ```
 
@@ -520,66 +524,66 @@ export class EnumMapper {
   // LimitedTypeのマッピング
   static toLimitedTypeEnum(value: string | null): string | null {
     if (!value) return null;
-    
+
     const mapping: Record<string, string> = {
-      '恒常': 'PERMANENT',
-      '限定': 'LIMITED',
-      '春限定': 'SPRING_LIMITED',
-      '夏限定': 'SUMMER_LIMITED',
-      '秋限定': 'AUTUMN_LIMITED',
-      '冬限定': 'WINTER_LIMITED',
-      '誕限定': 'BIRTHDAY_LIMITED',
-      'LEG限定': 'LEG_LIMITED',
-      '撃限定': 'BATTLE_LIMITED',
-      '宴限定': 'PARTY_LIMITED',
-      '活限定': 'ACTIVITY_LIMITED',
-      '卒限定': 'GRADUATE_LIMITED',
-      'ログボ': 'LOGIN_BONUS',
-      '報酬': 'REWARD'
+      恒常: 'PERMANENT',
+      限定: 'LIMITED',
+      春限定: 'SPRING_LIMITED',
+      夏限定: 'SUMMER_LIMITED',
+      秋限定: 'AUTUMN_LIMITED',
+      冬限定: 'WINTER_LIMITED',
+      誕限定: 'BIRTHDAY_LIMITED',
+      LEG限定: 'LEG_LIMITED',
+      撃限定: 'BATTLE_LIMITED',
+      宴限定: 'PARTY_LIMITED',
+      活限定: 'ACTIVITY_LIMITED',
+      卒限定: 'GRADUATE_LIMITED',
+      ログボ: 'LOGIN_BONUS',
+      報酬: 'REWARD',
     };
-    
+
     return mapping[value] || null;
   }
-  
+
   // StyleTypeのマッピング
   static toStyleTypeEnum(value: string | null): string | null {
     if (!value) return null;
-    
+
     const mapping: Record<string, string> = {
-      'チアリーダー': 'CHEERLEADER',
-      'トリックスター': 'TRICKSTER',
-      'パフォーマー': 'PERFORMER',
-      'ムードメーカー': 'MOODMAKER',
-      'ムードーメーカー': 'MOODOMAKER'
+      チアリーダー: 'CHEERLEADER',
+      トリックスター: 'TRICKSTER',
+      パフォーマー: 'PERFORMER',
+      ムードメーカー: 'MOODMAKER',
+      ムードーメーカー: 'MOODOMAKER',
     };
-    
+
     return mapping[value] || null;
   }
-  
+
   // FavoriteModeのマッピング
   static toFavoriteModeEnum(value: string | null): string | null {
     if (!value) return null;
-    
+
     const mapping: Record<string, string> = {
-      'ハッピー': 'HAPPY',
-      'メロウ': 'MELLOW',
-      'ニュートラル': 'NEUTRAL',
-      '--': 'NONE'
+      ハッピー: 'HAPPY',
+      メロウ: 'MELLOW',
+      ニュートラル: 'NEUTRAL',
+      '--': 'NONE',
     };
-    
+
     return mapping[value] || null;
   }
-  
+
   // ParentTypeのマッピング
   static toParentTypeEnum(value: string | null): string | null {
     if (!value) return null;
-    
+
     const mapping: Record<string, string> = {
-      'special_appeal': 'SPECIAL_APPEAL',
-      'skill': 'SKILL',
-      'trait': 'TRAIT'
+      special_appeal: 'SPECIAL_APPEAL',
+      skill: 'SKILL',
+      trait: 'TRAIT',
     };
-    
+
     return mapping[value] || null;
   }
 }
@@ -600,13 +604,13 @@ export class FirebaseAuth {
 
   constructor() {
     const serviceAccount = require(process.env.FIREBASE_SERVICE_ACCOUNT_PATH!);
-    
+
     if (!admin.apps.length) {
       admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
+        credential: admin.credential.cert(serviceAccount),
       });
     }
-    
+
     this.auth = admin.auth();
   }
 
@@ -637,30 +641,30 @@ export interface GraphQLContext {
 
 export async function createContext(req: Request): Promise<GraphQLContext> {
   const token = req.headers.authorization?.replace('Bearer ', '');
-  
+
   let user: GraphQLContext['user'] | undefined;
-  
+
   if (token) {
     try {
       const firebaseAuth = new FirebaseAuth();
       const decodedToken = await firebaseAuth.verifyToken(token);
       user = {
         uid: decodedToken.uid,
-        email: decodedToken.email
+        email: decodedToken.email,
       };
     } catch (error) {
       // トークン検証失敗時は未認証として扱う
       console.warn('Token verification failed:', error);
     }
   }
-  
+
   return {
     user,
     dataSources: {
       cardService: new CardService(),
       cardDetailService: new CardDetailService(),
-      accessoryService: new AccessoryService()
-    }
+      accessoryService: new AccessoryService(),
+    },
   };
 }
 ```
@@ -679,23 +683,27 @@ export function authDirectiveTransformer(
 ) {
   return mapSchema(schema, {
     [MapperKind.OBJECT_FIELD]: (fieldConfig) => {
-      const authDirective = getDirective(schema, fieldConfig, directiveName)?.[0];
-      
+      const authDirective = getDirective(
+        schema,
+        fieldConfig,
+        directiveName
+      )?.[0];
+
       if (authDirective) {
         const { resolve = defaultFieldResolver } = fieldConfig;
-        
+
         fieldConfig.resolve = async function (source, args, context, info) {
           if (!context.user) {
             throw new GraphQLError('認証が必要です', {
-              extensions: { code: 'UNAUTHENTICATED' }
+              extensions: { code: 'UNAUTHENTICATED' },
             });
           }
           return resolve(source, args, context, info);
         };
       }
-      
+
       return fieldConfig;
-    }
+    },
   });
 }
 ```
@@ -707,6 +715,7 @@ export function authDirectiveTransformer(
 ### 5.1 Redis キャッシュ設計
 
 #### キャッシュキー命名規則
+
 ```
 card:{id}                    # 単一カード
 card:name:{cardName}:{char}  # 名前検索
@@ -717,6 +726,7 @@ stats:cards                  # 統計情報
 ```
 
 #### TTL（Time To Live）設定
+
 - カード一覧: 1時間
 - カード詳細: 6時間
 - 統計情報: 30分
@@ -730,7 +740,7 @@ import Redis from 'ioredis';
 
 export class CacheService {
   private redis: Redis;
-  
+
   constructor() {
     this.redis = new Redis({
       host: process.env.REDIS_HOST || 'localhost',
@@ -738,15 +748,15 @@ export class CacheService {
       password: process.env.REDIS_PASSWORD,
       retryStrategy: (times) => {
         return Math.min(times * 50, 2000);
-      }
+      },
     });
   }
-  
+
   async get<T>(key: string): Promise<T | null> {
     const data = await this.redis.get(key);
     return data ? JSON.parse(data) : null;
   }
-  
+
   async set(key: string, value: any, ttlSeconds?: number): Promise<void> {
     const serialized = JSON.stringify(value);
     if (ttlSeconds) {
@@ -755,11 +765,11 @@ export class CacheService {
       await this.redis.set(key, serialized);
     }
   }
-  
+
   async del(key: string): Promise<void> {
     await this.redis.del(key);
   }
-  
+
   async invalidatePattern(pattern: string): Promise<void> {
     const keys = await this.redis.keys(pattern);
     if (keys.length > 0) {
@@ -778,25 +788,25 @@ import { Card } from '../../../domain/entities/Card';
 
 export class CardCacheStrategy {
   constructor(private cache: CacheService) {}
-  
+
   async getCard(id: number): Promise<Card | null> {
     return await this.cache.get<Card>(`card:${id}`);
   }
-  
+
   async setCard(card: Card): Promise<void> {
     const TTL = 24 * 60 * 60; // 24時間
     await this.cache.set(`card:${card.id}`, card, TTL);
   }
-  
+
   async getCardList(filterHash: string): Promise<Card[] | null> {
     return await this.cache.get<Card[]>(`cards:list:${filterHash}`);
   }
-  
+
   async setCardList(filterHash: string, cards: Card[]): Promise<void> {
     const TTL = 60 * 60; // 1時間
     await this.cache.set(`cards:list:${filterHash}`, cards, TTL);
   }
-  
+
   async invalidateCard(id: number): Promise<void> {
     await this.cache.del(`card:${id}`);
     // 一覧キャッシュも無効化
@@ -823,25 +833,25 @@ export class CardService {
     private cardRepository: ICardRepository,
     private cacheStrategy: CardCacheStrategy
   ) {}
-  
+
   async findById(id: number): Promise<Card | null> {
     // キャッシュチェック
     const cached = await this.cacheStrategy.getCard(id);
     if (cached) {
       return cached;
     }
-    
+
     // DBから取得
     const card = await this.cardRepository.findById(id);
-    
+
     // キャッシュに保存
     if (card) {
       await this.cacheStrategy.setCard(card);
     }
-    
+
     return card;
   }
-  
+
   async findByName(
     cardName: string,
     characterName: string
@@ -851,7 +861,7 @@ export class CardService {
       characterName
     );
   }
-  
+
   async findAll(
     filter?: CardFilterInput,
     sort?: CardSortInput,
@@ -863,43 +873,43 @@ export class CardService {
   }> {
     // フィルター条件からハッシュを生成
     const filterHash = this.generateFilterHash(filter, sort, pagination);
-    
+
     // キャッシュチェック
     const cached = await this.cacheStrategy.getCardList(filterHash);
     if (cached) {
       return {
         cards: cached,
         totalCount: cached.length,
-        hasNextPage: false
+        hasNextPage: false,
       };
     }
-    
+
     // DBから取得
     const result = await this.cardRepository.findAll(filter, sort, pagination);
-    
+
     // キャッシュに保存
     await this.cacheStrategy.setCardList(filterHash, result.cards);
-    
+
     return result;
   }
-  
+
   async getStats(): Promise<CardStats> {
     // 統計情報の取得とキャッシュ
     const cacheKey = 'stats:cards';
     const cached = await this.cacheStrategy.cache.get<CardStats>(cacheKey);
-    
+
     if (cached) {
       return cached;
     }
-    
+
     const stats = await this.cardRepository.getStats();
-    
+
     const TTL = 30 * 60; // 30分
     await this.cacheStrategy.cache.set(cacheKey, stats, TTL);
-    
+
     return stats;
   }
-  
+
   private generateFilterHash(
     filter?: CardFilterInput,
     sort?: CardSortInput,
@@ -1014,22 +1024,25 @@ model CardAccessory {
 import { PrismaClient } from '@prisma/client';
 import { ICardRepository } from '../../../domain/repositories/ICardRepository';
 import { Card } from '../../../domain/entities/Card';
-import { CardFilterInput, CardSortInput } from '../../../application/dto/CardDTO';
+import {
+  CardFilterInput,
+  CardSortInput,
+} from '../../../application/dto/CardDTO';
 
 export class CardRepository implements ICardRepository {
   constructor(private prisma: PrismaClient) {}
-  
+
   async findById(id: number): Promise<Card | null> {
     const card = await this.prisma.card.findUnique({
       where: { id },
       include: {
-        detail: true
-      }
+        detail: true,
+      },
     });
-    
+
     return card ? this.mapToEntity(card) : null;
   }
-  
+
   async findByCardNameAndCharacter(
     cardName: string,
     characterName: string
@@ -1038,17 +1051,17 @@ export class CardRepository implements ICardRepository {
       where: {
         cardName_characterName: {
           cardName,
-          characterName
-        }
+          characterName,
+        },
       },
       include: {
-        detail: true
-      }
+        detail: true,
+      },
     });
-    
+
     return card ? this.mapToEntity(card) : null;
   }
-  
+
   async findAll(
     filter?: CardFilterInput,
     sort?: CardSortInput,
@@ -1060,103 +1073,100 @@ export class CardRepository implements ICardRepository {
   }> {
     const where = this.buildWhereClause(filter);
     const orderBy = this.buildOrderByClause(sort);
-    
+
     const [cards, totalCount] = await Promise.all([
       this.prisma.card.findMany({
         where,
         orderBy,
         take: pagination?.first,
         skip: pagination?.after ? 1 : 0,
-        cursor: pagination?.after ? { id: parseInt(pagination.after) } : undefined,
+        cursor: pagination?.after
+          ? { id: parseInt(pagination.after) }
+          : undefined,
         include: {
-          detail: true
-        }
+          detail: true,
+        },
       }),
-      this.prisma.card.count({ where })
+      this.prisma.card.count({ where }),
     ]);
-    
+
     return {
       cards: cards.map(this.mapToEntity),
       totalCount,
       hasNextPage: pagination?.first
         ? cards.length === pagination.first
-        : false
+        : false,
     };
   }
-  
+
   async getStats(): Promise<CardStats> {
-    const [
-      totalCards,
-      byRarity,
-      byStyleType,
-      byCharacter
-    ] = await Promise.all([
+    const [totalCards, byRarity, byStyleType, byCharacter] = await Promise.all([
       this.prisma.card.count(),
       this.prisma.card.groupBy({
         by: ['rarity'],
-        _count: true
+        _count: true,
       }),
       this.prisma.card.groupBy({
         by: ['styleType'],
-        _count: true
+        _count: true,
       }),
       this.prisma.card.groupBy({
         by: ['characterName'],
         _count: true,
         orderBy: { _count: { characterName: 'desc' } },
-        take: 20
-      })
+        take: 20,
+      }),
     ]);
-    
+
     return {
       totalCards,
-      byRarity: byRarity.map(r => ({
+      byRarity: byRarity.map((r) => ({
         rarity: r.rarity as Rarity,
-        count: r._count
+        count: r._count,
       })),
-      byStyleType: byStyleType.map(s => ({
+      byStyleType: byStyleType.map((s) => ({
         styleType: s.styleType as StyleType,
-        count: s._count
+        count: s._count,
       })),
-      byCharacter: byCharacter.map(c => ({
+      byCharacter: byCharacter.map((c) => ({
         characterName: c.characterName,
-        count: c._count
-      }))
+        count: c._count,
+      })),
     };
   }
-  
+
   private buildWhereClause(filter?: CardFilterInput): any {
     if (!filter) return {};
-    
+
     return {
       ...(filter.rarity && { rarity: filter.rarity }),
       ...(filter.limited && { limited: filter.limited }),
       ...(filter.styleType && { styleType: filter.styleType }),
       ...(filter.characterName && {
-        characterName: { contains: filter.characterName }
+        characterName: { contains: filter.characterName },
       }),
       ...(filter.cardName && {
-        cardName: { contains: filter.cardName }
-      })
+        cardName: { contains: filter.cardName },
+      }),
     };
   }
-  
+
   private buildOrderByClause(sort?: CardSortInput): any {
     if (!sort) return { id: 'desc' };
-    
+
     const fieldMap: Record<string, string> = {
       ID: 'id',
       CARD_NAME: 'cardName',
       CHARACTER_NAME: 'characterName',
       CREATED_AT: 'createdAt',
-      UPDATED_AT: 'updatedAt'
+      UPDATED_AT: 'updatedAt',
     };
-    
+
     return {
-      [fieldMap[sort.field]]: sort.direction.toLowerCase()
+      [fieldMap[sort.field]]: sort.direction.toLowerCase(),
     };
   }
-  
+
   private mapToEntity(card: any): Card {
     return {
       id: card.id,
@@ -1169,7 +1179,7 @@ export class CardRepository implements ICardRepository {
       isLocked: card.isLocked,
       createdAt: card.createdAt,
       updatedAt: card.updatedAt,
-      detail: card.detail
+      detail: card.detail,
     };
   }
 }
@@ -1185,7 +1195,7 @@ import { GraphQLContext } from '../context';
 import {
   QueryResolvers,
   CardResolvers,
-  Card as GraphQLCard
+  Card as GraphQLCard,
 } from '../../../types/graphql';
 
 export const cardResolvers: {
@@ -1195,55 +1205,59 @@ export const cardResolvers: {
   Query: {
     cards: async (_, args, context: GraphQLContext) => {
       const { first, after, filter, sort } = args;
-      
+
       const result = await context.dataSources.cardService.findAll(
         filter || undefined,
         sort || undefined,
         { first: first || 20, after: after || undefined }
       );
-      
+
       const edges = result.cards.map((card, index) => ({
         node: card,
-        cursor: Buffer.from(`${card.id}`).toString('base64')
+        cursor: Buffer.from(`${card.id}`).toString('base64'),
       }));
-      
+
       return {
         edges,
         pageInfo: {
           hasNextPage: result.hasNextPage,
           hasPreviousPage: false,
           startCursor: edges[0]?.cursor,
-          endCursor: edges[edges.length - 1]?.cursor
+          endCursor: edges[edges.length - 1]?.cursor,
         },
-        totalCount: result.totalCount
+        totalCount: result.totalCount,
       };
     },
-    
+
     card: async (_, { id }, context: GraphQLContext) => {
       return await context.dataSources.cardService.findById(parseInt(id));
     },
-    
-    cardByName: async (_, { cardName, characterName }, context: GraphQLContext) => {
+
+    cardByName: async (
+      _,
+      { cardName, characterName },
+      context: GraphQLContext
+    ) => {
       return await context.dataSources.cardService.findByName(
         cardName,
         characterName
       );
     },
-    
+
     cardStats: async (_, __, context: GraphQLContext) => {
       return await context.dataSources.cardService.getStats();
-    }
+    },
   },
-  
+
   Card: {
     detail: async (parent, _, context: GraphQLContext) => {
       if (parent.detail) return parent.detail;
-      
+
       return await context.dataSources.cardDetailService.findByCardId(
         parent.id
       );
-    }
-  }
+    },
+  },
 };
 ```
 
@@ -1302,20 +1316,20 @@ export function formatError(error: GraphQLError) {
       path: error.path,
       extensions: {
         code: error.originalError.code,
-        statusCode: error.originalError.statusCode
-      }
+        statusCode: error.originalError.statusCode,
+      },
     };
   }
-  
+
   // その他のエラー
   console.error('Unexpected error:', error);
-  
+
   return {
     message: 'Internal server error',
     code: 'INTERNAL_SERVER_ERROR',
     extensions: {
-      code: 'INTERNAL_SERVER_ERROR'
-    }
+      code: 'INTERNAL_SERVER_ERROR',
+    },
   };
 }
 ```
@@ -1364,7 +1378,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile
     ports:
-      - "4000:4000"
+      - '4000:4000'
     environment:
       NODE_ENV: production
       DATABASE_URL: ${DATABASE_URL}
@@ -1379,7 +1393,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - '6379:6379'
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
@@ -1440,42 +1454,42 @@ describe('CardService', () => {
   let cardService: CardService;
   let mockRepository: jest.Mocked<ICardRepository>;
   let mockCache: jest.Mocked<CardCacheStrategy>;
-  
+
   beforeEach(() => {
     mockRepository = {
       findById: jest.fn(),
       findAll: jest.fn(),
       // ... other methods
     } as any;
-    
+
     mockCache = {
       getCard: jest.fn(),
       setCard: jest.fn(),
       // ... other methods
     } as any;
-    
+
     cardService = new CardService(mockRepository, mockCache);
   });
-  
+
   describe('findById', () => {
     it('should return card from cache if available', async () => {
       const mockCard = { id: 1, cardName: 'Test Card' };
       mockCache.getCard.mockResolvedValue(mockCard as any);
-      
+
       const result = await cardService.findById(1);
-      
+
       expect(result).toEqual(mockCard);
       expect(mockCache.getCard).toHaveBeenCalledWith(1);
       expect(mockRepository.findById).not.toHaveBeenCalled();
     });
-    
+
     it('should fetch from DB and cache if not in cache', async () => {
       const mockCard = { id: 1, cardName: 'Test Card' };
       mockCache.getCard.mockResolvedValue(null);
       mockRepository.findById.mockResolvedValue(mockCard as any);
-      
+
       const result = await cardService.findById(1);
-      
+
       expect(result).toEqual(mockCard);
       expect(mockRepository.findById).toHaveBeenCalledWith(1);
       expect(mockCache.setCard).toHaveBeenCalledWith(mockCard);
@@ -1498,15 +1512,15 @@ import { Card } from '../../domain/entities/Card';
 
 export class CardLoader {
   private loader: DataLoader<number, Card | null>;
-  
+
   constructor(private repository: ICardRepository) {
     this.loader = new DataLoader(async (ids: readonly number[]) => {
       const cards = await this.repository.findByIds([...ids]);
-      const cardMap = new Map(cards.map(card => [card.id, card]));
-      return ids.map(id => cardMap.get(id) || null);
+      const cardMap = new Map(cards.map((card) => [card.id, card]));
+      return ids.map((id) => cardMap.get(id) || null);
     });
   }
-  
+
   async load(id: number): Promise<Card | null> {
     return await this.loader.load(id);
   }
@@ -1541,9 +1555,9 @@ export const logger = winston.createLogger({
       format: winston.format.combine(
         winston.format.colorize(),
         winston.format.simple()
-      )
-    })
-  ]
+      ),
+    }),
+  ],
 });
 ```
 
@@ -1555,7 +1569,7 @@ import { logger } from '../../infrastructure/logger/Logger';
 
 export function requestLogger(req: Request, res: Response, next: NextFunction) {
   const start = Date.now();
-  
+
   res.on('finish', () => {
     const duration = Date.now() - start;
     logger.info('GraphQL Request', {
@@ -1563,10 +1577,10 @@ export function requestLogger(req: Request, res: Response, next: NextFunction) {
       url: req.url,
       statusCode: res.statusCode,
       duration,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
   });
-  
+
   next();
 }
 ```
@@ -1586,7 +1600,7 @@ export const rateLimiter = rateLimit({
   max: 100, // 最大100リクエスト
   message: 'リクエスト数が多すぎます。しばらく待ってから再度お試しください。',
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
 });
 ```
 
@@ -1599,7 +1613,7 @@ import { createComplexityLimitRule } from 'graphql-validation-complexity';
 const complexityLimit = createComplexityLimitRule(1000, {
   onCost: (cost) => {
     console.log('Query complexity:', cost);
-  }
+  },
 });
 ```
 
@@ -1644,9 +1658,9 @@ name: CI
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   lint:
@@ -1655,19 +1669,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Run ESLint
         run: npm run lint
-      
+
       - name: Run Prettier check
         run: npm run format:check
 
@@ -1677,24 +1691,24 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Generate Prisma Client
         run: npm run prisma:generate
-      
+
       - name: Run unit tests
         run: npm run test:unit
         env:
           NODE_ENV: test
-      
+
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
@@ -1707,19 +1721,19 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-      
+
       - name: Generate Prisma Client
         run: npm run prisma:generate
-      
+
       - name: Type check
         run: npm run type-check
 
@@ -1749,20 +1763,20 @@ Jenkinsを使用してデプロイメントを実行。CI（GitHub Actions）の
 // Jenkinsfile
 pipeline {
     agent any
-    
+
     environment {
         DOCKER_REGISTRY = 'your-registry.example.com'
         IMAGE_NAME = 'link-like-essentials-backend'
         DOCKER_CREDENTIALS_ID = 'docker-registry-credentials'
         DEPLOYMENT_ENV = "${env.BRANCH_NAME == 'main' ? 'production' : 'staging'}"
     }
-    
+
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
         timestamps()
         timeout(time: 1, unit: 'HOURS')
     }
-    
+
     stages {
         stage('Checkout') {
             steps {
@@ -1776,7 +1790,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Verify CI Status') {
             steps {
                 script {
@@ -1790,7 +1804,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Build Docker Image') {
             steps {
                 script {
@@ -1802,7 +1816,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Push to Registry') {
             steps {
                 script {
@@ -1814,7 +1828,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Database Migration') {
             when {
                 expression { env.DEPLOYMENT_ENV == 'production' }
@@ -1831,7 +1845,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Deploy to Staging') {
             when {
                 expression { env.DEPLOYMENT_ENV == 'staging' }
@@ -1844,7 +1858,7 @@ pipeline {
                         kubectl set image deployment/link-like-backend-staging \
                           backend=${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} \
                           --namespace=staging
-                        
+
                         kubectl rollout status deployment/link-like-backend-staging \
                           --namespace=staging \
                           --timeout=300s
@@ -1852,7 +1866,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Deploy to Production') {
             when {
                 expression { env.DEPLOYMENT_ENV == 'production' }
@@ -1861,14 +1875,14 @@ pipeline {
                 script {
                     // 本番環境デプロイには手動承認を要求
                     input message: 'Deploy to Production?', ok: 'Deploy'
-                    
+
                     echo "Deploying to Production environment..."
                     sh """
                         # Blue-Green Deployment
                         kubectl set image deployment/link-like-backend-production \
                           backend=${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} \
                           --namespace=production
-                        
+
                         kubectl rollout status deployment/link-like-backend-production \
                           --namespace=production \
                           --timeout=600s
@@ -1876,7 +1890,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Health Check') {
             steps {
                 script {
@@ -1884,18 +1898,18 @@ pipeline {
                     sh """
                         # デプロイ後のヘルスチェック
                         sleep 10
-                        
+
                         HEALTH_URL=\$(kubectl get service link-like-backend-${env.DEPLOYMENT_ENV} \
                           --namespace=${env.DEPLOYMENT_ENV} \
                           -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-                        
+
                         curl -f http://\${HEALTH_URL}:4000/health || exit 1
                         echo "Health check passed"
                     """
                 }
             }
         }
-        
+
         stage('Smoke Tests') {
             steps {
                 script {
@@ -1908,7 +1922,7 @@ pipeline {
             }
         }
     }
-    
+
     post {
         success {
             echo "Deployment succeeded: ${env.DEPLOYMENT_ENV} - ${IMAGE_TAG}"
@@ -1995,17 +2009,20 @@ pipeline {
 ## 16. 今後の拡張計画
 
 ### 16.1 Phase 1（現在）
+
 - ✅ GraphQL APIによる読み取り専用エンドポイント
 - ✅ Firebase Authentication統合
 - ✅ Redisキャッシュ実装
 
 ### 16.2 Phase 2（将来）
+
 - ユーザー機能（お気に入り、デッキ構築）
 - Mutation追加
 - サブスクリプション（リアルタイム更新）
 - 全文検索（Elasticsearch統合）
 
 ### 16.3 Phase 3（将来）
+
 - 管理画面API
 - データ分析機能
 - レコメンデーション機能
@@ -2016,16 +2033,19 @@ pipeline {
 ## 17. 開発規約
 
 ### 17.1 コーディング規約
+
 - TypeScript Strict Mode有効化
 - ESLint + Prettierによるコードフォーマット
 - 命名規則: camelCase (変数・関数), PascalCase (クラス・型)
 
 ### 17.2 Git運用
+
 - ブランチ戦略: Git Flow
 - コミットメッセージ: Conventional Commits
 - プルリクエスト必須
 
 ### 17.3 レビュー基準
+
 - テストカバレッジ80%以上
 - TypeScript型エラーゼロ
 - ESLintエラーゼロ
@@ -2034,9 +2054,10 @@ pipeline {
 
 ## まとめ
 
-本設計書では、link-like-scraperで収集したデータを効率的に提供するための、モダンで拡張性の高いGraphQLバックエンドシステムを定義しました。
+本設計書ではモダンで拡張性の高いGraphQLバックエンドシステムを定義しました。
 
 **主要ポイント:**
+
 1. レイヤードアーキテクチャによる徹底した責務分離
 2. Prisma + Redisによる高速キャッシュ戦略
 3. Firebase Authenticationによる堅牢な認証基盤

@@ -1,11 +1,6 @@
 # Link Like Essentials Backend
 
-GraphQLバックエンドシステム - Link Likeカードデータを提供するAPI
-
-[![CI](https://github.com/your-org/link-like-essentials-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/link-like-essentials-backend/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/your-org/link-like-essentials-backend/branch/main/graph/badge.svg)](https://codecov.io/gh/your-org/link-like-essentials-backend)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
-[![Node](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org/)
+GraphQLバックエンドシステム - Link! Like! ラブライブ! のカードデータを提供するAPI
 
 ## 📋 目次
 
@@ -17,9 +12,10 @@ GraphQLバックエンドシステム - Link Likeカードデータを提供す�
 
 ## 🎯 概要
 
-link-like-scraperで収集したカードデータをWebフロントエンドに提供するGraphQLバックエンドシステム。
+カードデータをWebフロントエンドに提供するGraphQLバックエンドシステム。
 
 **主要機能:**
+
 - GraphQL APIによるカードデータの柔軟な取得
 - Firebase Authenticationによる認証基盤
 - Prisma + Redisによる高速キャッシュ戦略
@@ -129,10 +125,12 @@ npm run ci:local
 ### GitHub Actions（CI）
 
 **自動実行条件:**
+
 - `main`または`develop`ブランチへのPush
 - Pull Request作成時
 
 **必須チェック項目:**
+
 - ✅ ESLint（警告0件）
 - ✅ Prettier
 - ✅ TypeScript型チェック
@@ -143,6 +141,7 @@ npm run ci:local
 ### Jenkins（CD）
 
 **デプロイフロー:**
+
 1. CI成功確認
 2. Dockerイメージビルド
 3. レジストリへプッシュ
@@ -150,6 +149,7 @@ npm run ci:local
 5. ヘルスチェック & スモークテスト
 
 **環境:**
+
 - **Staging**: developブランチ → 自動デプロイ
 - **Production**: mainブランチ → 手動承認後デプロイ
 
@@ -184,19 +184,6 @@ npm run ci:local
 3. ブランチにプッシュ (`git push origin feature/amazing-feature`)
 4. Pull Request を作成
 
-**コミットメッセージ規約:**
-- Conventional Commits準拠
-- 例: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`
-
 ## 📝 ライセンス
 
 MIT License
-
-## 👥 開発チーム
-
-- Kakeru Ikeda ([@kakeru-ikeda](https://github.com/kakeru-ikeda))
-
-## 🔗 関連リポジトリ
-
-- [link-like-scraper](https://github.com/kakeru-ikeda/link-like-scraper) - データ収集スクレイパー
-- link-like-essentials-frontend（TODO）- Webフロントエンド
