@@ -18,6 +18,10 @@ const accessoryTypeDefs = readFileSync(
   'utf-8'
 );
 const queryTypeDefs = readFileSync(join(schemaDir, 'query.graphql'), 'utf-8');
+const metricsTypeDefs = readFileSync(
+  join(schemaDir, 'metrics.graphql'),
+  'utf-8'
+);
 
 const typeDefs = [
   commonTypeDefs,
@@ -25,6 +29,7 @@ const typeDefs = [
   cardDetailTypeDefs,
   accessoryTypeDefs,
   queryTypeDefs,
+  metricsTypeDefs,
 ];
 
 export const schema = makeExecutableSchema({

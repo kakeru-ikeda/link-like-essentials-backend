@@ -1,9 +1,11 @@
-import crypto from 'crypto';
+import { createHash } from 'crypto';
+import { performance } from 'perf_hooks';
 
 import type { Card } from '@/domain/entities/Card';
 import { NotFoundError } from '@/domain/errors/AppError';
 import type { ICardRepository } from '@/domain/repositories/ICardRepository';
 import type { CardCacheStrategy } from '@/infrastructure/cache/strategies/CardCacheStrategy';
+import { performanceMetrics } from '@/infrastructure/metrics/PerformanceMetrics';
 
 import type {
   CardFilterInput,
@@ -20,11 +22,20 @@ export class CardService {
   ) {}
 
   async findById(id: number): Promise<Card> {
+    const startTime = performance.now();
+    let isCacheHit = false;
+
     // キャッシュチェック
     const cached = await this.cacheStrategy.getCard(id);
     if (cached) {
+      isCacheHit = true;
+      performanceMetrics.recordCacheHit();
+      const duration = performance.now() - startTime;
+      performanceMetrics.recordQuery('findById', duration, true);
       return cached;
     }
+
+    performanceMetrics.recordCacheMiss();
 
     // DBから取得
     const card = await this.cardRepository.findById(id);
@@ -35,6 +46,9 @@ export class CardService {
     // キャッシュに保存
     await this.cacheStrategy.setCard(card);
 
+    const duration = performance.now() - startTime;
+    performanceMetrics.recordQuery('findById', duration, isCacheHit);
+
     return card;
   }
 
@@ -42,14 +56,23 @@ export class CardService {
     cardName: string,
     characterName: string
   ): Promise<Card | null> {
+    const startTime = performance.now();
+    let isCacheHit = false;
+
     // キャッシュチェック
     const cached = await this.cacheStrategy.getCardByName(
       cardName,
       characterName
     );
     if (cached) {
+      isCacheHit = true;
+      performanceMetrics.recordCacheHit();
+      const duration = performance.now() - startTime;
+      performanceMetrics.recordQuery('findByName', duration, true);
       return cached;
     }
+
+    performanceMetrics.recordCacheMiss();
 
     // DBから取得
     const card = await this.cardRepository.findByCardNameAndCharacter(
@@ -62,6 +85,9 @@ export class CardService {
       await this.cacheStrategy.setCardByName(card);
     }
 
+    const duration = performance.now() - startTime;
+    performanceMetrics.recordQuery('findByName', duration, isCacheHit);
+
     return card;
   }
 
@@ -70,20 +96,32 @@ export class CardService {
     sort?: CardSortInput,
     pagination?: PaginationInput
   ): Promise<CardConnectionResult> {
+    const startTime = performance.now();
+    let isCacheHit = false;
+
     // フィルター条件からハッシュを生成
     const filterHash = this.generateFilterHash(filter, sort, pagination);
 
     // キャッシュチェック
     const cached = await this.cacheStrategy.getCardList(filterHash);
     if (cached) {
+      isCacheHit = true;
+      performanceMetrics.recordCacheHit();
+      const duration = performance.now() - startTime;
+      performanceMetrics.recordQuery('findAll', duration, true);
       return this.buildConnectionResult(cached, pagination);
     }
+
+    performanceMetrics.recordCacheMiss();
 
     // DBから取得
     const result = await this.cardRepository.findAll(filter, sort, pagination);
 
     // キャッシュに保存
     await this.cacheStrategy.setCardList(filterHash, result.cards);
+
+    const duration = performance.now() - startTime;
+    performanceMetrics.recordQuery('findAll', duration, isCacheHit);
 
     return this.buildConnectionResult(result.cards, pagination, result);
   }
@@ -105,7 +143,7 @@ export class CardService {
     pagination?: PaginationInput
   ): string {
     const data = JSON.stringify({ filter, sort, pagination });
-    return crypto.createHash('md5').update(data).digest('hex');
+    return createHash('md5').update(data).digest('hex');
   }
 
   private buildConnectionResult(

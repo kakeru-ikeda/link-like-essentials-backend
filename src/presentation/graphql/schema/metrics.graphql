@@ -1,0 +1,44 @@
+type CacheMetrics {
+  hits: Int!
+  misses: Int!
+  hitRate: Float!
+  totalRequests: Int!
+}
+
+type QueryMetric {
+  queryName: String!
+  count: Int!
+  totalDuration: Float!
+  avgDuration: Float!
+  minDuration: Float!
+  maxDuration: Float!
+  cacheHits: Int!
+  cacheMisses: Int!
+}
+
+type MetricsResetResult {
+  success: Boolean!
+  message: String!
+}
+
+extend type Query {
+  """
+  キャッシュの統計情報を取得
+  """
+  cacheMetrics: CacheMetrics!
+
+  """
+  クエリごとのパフォーマンス統計を取得
+  """
+  queryMetrics: [QueryMetric!]!
+
+  """
+  メトリクスのサマリーをテキスト形式で取得
+  """
+  metricsSummary: String!
+
+  """
+  メトリクスをリセット
+  """
+  resetMetrics: MetricsResetResult!
+}
