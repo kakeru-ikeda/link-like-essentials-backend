@@ -1,0 +1,202 @@
+# Link Like Essentials Backend
+
+GraphQLバックエンドシステム - Link Likeカードデータを提供するAPI
+
+[![CI](https://github.com/your-org/link-like-essentials-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/link-like-essentials-backend/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/your-org/link-like-essentials-backend/branch/main/graph/badge.svg)](https://codecov.io/gh/your-org/link-like-essentials-backend)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue.svg)](https://www.typescriptlang.org/)
+[![Node](https://img.shields.io/badge/Node.js-20.x-green.svg)](https://nodejs.org/)
+
+## 📋 目次
+
+- [概要](#概要)
+- [技術スタック](#技術スタック)
+- [開発環境セットアップ](#開発環境セットアップ)
+- [CI/CD](#cicd)
+- [ドキュメント](#ドキュメント)
+
+## 🎯 概要
+
+link-like-scraperで収集したカードデータをWebフロントエンドに提供するGraphQLバックエンドシステム。
+
+**主要機能:**
+- GraphQL APIによるカードデータの柔軟な取得
+- Firebase Authenticationによる認証基盤
+- Prisma + Redisによる高速キャッシュ戦略
+- レイヤードアーキテクチャによる保守性の高い設計
+
+## 🛠 技術スタック
+
+- **言語**: TypeScript 5.x
+- **ランタイム**: Node.js 20+
+- **GraphQL**: Apollo Server 4.x
+- **ORM**: Prisma
+- **キャッシュ**: Redis (ioredis)
+- **認証**: Firebase Authentication
+- **データベース**: Neon PostgreSQL
+- **テスト**: Jest
+- **CI/CD**: GitHub Actions + Jenkins
+
+## 🚀 開発環境セットアップ
+
+### 必要要件
+
+- Node.js 20.x以上
+- npm 10.x以上
+- Docker & Docker Compose（オプション）
+
+### インストール
+
+```bash
+# リポジトリクローン
+git clone https://github.com/your-org/link-like-essentials-backend.git
+cd link-like-essentials-backend
+
+# 依存関係インストール
+npm install
+
+# 環境変数設定
+cp .env.example .env
+# .envファイルを編集して必要な値を設定
+
+# Prisma Client生成
+npm run prisma:generate
+
+# データベースマイグレーション
+npm run prisma:migrate:dev
+```
+
+### 開発サーバー起動
+
+```bash
+# 開発モード（ホットリロード）
+npm run dev
+
+# GraphQL Playground
+# http://localhost:4000/graphql
+```
+
+### Dockerで起動
+
+```bash
+# コンテナビルド & 起動
+docker-compose up -d
+
+# ログ確認
+docker-compose logs -f app
+```
+
+## 🧪 テスト
+
+```bash
+# 全テスト実行
+npm test
+
+# ユニットテストのみ
+npm run test:unit
+
+# カバレッジ付き
+npm run test:unit -- --coverage
+
+# ウォッチモード
+npm run test:watch
+```
+
+## 🔍 コード品質チェック
+
+```bash
+# Lint
+npm run lint
+
+# Lint自動修正
+npm run lint:fix
+
+# フォーマットチェック
+npm run format:check
+
+# フォーマット適用
+npm run format
+
+# 型チェック
+npm run type-check
+
+# CI全体をローカル実行
+npm run ci:local
+```
+
+## 🔄 CI/CD
+
+### GitHub Actions（CI）
+
+**自動実行条件:**
+- `main`または`develop`ブランチへのPush
+- Pull Request作成時
+
+**必須チェック項目:**
+- ✅ ESLint（警告0件）
+- ✅ Prettier
+- ✅ TypeScript型チェック
+- ✅ ユニットテスト
+
+詳細: [CI/CD ドキュメント](./docs/CI_CD.md)
+
+### Jenkins（CD）
+
+**デプロイフロー:**
+1. CI成功確認
+2. Dockerイメージビルド
+3. レジストリへプッシュ
+4. Staging/Productionへデプロイ
+5. ヘルスチェック & スモークテスト
+
+**環境:**
+- **Staging**: developブランチ → 自動デプロイ
+- **Production**: mainブランチ → 手動承認後デプロイ
+
+詳細: [CI/CD ドキュメント](./docs/CI_CD.md)
+
+## 📚 ドキュメント
+
+- [設計書](./docs/DESIGN.md) - アーキテクチャ、データモデル、API設計
+- [CI/CD](./docs/CI_CD.md) - CI/CDパイプライン詳細
+- [API ドキュメント](./docs/API.md) - GraphQL API仕様（TODO）
+
+## 🏗 アーキテクチャ
+
+```
+┌─────────────────────────────────────────┐
+│   Presentation Layer                    │  ← GraphQL API
+├─────────────────────────────────────────┤
+│   Application Layer                     │  ← Services
+├─────────────────────────────────────────┤
+│   Domain Layer                          │  ← Entities & Interfaces
+├─────────────────────────────────────────┤
+│   Infrastructure Layer                  │  ← DB, Cache, Auth
+└─────────────────────────────────────────┘
+```
+
+詳細: [設計書](./docs/DESIGN.md)
+
+## 🤝 コントリビューション
+
+1. Feature ブランチを作成 (`git checkout -b feature/amazing-feature`)
+2. 変更をコミット (`git commit -m 'feat: add amazing feature'`)
+3. ブランチにプッシュ (`git push origin feature/amazing-feature`)
+4. Pull Request を作成
+
+**コミットメッセージ規約:**
+- Conventional Commits準拠
+- 例: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`
+
+## 📝 ライセンス
+
+MIT License
+
+## 👥 開発チーム
+
+- Kakeru Ikeda ([@kakeru-ikeda](https://github.com/kakeru-ikeda))
+
+## 🔗 関連リポジトリ
+
+- [link-like-scraper](https://github.com/kakeru-ikeda/link-like-scraper) - データ収集スクレイパー
+- link-like-essentials-frontend（TODO）- Webフロントエンド

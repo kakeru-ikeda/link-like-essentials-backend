@@ -1,0 +1,19 @@
+type CardDetail {
+  id: ID!
+  cardId: Int!
+  favoriteMode: FavoriteMode
+  acquisitionMethod: String
+  awakeBeforeUrl: String
+  awakeAfterUrl: String
+  awakeBeforeStorageUrl: String
+  awakeAfterStorageUrl: String
+  stats: Stats!
+  specialAppeal: Skill
+  skill: Skill
+  trait: Trait
+  isLocked: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  card: Card!
+  accessories: [Accessory!]!
+}

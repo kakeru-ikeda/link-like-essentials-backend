@@ -1,0 +1,71 @@
+type Card {
+  id: ID!
+  rarity: Rarity
+  limited: LimitedType
+  cardName: String!
+  cardUrl: String
+  characterName: String!
+  styleType: StyleType
+  isLocked: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  detail: CardDetail
+}
+
+type CardConnection {
+  edges: [CardEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type CardEdge {
+  node: Card!
+  cursor: String!
+}
+
+input CardFilterInput {
+  rarity: Rarity
+  limited: LimitedType
+  characterName: String
+  styleType: StyleType
+  cardName: String
+  skillEffectContains: String
+  traitEffectContains: String
+  specialAppealEffectContains: String
+  accessoryEffectContains: String
+}
+
+input CardSortInput {
+  field: CardSortField!
+  direction: SortDirection!
+}
+
+enum CardSortField {
+  ID
+  CARD_NAME
+  CHARACTER_NAME
+  CREATED_AT
+  UPDATED_AT
+}
+
+type CardStats {
+  totalCards: Int!
+  byRarity: [RarityCount!]!
+  byStyleType: [StyleTypeCount!]!
+  byCharacter: [CharacterCount!]!
+}
+
+type RarityCount {
+  rarity: Rarity!
+  count: Int!
+}
+
+type StyleTypeCount {
+  styleType: StyleType!
+  count: Int!
+}
+
+type CharacterCount {
+  characterName: String!
+  count: Int!
+}

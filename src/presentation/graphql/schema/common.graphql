@@ -1,0 +1,88 @@
+scalar DateTime
+
+# レアリティ
+enum Rarity {
+  UR
+  SR
+  R
+  DR
+  BR
+  LR
+}
+
+# 限定区分
+enum LimitedType {
+  PERMANENT
+  LIMITED
+  SPRING_LIMITED
+  SUMMER_LIMITED
+  AUTUMN_LIMITED
+  WINTER_LIMITED
+  BIRTHDAY_LIMITED
+  LEG_LIMITED
+  BATTLE_LIMITED
+  PARTY_LIMITED
+  ACTIVITY_LIMITED
+  GRADUATE_LIMITED
+  LOGIN_BONUS
+  REWARD
+}
+
+# スタイルタイプ
+enum StyleType {
+  CHEERLEADER
+  TRICKSTER
+  PERFORMER
+  MOODMAKER
+  MOODOMAKER
+}
+
+# お気に入りモード
+enum FavoriteMode {
+  HAPPY
+  MELLOW
+  NEUTRAL
+  NONE
+}
+
+# アクセサリーの親タイプ
+enum ParentType {
+  SPECIAL_APPEAL
+  SKILL
+  TRAIT
+}
+
+# ソート順
+enum SortDirection {
+  ASC
+  DESC
+}
+
+# ステータス
+type Stats {
+  smile: Int
+  pure: Int
+  cool: Int
+  mental: Int
+}
+
+# スキル
+type Skill {
+  name: String!
+  ap: String
+  effect: String
+}
+
+# 特性
+type Trait {
+  name: String!
+  effect: String
+}
+
+# ページネーション情報
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}

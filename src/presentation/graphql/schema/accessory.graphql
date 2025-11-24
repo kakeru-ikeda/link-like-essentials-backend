@@ -1,0 +1,22 @@
+type Accessory {
+  id: ID!
+  cardId: Int!
+  parentType: ParentType!
+  name: String!
+  ap: String
+  effect: String
+  traitName: String
+  traitEffect: String
+  trait: Trait
+  displayOrder: Int!
+  isLocked: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  card: Card!
+}
+
+input AccessoryFilterInput {
+  parentType: ParentType
+  nameContains: String
+  effectContains: String
+}

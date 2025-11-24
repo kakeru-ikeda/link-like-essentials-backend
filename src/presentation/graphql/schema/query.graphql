@@ -1,0 +1,22 @@
+type Query {
+  # カード一覧取得（ページネーション対応）
+  cards(
+    first: Int
+    after: String
+    filter: CardFilterInput
+    sort: CardSortInput
+  ): CardConnection!
+
+  # 単一カード取得
+  card(id: ID!): Card
+  cardByName(cardName: String!, characterName: String!): Card
+
+  # カード詳細取得
+  cardDetail(cardId: ID!): CardDetail
+
+  # アクセサリー一覧取得
+  accessories(cardId: ID!, filter: AccessoryFilterInput): [Accessory!]!
+
+  # 統計情報
+  cardStats: CardStats!
+}
