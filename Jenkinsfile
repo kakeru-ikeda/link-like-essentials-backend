@@ -153,8 +153,8 @@ pipeline {
                             # 最新イメージをプル
                             docker pull ${dockerHubUser}/${imageName}:latest
                             
-                            # .envファイルを作成（環境変数を設定）
-                            cat > .env << 'EOF'
+                            # .envファイルをdocker/ディレクトリに作成（docker-compose.ymlと同じ場所）
+                            cat > docker/.env << 'EOF'
 NODE_ENV=production
 LLES_DATABASE_URL=${databaseUrl}
 LLES_FIREBASE_PROJECT_ID=${firebaseProjectId}
