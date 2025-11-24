@@ -1,5 +1,6 @@
 import type { CardFilterInput, CardSortInput } from '@/application/dto/CardDTO';
 import { EnumMapper } from '@/infrastructure/mappers/EnumMapper';
+import { requireAuth } from '@/presentation/middleware/authGuard';
 
 import type { GraphQLContext } from '../context';
 
@@ -53,6 +54,8 @@ export const cardResolvers: {
 } = {
   Query: {
     cards: async (_, args, context) => {
+      requireAuth(context);
+
       const { first, after, filter, sort } = args;
 
       const result = await context.dataSources.cardService.findAll(
@@ -65,10 +68,14 @@ export const cardResolvers: {
     },
 
     card: async (_, { id }, context) => {
+      requireAuth(context);
+
       return await context.dataSources.cardService.findById(parseInt(id, 10));
     },
 
     cardByName: async (_, { cardName, characterName }, context) => {
+      requireAuth(context);
+
       return await context.dataSources.cardService.findByName(
         cardName,
         characterName
@@ -76,6 +83,8 @@ export const cardResolvers: {
     },
 
     cardStats: async (_, __, context) => {
+      requireAuth(context);
+
       return await context.dataSources.cardService.getStats();
     },
   },

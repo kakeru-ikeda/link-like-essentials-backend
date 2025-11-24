@@ -4,12 +4,73 @@ Link Like Essentials Backend で使用できるGraphQLクエリの例を示し�
 
 ## 目次
 
+- [認証](#認証)
 - [基本的なクエリ](#基本的なクエリ)
 - [カード検索](#カード検索)
 - [効果検索（テキスト検索）](#効果検索テキスト検索)
 - [複合検索](#複合検索)
 - [アクセサリー検索](#アクセサリー検索)
 - [統計情報](#統計情報)
+
+---
+
+## 認証
+
+### 環境別の認証要件
+
+| 環境   | NODE_ENV    | 認証要否 | 備考                       |
+| ------ | ----------- | -------- | -------------------------- |
+| 開発   | development | ❌ 不要  | トークンなしでアクセス可能 |
+| テスト | test        | ✅ 必要  | テスト用トークンが必要     |
+| 本番   | production  | ✅ 必要  | 必須                       |
+
+**開発環境（NODE_ENV=development）**: すべてのGraphQLクエリは認証なしで実行可能です。
+
+**本番環境（NODE_ENV=production）**: すべてのGraphQLクエリにFirebase Authenticationトークンが必要です。
+
+### リクエストヘッダー
+
+本番環境またはテスト環境では、すべてのGraphQLリクエストにFirebase Authenticationトークンを含むAuthorizationヘッダーが必要です:
+
+```http
+Authorization: Bearer <Firebase_ID_Token>
+```
+
+### 認証エラー
+
+認証トークンが無効、期限切れ、または提供されていない場合（本番環境のみ）、以下のエラーが返されます:
+
+```json
+{
+  "errors": [
+    {
+      "message": "認証が必要です",
+      "extensions": {
+        "code": "AUTHENTICATION_ERROR"
+      }
+    }
+  ]
+}
+```
+
+### curlでの例
+
+```bash
+curl -X POST http://localhost:4000/graphql \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_FIREBASE_TOKEN" \
+  -d '{"query": "{ cards(first: 10) { edges { node { id cardName } } } }"}'
+```
+
+### GraphQL Playgroundでの設定
+
+HTTP Headersセクションに以下を追加:
+
+```json
+{
+  "Authorization": "Bearer YOUR_FIREBASE_TOKEN"
+}
+```
 
 ---
 
@@ -56,7 +117,7 @@ query GetCards {
 query GetNextPage {
   cards(
     first: 10
-    after: "カーソル文字列"  # 前のページのendCursorを指定
+    after: "カーソル文字列" # 前のページのendCursorを指定
   ) {
     edges {
       node {
@@ -125,10 +186,7 @@ query GetCard {
 
 ```graphql
 query GetCardByName {
-  cardByName(
-    cardName: "【スターティングメンバー】"
-    characterName: "月雫"
-  ) {
+  cardByName(cardName: "【スターティングメンバー】", characterName: "月雫") {
     id
     cardName
     characterName
@@ -145,12 +203,7 @@ query GetCardByName {
 
 ```graphql
 query SearchByRarity {
-  cards(
-    first: 20
-    filter: {
-      rarity: UR
-    }
-  ) {
+  cards(first: 20, filter: { rarity: UR }) {
     edges {
       node {
         id
@@ -170,12 +223,7 @@ query SearchByRarity {
 
 ```graphql
 query SearchByCharacter {
-  cards(
-    first: 20
-    filter: {
-      characterName: "月雫"
-    }
-  ) {
+  cards(first: 20, filter: { characterName: "月雫" }) {
     edges {
       node {
         id
@@ -192,12 +240,7 @@ query SearchByCharacter {
 
 ```graphql
 query SearchByStyleType {
-  cards(
-    first: 20
-    filter: {
-      styleType: CHEERLEADER
-    }
-  ) {
+  cards(first: 20, filter: { styleType: CHEERLEADER }) {
     edges {
       node {
         id
@@ -217,12 +260,7 @@ query SearchByStyleType {
 
 ```graphql
 query SearchByLimited {
-  cards(
-    first: 20
-    filter: {
-      limited: BIRTHDAY_LIMITED
-    }
-  ) {
+  cards(first: 20, filter: { limited: BIRTHDAY_LIMITED }) {
     edges {
       node {
         id
@@ -242,12 +280,7 @@ query SearchByLimited {
 
 ```graphql
 query SearchByCardName {
-  cards(
-    first: 20
-    filter: {
-      cardName: "スターティング"
-    }
-  ) {
+  cards(first: 20, filter: { cardName: "スターティング" }) {
     edges {
       node {
         id
@@ -268,12 +301,7 @@ query SearchByCardName {
 
 ```graphql
 query SearchBySkillEffect {
-  cards(
-    first: 20
-    filter: {
-      skillEffectContains: "アトラクト"
-    }
-  ) {
+  cards(first: 20, filter: { skillEffectContains: "アトラクト" }) {
     edges {
       node {
         id
@@ -296,12 +324,7 @@ query SearchBySkillEffect {
 
 ```graphql
 query SearchByTraitEffect {
-  cards(
-    first: 20
-    filter: {
-      traitEffectContains: "ダメージ"
-    }
-  ) {
+  cards(first: 20, filter: { traitEffectContains: "ダメージ" }) {
     edges {
       node {
         id
@@ -324,12 +347,7 @@ query SearchByTraitEffect {
 
 ```graphql
 query SearchBySpecialAppealEffect {
-  cards(
-    first: 20
-    filter: {
-      specialAppealEffectContains: "全体"
-    }
-  ) {
+  cards(first: 20, filter: { specialAppealEffectContains: "全体" }) {
     edges {
       node {
         id
@@ -352,12 +370,7 @@ query SearchBySpecialAppealEffect {
 
 ```graphql
 query SearchByAccessoryEffect {
-  cards(
-    first: 20
-    filter: {
-      accessoryEffectContains: "回復"
-    }
-  ) {
+  cards(first: 20, filter: { accessoryEffectContains: "回復" }) {
     edges {
       node {
         id
@@ -368,9 +381,9 @@ query SearchByAccessoryEffect {
             id
             parentType
             name
-            effect        # スキル効果
-            traitName     # 特性名
-            traitEffect   # 特性効果
+            effect # スキル効果
+            traitName # 特性名
+            traitEffect # 特性効果
           }
         }
       }
@@ -385,7 +398,10 @@ query SearchByAccessoryEffect {
 ```graphql
 query SearchAttractEverywhere {
   # スキル効果
-  skillAttract: cards(first: 20, filter: { skillEffectContains: "アトラクト" }) {
+  skillAttract: cards(
+    first: 20
+    filter: { skillEffectContains: "アトラクト" }
+  ) {
     edges {
       node {
         id
@@ -401,9 +417,12 @@ query SearchAttractEverywhere {
     }
     totalCount
   }
-  
+
   # 特性効果
-  traitAttract: cards(first: 20, filter: { traitEffectContains: "アトラクト" }) {
+  traitAttract: cards(
+    first: 20
+    filter: { traitEffectContains: "アトラクト" }
+  ) {
     edges {
       node {
         id
@@ -419,9 +438,12 @@ query SearchAttractEverywhere {
     }
     totalCount
   }
-  
+
   # スペシャルアピール効果
-  specialAttract: cards(first: 20, filter: { specialAppealEffectContains: "アトラクト" }) {
+  specialAttract: cards(
+    first: 20
+    filter: { specialAppealEffectContains: "アトラクト" }
+  ) {
     edges {
       node {
         id
@@ -437,9 +459,12 @@ query SearchAttractEverywhere {
     }
     totalCount
   }
-  
+
   # アクセサリー効果（スキル・特性）
-  accessoryAttract: cards(first: 20, filter: { accessoryEffectContains: "アトラクト" }) {
+  accessoryAttract: cards(
+    first: 20
+    filter: { accessoryEffectContains: "アトラクト" }
+  ) {
     edges {
       node {
         id
@@ -468,13 +493,7 @@ query SearchAttractEverywhere {
 
 ```graphql
 query SearchURByCharacter {
-  cards(
-    first: 20
-    filter: {
-      rarity: UR
-      characterName: "月雫"
-    }
-  ) {
+  cards(first: 20, filter: { rarity: UR, characterName: "月雫" }) {
     edges {
       node {
         id
@@ -494,11 +513,7 @@ query SearchURByCharacter {
 query SearchComplexFilter {
   cards(
     first: 20
-    filter: {
-      rarity: UR
-      styleType: CHEERLEADER
-      characterName: "月雫"
-    }
+    filter: { rarity: UR, styleType: CHEERLEADER, characterName: "月雫" }
   ) {
     edges {
       node {
@@ -520,10 +535,7 @@ query SearchComplexFilter {
 query SearchCharacterWithEffect {
   cards(
     first: 20
-    filter: {
-      characterName: "月雫"
-      skillEffectContains: "アトラクト"
-    }
+    filter: { characterName: "月雫", skillEffectContains: "アトラクト" }
   ) {
     edges {
       node {
@@ -549,11 +561,7 @@ query SearchCharacterWithEffect {
 query SearchThreeConditions {
   cards(
     first: 20
-    filter: {
-      rarity: UR
-      characterName: "月雫"
-      skillEffectContains: "回復"
-    }
+    filter: { rarity: UR, characterName: "月雫", skillEffectContains: "回復" }
   ) {
     edges {
       node {
@@ -581,10 +589,7 @@ query FindDamageURCards {
   # スキルでダメージを与えるURカード
   skillDamage: cards(
     first: 10
-    filter: {
-      rarity: UR
-      skillEffectContains: "ダメージ"
-    }
+    filter: { rarity: UR, skillEffectContains: "ダメージ" }
   ) {
     edges {
       node {
@@ -601,14 +606,11 @@ query FindDamageURCards {
     }
     totalCount
   }
-  
+
   # アクセサリーでダメージを与えるURカード
   accessoryDamage: cards(
     first: 10
-    filter: {
-      rarity: UR
-      accessoryEffectContains: "ダメージ"
-    }
+    filter: { rarity: UR, accessoryEffectContains: "ダメージ" }
   ) {
     edges {
       node {
@@ -655,12 +657,7 @@ query GetAccessories {
 
 ```graphql
 query GetAccessoriesByParentType {
-  accessories(
-    cardId: "1"
-    filter: {
-      parentType: SKILL
-    }
-  ) {
+  accessories(cardId: "1", filter: { parentType: SKILL }) {
     id
     parentType
     name
@@ -675,12 +672,7 @@ query GetAccessoriesByParentType {
 
 ```graphql
 query SearchAccessoriesByName {
-  accessories(
-    cardId: "1"
-    filter: {
-      nameContains: "スキル"
-    }
-  ) {
+  accessories(cardId: "1", filter: { nameContains: "スキル" }) {
     id
     name
     effect
@@ -692,17 +684,12 @@ query SearchAccessoriesByName {
 
 ```graphql
 query SearchAccessoriesByEffect {
-  accessories(
-    cardId: "1"
-    filter: {
-      effectContains: "ダメージ"
-    }
-  ) {
+  accessories(cardId: "1", filter: { effectContains: "ダメージ" }) {
     id
     parentType
     name
-    effect       # スキル効果
-    traitEffect  # 特性効果
+    effect # スキル効果
+    traitEffect # 特性効果
   }
 }
 ```
@@ -713,10 +700,7 @@ query SearchAccessoriesByEffect {
 query SearchAccessoriesByTypeAndEffect {
   accessories(
     cardId: "1"
-    filter: {
-      parentType: SKILL
-      effectContains: "回復"
-    }
+    filter: { parentType: SKILL, effectContains: "回復" }
   ) {
     id
     parentType
@@ -761,13 +745,7 @@ query GetCardStats {
 
 ```graphql
 query SortByCreatedAt {
-  cards(
-    first: 20
-    sort: {
-      field: CREATED_AT
-      direction: DESC
-    }
-  ) {
+  cards(first: 20, sort: { field: CREATED_AT, direction: DESC }) {
     edges {
       node {
         id
@@ -783,13 +761,7 @@ query SortByCreatedAt {
 
 ```graphql
 query SortByCardName {
-  cards(
-    first: 20
-    sort: {
-      field: CARD_NAME
-      direction: ASC
-    }
-  ) {
+  cards(first: 20, sort: { field: CARD_NAME, direction: ASC }) {
     edges {
       node {
         id
@@ -852,7 +824,7 @@ query GetCompleteCardInfo {
         isLocked
         createdAt
         updatedAt
-        
+
         # カード詳細
         detail {
           id
@@ -860,7 +832,7 @@ query GetCompleteCardInfo {
           acquisitionMethod
           awakeBeforeUrl
           awakeAfterUrl
-          
+
           # ステータス
           stats {
             smile
@@ -868,27 +840,27 @@ query GetCompleteCardInfo {
             cool
             mental
           }
-          
+
           # スペシャルアピール
           specialAppeal {
             name
             ap
             effect
           }
-          
+
           # スキル
           skill {
             name
             ap
             effect
           }
-          
+
           # 特性
           trait {
             name
             effect
           }
-          
+
           # アクセサリー
           accessories {
             id
