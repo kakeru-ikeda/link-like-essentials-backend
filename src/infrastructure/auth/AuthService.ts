@@ -4,8 +4,6 @@ import { AuthenticationError } from '@/domain/errors/AppError';
 
 import { FirebaseAuth } from './FirebaseAuth';
 
-
-
 export interface AuthUser {
   uid: string;
   email?: string;

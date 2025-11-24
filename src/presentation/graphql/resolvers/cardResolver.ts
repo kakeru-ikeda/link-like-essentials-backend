@@ -1,4 +1,3 @@
-
 import type { CardFilterInput, CardSortInput } from '@/application/dto/CardDTO';
 import { EnumMapper } from '@/infrastructure/mappers/EnumMapper';
 
@@ -35,6 +34,11 @@ interface QueryResolvers {
 export interface CardResolvers {
   detail: (
     parent: { id: number; detail?: unknown },
+    args: Record<string, never>,
+    context: GraphQLContext
+  ) => Promise<unknown>;
+  accessories: (
+    parent: { id: number },
     args: Record<string, never>,
     context: GraphQLContext
   ) => Promise<unknown>;
@@ -83,6 +87,10 @@ export const cardResolvers: {
       return await context.dataSources.cardDetailService.findByCardId(
         parent.id
       );
+    },
+
+    accessories: async (parent, _, context) => {
+      return await context.dataSources.accessoryService.findByCardId(parent.id);
     },
 
     rarity: (parent) => {

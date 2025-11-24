@@ -1,7 +1,6 @@
 import { ApolloServer } from '@apollo/server';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 
-
 import { logger } from '@/infrastructure/logger/Logger';
 import type { GraphQLContext } from '@/presentation/graphql/context';
 import { formatError } from '@/presentation/middleware/errorHandler';

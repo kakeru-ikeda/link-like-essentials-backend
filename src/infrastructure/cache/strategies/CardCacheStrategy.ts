@@ -2,8 +2,6 @@ import type { Card } from '@/domain/entities/Card';
 
 import type { CacheService } from '../CacheService';
 
-
-
 export const TTL = {
   CARD: 24 * 60 * 60, // 24時間
   CARD_LIST: 60 * 60, // 1時間

@@ -1,4 +1,3 @@
-
 import type { CardDetail } from '@/domain/entities/CardDetail';
 import { EnumMapper } from '@/infrastructure/mappers/EnumMapper';
 

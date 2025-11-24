@@ -1,6 +1,5 @@
 import crypto from 'crypto';
 
-
 import type { Card } from '@/domain/entities/Card';
 import { NotFoundError } from '@/domain/errors/AppError';
 import type { ICardRepository } from '@/domain/repositories/ICardRepository';
@@ -13,7 +12,6 @@ import type {
   CardConnectionResult,
   CardStatsResult,
 } from '../dto/CardDTO';
-
 
 export class CardService {
   constructor(

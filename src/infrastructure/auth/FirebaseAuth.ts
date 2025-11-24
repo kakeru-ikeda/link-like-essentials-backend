@@ -20,7 +20,9 @@ export class FirebaseAuth {
 
       // サービスアカウントキーの読み込み
       // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const serviceAccount: admin.ServiceAccount = require(serviceAccountPath) as admin.ServiceAccount;
+      const serviceAccount: admin.ServiceAccount = require(
+        serviceAccountPath
+      ) as admin.ServiceAccount;
 
       if (!admin.apps.length) {
         admin.initializeApp({

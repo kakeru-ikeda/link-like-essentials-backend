@@ -4,7 +4,6 @@ import { accessoryResolvers } from './accessoryResolver';
 import { cardDetailResolvers } from './cardDetailResolver';
 import { cardResolvers } from './cardResolver';
 
-
 export const resolvers = {
   DateTime: DateTimeResolver,
   Query: {

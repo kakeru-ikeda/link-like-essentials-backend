@@ -1,9 +1,7 @@
-
 import type { CardDetail } from '@/domain/entities/CardDetail';
 
 import type { CacheService } from '../CacheService';
 import { TTL } from './CardCacheStrategy';
-
 
 export class DetailCacheStrategy {
   constructor(private readonly cache: CacheService) {}
