@@ -22,9 +22,9 @@ export interface CardDetail {
     skillEffect: string | null;
     traitName: string | null;
     traitEffect: string | null;
-    isLocked: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+    isLocked: boolean | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
     card?: Card;
     accessories?: Accessory[];
 }

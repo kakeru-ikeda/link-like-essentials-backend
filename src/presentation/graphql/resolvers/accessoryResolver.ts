@@ -3,7 +3,7 @@ import type { Accessory } from '@/domain/entities/Accessory';
 import type { AccessoryFilterInput } from '@/domain/repositories/IAccessoryRepository';
 import { EnumMapper } from '@/infrastructure/mappers/EnumMapper';
 
-interface AccessoryQueryArgs {
+export interface AccessoryQueryArgs {
     cardId: string;
     filter?: {
         parentType?: string;
@@ -20,7 +20,7 @@ interface QueryResolvers {
     ) => Promise<unknown>;
 }
 
-interface AccessoryResolvers {
+export interface AccessoryResolvers {
     trait: (parent: Accessory, args: Record<string, never>, context: GraphQLContext) => unknown;
     parentType: (parent: Accessory) => string | null;
     card: (parent: Accessory, args: Record<string, never>, context: GraphQLContext) => Promise<unknown>;

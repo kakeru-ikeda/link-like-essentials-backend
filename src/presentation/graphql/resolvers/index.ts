@@ -13,4 +13,4 @@ export const resolvers = {
     Card: cardResolvers.Card,
     CardDetail: cardDetailResolvers.CardDetail,
     Accessory: accessoryResolvers.Accessory,
-};
+} as const;

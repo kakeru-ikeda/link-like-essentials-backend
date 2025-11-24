@@ -9,9 +9,9 @@ export interface Accessory {
     effect: string | null;
     traitName: string | null;
     traitEffect: string | null;
-    displayOrder: number;
-    isLocked: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+    displayOrder: number | null;
+    isLocked: boolean | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
     card?: Card;
 }

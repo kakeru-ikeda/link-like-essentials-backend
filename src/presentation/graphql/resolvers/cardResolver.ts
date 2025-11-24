@@ -33,7 +33,7 @@ interface QueryResolvers {
     ) => Promise<unknown>;
 }
 
-interface CardResolvers {
+export interface CardResolvers {
     detail: (
         parent: { id: number; detail?: unknown },
         args: Record<string, never>,

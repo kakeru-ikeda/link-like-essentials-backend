@@ -8,8 +8,8 @@ export interface Card {
     cardUrl: string | null;
     characterName: string;
     styleType: string | null;
-    isLocked: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+    isLocked: boolean | null;
+    createdAt: Date | null;
+    updatedAt: Date | null;
     detail?: CardDetail;
 }

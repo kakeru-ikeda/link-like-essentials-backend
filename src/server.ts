@@ -31,7 +31,7 @@ async function startServer(): Promise<void> {
         app.use(requestLogger);
 
         // ヘルスチェック
-        app.get('/health', (req, res) => {
+        app.get('/health', (_req, res) => {
             res.status(200).json({ status: 'ok' });
         });
 

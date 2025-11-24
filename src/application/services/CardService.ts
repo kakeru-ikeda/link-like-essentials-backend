@@ -114,7 +114,7 @@ export class CardService {
 
     private buildConnectionResult(
         cards: Card[],
-        pagination?: PaginationInput,
+        _pagination?: PaginationInput,
         result?: { totalCount: number; hasNextPage: boolean }
     ): CardConnectionResult {
         const edges = cards.map((card) => ({

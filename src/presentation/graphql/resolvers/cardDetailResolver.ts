@@ -10,8 +10,8 @@ interface QueryResolvers {
     ) => Promise<unknown>;
 }
 
-interface CardDetailResolvers {
-    stats: (parent: CardDetail) => unknown;
+export interface CardDetailResolvers {
+    stats: (parent: CardDetail, args: Record<string, never>, context: GraphQLContext) => unknown;
     specialAppeal: (parent: CardDetail, args: Record<string, never>, context: GraphQLContext) => unknown;
     skill: (parent: CardDetail, args: Record<string, never>, context: GraphQLContext) => unknown;
     trait: (parent: CardDetail, args: Record<string, never>, context: GraphQLContext) => unknown;
