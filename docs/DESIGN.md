@@ -936,7 +936,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("LLES_DATABASE_URL")
 }
 
 model Card {
@@ -1348,7 +1348,7 @@ NODE_ENV=development
 PORT=4000
 
 # Database
-DATABASE_URL=postgresql://user:password@host:5432/database?schema=public
+LLES_DATABASE_URL=postgresql://user:password@host:5432/database?schema=public
 
 # Redis
 REDIS_HOST=localhost
@@ -1357,7 +1357,7 @@ REDIS_PASSWORD=
 
 # Firebase
 FIREBASE_SERVICE_ACCOUNT_PATH=./firebase-service-account.json
-FIREBASE_PROJECT_ID=your-project-id
+LLES_FIREBASE_PROJECT_ID=your-project-id
 
 # CORS
 CORS_ORIGIN=http://localhost:3000
@@ -1381,7 +1381,7 @@ services:
       - '4000:4000'
     environment:
       NODE_ENV: production
-      DATABASE_URL: ${DATABASE_URL}
+      LLES_DATABASE_URL: ${LLES_DATABASE_URL}
       REDIS_HOST: redis
       REDIS_PORT: 6379
     depends_on:
@@ -1838,7 +1838,7 @@ pipeline {
                     echo "Running database migrations..."
                     sh """
                         docker run --rm \
-                          -e DATABASE_URL=${env.DATABASE_URL} \
+                          -e LLES_DATABASE_URL=${env.LLES_DATABASE_URL} \
                           ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} \
                           npm run prisma:migrate:deploy
                     """

@@ -10,7 +10,7 @@ function getEnvVar(key: string): string {
   return value;
 }
 
-const databaseUrl = getEnvVar('DATABASE_URL');
+const databaseUrl = getEnvVar('LLES_DATABASE_URL');
 
 export const prisma = new PrismaClient({
   datasources: {

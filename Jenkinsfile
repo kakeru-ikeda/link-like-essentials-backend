@@ -126,7 +126,7 @@ pipeline {
                     echo "Running database migrations..."
                     sh """
                         docker run --rm \
-                          -e DATABASE_URL=${env.DATABASE_URL} \
+                          -e LLES_DATABASE_URL=${env.LLES_DATABASE_URL} \
                           ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} \
                           npm run prisma:migrate:deploy
                     """

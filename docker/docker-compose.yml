@@ -10,11 +10,11 @@ services:
       - '4000:4000'
     environment:
       NODE_ENV: ${NODE_ENV:-production}
-      DATABASE_URL: ${DATABASE_URL}
+      LLES_DATABASE_URL: ${LLES_DATABASE_URL}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       FIREBASE_SERVICE_ACCOUNT_PATH: /app/firebase-service-account.json
-      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
+      LLES_FIREBASE_PROJECT_ID: ${LLES_FIREBASE_PROJECT_ID}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     depends_on:

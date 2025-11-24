@@ -393,16 +393,16 @@ function getEnvVar(key: string): string {
   return value;
 }
 
-const DATABASE_URL = getEnvVar('DATABASE_URL');
+const LLES_DATABASE_URL = getEnvVar('LLES_DATABASE_URL');
 
 // ❌ Bad - 直接参照
-const url = process.env.DATABASE_URL;
+const url = process.env.LLES_DATABASE_URL;
 ```
 
 **必須環境変数**:
 
 ```env
-DATABASE_URL          # Neon PostgreSQL
+LLES_DATABASE_URL          # Neon PostgreSQL
 REDIS_HOST
 REDIS_PORT
 FIREBASE_SERVICE_ACCOUNT_PATH

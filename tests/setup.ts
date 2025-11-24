@@ -3,7 +3,7 @@
 
 // Set up test environment variables
 process.env.NODE_ENV = 'test';
-process.env.DATABASE_URL = process.env.TEST_DATABASE_URL || 'postgresql://test:test@localhost:5432/test?schema=public';
+process.env.LLES_DATABASE_URL = process.env.TEST_LLES_DATABASE_URL || 'postgresql://test:test@localhost:5432/test?schema=public';
 process.env.REDIS_HOST = 'localhost';
 process.env.REDIS_PORT = '6379';
 
