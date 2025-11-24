@@ -189,7 +189,7 @@ EOF
                                 # ヘルスチェック（GraphQLサーバーが応答するか確認）
                                 echo "GraphQLサーバーのヘルスチェック中..."
                                 sleep 5
-                                curl -f http://localhost:4000/.well-known/apollo/server-health || echo "警告: ヘルスチェックに失敗しました"
+                                curl -f http://localhost:4000/health || echo "警告: ヘルスチェックに失敗しました"
                             else
                                 echo "デプロイ失敗: コンテナが起動していません"
                                 docker compose -f docker/docker-compose.yml logs
@@ -198,6 +198,7 @@ EOF
                             
                             # 一時ファイルを削除
                             rm -f /tmp/firebase-service-account.json
+                            rm -f /tmp/docker-compose.yml
                             
                             # コンテナのステータスを確認
                             docker compose -f docker/docker-compose.yml ps
