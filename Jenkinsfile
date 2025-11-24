@@ -150,7 +150,12 @@ pipeline {
                             cp /tmp/firebase-service-account.json ./firebase-service-account.json
                             chmod 600 ./firebase-service-account.json
                             
+                            # 既存のコンテナを停止・削除（古いイメージをクリア）
+                            echo "既存のコンテナとイメージを削除中..."
+                            docker compose -f docker/docker-compose.yml down --rmi all || true
+                            
                             # 最新イメージをプル
+                            echo "最新イメージをプル中..."
                             docker pull ${dockerHubUser}/${imageName}:latest
                             
                             # .envファイルをdocker/ディレクトリに作成（docker-compose.ymlと同じ場所）
@@ -160,11 +165,8 @@ LLES_DATABASE_URL=${databaseUrl}
 LLES_FIREBASE_PROJECT_ID=${firebaseProjectId}
 CORS_ORIGIN=http://localhost:3000
 LOG_LEVEL=info
+DOCKER_IMAGE=${dockerHubUser}/${imageName}:latest
 EOF
-                            
-                            # 既存のコンテナを停止・削除
-                            echo "既存のコンテナを停止中..."
-                            docker compose -f docker/docker-compose.yml down || true
                             
                             # 新しいコンテナを起動
                             echo "新しいコンテナを起動中..."

@@ -3,9 +3,7 @@ version: '3.8'
 services:
   app:
     container_name: link-like-essentials-backend
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
+    image: ${DOCKER_IMAGE:-link-like-essentials-backend:latest}
     ports:
       - '4000:4000'
     environment:
