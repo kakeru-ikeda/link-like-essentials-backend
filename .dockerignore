@@ -12,6 +12,7 @@ build/
 .env
 .env.local
 .env.*.local
+firebase-service-account.json
 
 # Logs
 logs/
