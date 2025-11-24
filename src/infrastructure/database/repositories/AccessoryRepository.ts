@@ -1,12 +1,21 @@
-import type { CardAccessory as PrismaAccessory, PrismaClient } from '@prisma/client';
+import type {
+    CardAccessory as PrismaAccessory,
+    PrismaClient,
+} from '@prisma/client';
 
 import type { Accessory } from '@/domain/entities/Accessory';
-import type { AccessoryFilterInput, IAccessoryRepository } from '@/domain/repositories/IAccessoryRepository';
+import type {
+    AccessoryFilterInput,
+    IAccessoryRepository,
+} from '@/domain/repositories/IAccessoryRepository';
 
 export class AccessoryRepository implements IAccessoryRepository {
     constructor(private readonly prisma: PrismaClient) { }
 
-    async findByCardId(cardId: number, filter?: AccessoryFilterInput): Promise<Accessory[]> {
+    async findByCardId(
+        cardId: number,
+        filter?: AccessoryFilterInput
+    ): Promise<Accessory[]> {
         const where = this.buildWhereClause(cardId, filter);
 
         const accessories = await this.prisma.cardAccessory.findMany({
@@ -38,8 +47,21 @@ export class AccessoryRepository implements IAccessoryRepository {
         return accessories.map((accessory) => this.mapToEntity(accessory));
     }
 
-    private buildWhereClause(cardId: number, filter?: AccessoryFilterInput): object {
-        const conditions: any = {
+    private buildWhereClause(
+        cardId: number,
+        filter?: AccessoryFilterInput
+    ): Record<string, unknown> {
+        type WhereCondition = {
+            cardId: number;
+            parentType?: string;
+            name?: { contains: string; mode: string };
+            OR?: Array<{
+                effect?: { contains: string; mode: string };
+                traitEffect?: { contains: string; mode: string };
+            }>;
+        };
+
+        const conditions: WhereCondition = {
             cardId,
             ...(filter?.parentType && { parentType: filter.parentType }),
             ...(filter?.nameContains && {
@@ -68,7 +90,9 @@ export class AccessoryRepository implements IAccessoryRepository {
         return conditions;
     }
 
-    private mapToEntity(accessory: PrismaAccessory & { card?: unknown }): Accessory {
+    private mapToEntity(
+        accessory: PrismaAccessory & { card?: unknown }
+    ): Accessory {
         return {
             id: accessory.id,
             cardId: accessory.cardId,

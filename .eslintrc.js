@@ -62,6 +62,7 @@ module.exports = {
         ],
         'import/no-unresolved': 'off', // TypeScriptがチェックするため
         'import/no-duplicates': 'error',
+        'import/no-named-as-default-member': 'off', // winston, expressの既知の問題を無視
 
         // General
         'no-console': ['warn', { allow: ['warn', 'error'] }],

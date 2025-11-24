@@ -1,75 +1,75 @@
 import type { CardDetail } from '@/domain/entities/CardDetail';
-import type { ICardDetailRepository } from '@/domain/repositories/ICardDetailRepository';
 import { NotFoundError } from '@/domain/errors/AppError';
-import type { DetailCacheStrategy } from '@/infrastructure/cache/strategies/DetailCacheStrategy';
+import type { ICardDetailRepository } from '@/domain/repositories/ICardDetailRepository';
 import type { Stats, Skill, Trait } from '@/domain/valueObjects/Stats';
+import type { DetailCacheStrategy } from '@/infrastructure/cache/strategies/DetailCacheStrategy';
 
 export class CardDetailService {
-    constructor(
-        private readonly detailRepository: ICardDetailRepository,
-        private readonly cacheStrategy: DetailCacheStrategy
-    ) { }
+  constructor(
+    private readonly detailRepository: ICardDetailRepository,
+    private readonly cacheStrategy: DetailCacheStrategy
+  ) {}
 
-    async findByCardId(cardId: number): Promise<CardDetail> {
-        // キャッシュチェック
-        const cached = await this.cacheStrategy.getDetail(cardId);
-        if (cached) {
-            return cached;
-        }
-
-        // DBから取得
-        const detail = await this.detailRepository.findByCardId(cardId);
-        if (!detail) {
-            throw new NotFoundError(`CardDetail for cardId ${cardId} not found`);
-        }
-
-        // キャッシュに保存
-        await this.cacheStrategy.setDetail(detail);
-
-        return detail;
+  async findByCardId(cardId: number): Promise<CardDetail> {
+    // キャッシュチェック
+    const cached = await this.cacheStrategy.getDetail(cardId);
+    if (cached) {
+      return cached;
     }
 
-    buildStats(detail: CardDetail): Stats {
-        return {
-            smile: this.parseIntOrNull(detail.smileMaxLevel),
-            pure: this.parseIntOrNull(detail.pureMaxLevel),
-            cool: this.parseIntOrNull(detail.coolMaxLevel),
-            mental: this.parseIntOrNull(detail.mentalMaxLevel),
-        };
+    // DBから取得
+    const detail = await this.detailRepository.findByCardId(cardId);
+    if (!detail) {
+      throw new NotFoundError(`CardDetail for cardId ${cardId} not found`);
     }
 
-    buildSpecialAppeal(detail: CardDetail): Skill | null {
-        if (!detail.specialAppealName) return null;
+    // キャッシュに保存
+    await this.cacheStrategy.setDetail(detail);
 
-        return {
-            name: detail.specialAppealName,
-            ap: detail.specialAppealAp,
-            effect: detail.specialAppealEffect,
-        };
-    }
+    return detail;
+  }
 
-    buildSkill(detail: CardDetail): Skill | null {
-        if (!detail.skillName) return null;
+  buildStats(detail: CardDetail): Stats {
+    return {
+      smile: this.parseIntOrNull(detail.smileMaxLevel),
+      pure: this.parseIntOrNull(detail.pureMaxLevel),
+      cool: this.parseIntOrNull(detail.coolMaxLevel),
+      mental: this.parseIntOrNull(detail.mentalMaxLevel),
+    };
+  }
 
-        return {
-            name: detail.skillName,
-            ap: detail.skillAp,
-            effect: detail.skillEffect,
-        };
-    }
+  buildSpecialAppeal(detail: CardDetail): Skill | null {
+    if (!detail.specialAppealName) return null;
 
-    buildTrait(detail: CardDetail): Trait | null {
-        if (!detail.traitName) return null;
+    return {
+      name: detail.specialAppealName,
+      ap: detail.specialAppealAp,
+      effect: detail.specialAppealEffect,
+    };
+  }
 
-        return {
-            name: detail.traitName,
-            effect: detail.traitEffect,
-        };
-    }
+  buildSkill(detail: CardDetail): Skill | null {
+    if (!detail.skillName) return null;
 
-    private parseIntOrNull(value: string | null): number | null {
-        if (!value) return null;
-        const parsed = parseInt(value, 10);
-        return isNaN(parsed) ? null : parsed;
-    }
+    return {
+      name: detail.skillName,
+      ap: detail.skillAp,
+      effect: detail.skillEffect,
+    };
+  }
+
+  buildTrait(detail: CardDetail): Trait | null {
+    if (!detail.traitName) return null;
+
+    return {
+      name: detail.traitName,
+      effect: detail.traitEffect,
+    };
+  }
+
+  private parseIntOrNull(value: string | null): number | null {
+    if (!value) return null;
+    const parsed = parseInt(value, 10);
+    return isNaN(parsed) ? null : parsed;
+  }
 }

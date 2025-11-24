@@ -93,35 +93,33 @@ export class CardRepository implements ICardRepository {
     }
 
     async getStats(): Promise<CardStats> {
-        const [totalCards, byRarity, byStyleType, byCharacter] = await Promise.all(
-            [
-                this.prisma.card.count(),
-                this.prisma.card.groupBy({
-                    by: ['rarity'],
-                    _count: true,
-                    where: {
-                        rarity: { not: null },
+        const [totalCards, byRarity, byStyleType, byCharacter] = await Promise.all([
+            this.prisma.card.count(),
+            this.prisma.card.groupBy({
+                by: ['rarity'],
+                _count: true,
+                where: {
+                    rarity: { not: null },
+                },
+            }),
+            this.prisma.card.groupBy({
+                by: ['styleType'],
+                _count: true,
+                where: {
+                    styleType: { not: null },
+                },
+            }),
+            this.prisma.card.groupBy({
+                by: ['characterName'],
+                _count: true,
+                orderBy: {
+                    _count: {
+                        characterName: 'desc',
                     },
-                }),
-                this.prisma.card.groupBy({
-                    by: ['styleType'],
-                    _count: true,
-                    where: {
-                        styleType: { not: null },
-                    },
-                }),
-                this.prisma.card.groupBy({
-                    by: ['characterName'],
-                    _count: true,
-                    orderBy: {
-                        _count: {
-                            characterName: 'desc',
-                        },
-                    },
-                    take: 20,
-                }),
-            ]
-        );
+                },
+                take: 20,
+            }),
+        ]);
 
         return {
             totalCards,
@@ -140,10 +138,31 @@ export class CardRepository implements ICardRepository {
         };
     }
 
-    private buildWhereClause(filter?: CardFilterInput): object {
+    private buildWhereClause(filter?: CardFilterInput): Record<string, unknown> {
         if (!filter) return {};
 
-        const conditions: any = {
+        type WhereCondition = {
+            rarity?: string;
+            limited?: string;
+            styleType?: string;
+            characterName?: { contains: string; mode: string };
+            cardName?: { contains: string; mode: string };
+            detail?: {
+                skillEffect?: { contains: string; mode: string };
+                traitEffect?: { contains: string; mode: string };
+                specialAppealEffect?: { contains: string; mode: string };
+            };
+            accessories?: {
+                some: {
+                    OR: Array<{
+                        effect?: { contains: string; mode: string };
+                        traitEffect?: { contains: string; mode: string };
+                    }>;
+                };
+            };
+        };
+
+        const conditions: WhereCondition = {
             ...(filter.rarity && { rarity: filter.rarity }),
             ...(filter.limited && { limited: filter.limited }),
             ...(filter.styleType && { styleType: filter.styleType }),
@@ -209,7 +228,9 @@ export class CardRepository implements ICardRepository {
         return conditions;
     }
 
-    private buildOrderByClause(sort?: CardSortInput): object {
+    private buildOrderByClause(
+        sort?: CardSortInput
+    ): Record<string, 'asc' | 'desc'> {
         if (!sort) return { id: 'desc' };
 
         const fieldMap: Record<string, string> = {
@@ -221,7 +242,7 @@ export class CardRepository implements ICardRepository {
         };
 
         const field = fieldMap[sort.field] || 'id';
-        const direction = sort.direction.toLowerCase();
+        const direction = sort.direction.toLowerCase() as 'asc' | 'desc';
 
         return { [field]: direction };
     }
