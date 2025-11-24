@@ -21,6 +21,9 @@ RUN npm run build
 # Production stage
 FROM node:20-alpine
 
+# Install OpenSSL for Prisma
+RUN apk add --no-cache openssl
+
 WORKDIR /app
 
 # Copy built files and dependencies from builder
@@ -28,6 +31,9 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
+
+# Copy GraphQL schema files
+COPY --from=builder /app/src/presentation/graphql/schema/*.graphql ./dist/presentation/graphql/schema/
 
 ENV NODE_ENV=production
 
