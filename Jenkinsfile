@@ -125,9 +125,10 @@ pipeline {
                             usernameVariable: 'SSH_USER'
                         )
                     ]) {
-                        // Firebase Service Accountファイルをデプロイサーバーに転送
+                        // 必要なファイルをデプロイサーバーに転送
                         sh '''
                             scp -o StrictHostKeyChecking=no -i "$SSH_KEY" "$FIREBASE_SERVICE_ACCOUNT" ''' + "${env.DEPLOY_USER}@${env.DEPLOY_HOST}" + ''':/tmp/firebase-service-account.json
+                            scp -o StrictHostKeyChecking=no -i "$SSH_KEY" docker/docker-compose.yml ''' + "${env.DEPLOY_USER}@${env.DEPLOY_HOST}" + ''':/tmp/docker-compose.yml
                         '''
                         
                         def databaseUrl = sh(script: 'echo "$LLES_DATABASE_URL"', returnStdout: true).trim()
@@ -144,7 +145,12 @@ pipeline {
                             allowAnyHosts: true,
                             timeout: 60
                         ], command: """
+                            # デプロイディレクトリを作成（存在しない場合）
+                            mkdir -p /home/${env.DEPLOY_USER}/link-like-essentials-backend/docker
                             cd /home/${env.DEPLOY_USER}/link-like-essentials-backend
+                            
+                            # 最新のdocker-compose.ymlを配置
+                            cp /tmp/docker-compose.yml docker/docker-compose.yml
                             
                             # Firebase Service Accountファイルを配置
                             cp /tmp/firebase-service-account.json ./firebase-service-account.json
