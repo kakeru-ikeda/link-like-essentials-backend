@@ -56,17 +56,30 @@ pipeline {
 
         stage('Build and Test') {
             steps {
-                echo "Dockerイメージをビルド中..."
+                echo "Lintとテストを実行中..."
                 script {
                     sh '''
-                        # Dockerイメージをビルド
+                        # builderステージでテストを実行（ソースコードが存在する段階）
+                        docker build -f docker/Dockerfile --target builder -t ${IMAGE_NAME}:builder .
+                        
+                        echo "Type Check, Lint, Formatチェックを実行中..."
+                        docker run --rm ${IMAGE_NAME}:builder sh -c "npm run type-check && npm run lint && npm run format:check"
+                        
+                        echo "テストが完了しました"
+                    '''
+                }
+            }
+        }
+        
+        stage('Build Production Image') {
+            steps {
+                echo "本番用Dockerイメージをビルド中..."
+                script {
+                    sh '''
+                        # 本番イメージをビルド
                         docker build -f docker/Dockerfile -t ${IMAGE_NAME}:latest .
                         
-                        # テスト用の一時的なコンテナを起動してテスト実行
-                        echo "テストを実行中..."
-                        docker run --rm ${IMAGE_NAME}:latest sh -c "npm run type-check && npm run lint && npm run format:check"
-                        
-                        echo "ビルドとテストが完了しました"
+                        echo "ビルドが完了しました"
                     '''
                 }
             }
