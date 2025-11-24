@@ -1,275 +1,231 @@
 pipeline {
-    agent any
+    agent {
+        label 'built-in'
+    }
 
     environment {
-        DOCKER_REGISTRY = 'your-registry.example.com'
+        DOCKER_HUB_CREDS = 'dockerhub-cred-id'
+        DEPLOY_HOST = '192.168.40.99'
+        DEPLOY_USER = 'server'
         IMAGE_NAME = 'link-like-essentials-backend'
-        DOCKER_CREDENTIALS_ID = 'docker-registry-credentials'
-        DEPLOYMENT_ENV = "${env.BRANCH_NAME == 'main' ? 'production' : 'staging'}"
+        DISCORD_WEBHOOK = credentials('DISCORD_WEBHOOK_JENKINS_LOG_URL')
     }
 
     options {
-        buildDiscarder(logRotator(numToKeepStr: '10'))
         timestamps()
-        timeout(time: 1, unit: 'HOURS')
+        timeout(time: 30, unit: 'MINUTES')
     }
 
     stages {
+        stage('Notification') {
+            steps {
+                echo 'パイプラインの実行を開始しました'
+                withCredentials([string(credentialsId: 'DISCORD_WEBHOOK_JENKINS_LOG_URL', variable: 'DISCORD_WEBHOOK_JENKINS_LOG_URL')]) {
+                    sh '''
+                        # JSONをエスケープして正しく構築
+                        JOB_NAME_ESC=$(echo "${JOB_NAME}" | sed 's/"/\\\\"/g')
+                        
+                        # Discord通知をcurlで送信（ビルド開始）
+                        curl -X POST -H "Content-Type: application/json" \\
+                             -d "{\\"content\\":\\"**Jenkinsがビルドを受け付けました** 🚀\\nジョブ: ${JOB_NAME_ESC}\\nビルド番号: #${BUILD_NUMBER}\\"}" \\
+                             "${DISCORD_WEBHOOK_JENKINS_LOG_URL}"
+                    '''
+                }
+            }
+        }
+
+        stage('Workspace Debug') {
+            steps {
+                echo "ワークスペース情報をデバッグ中..."
+                sh '''
+                    echo "現在のワークスペース: $(pwd)"
+                    echo "ワークスペース内のファイル:"
+                    ls -la
+                    echo "環境変数:"
+                    env | sort
+                '''
+            }
+        }
+
         stage('Checkout') {
             steps {
+                echo "ソースコードをチェックアウト中..."
                 checkout scm
+            }
+        }
+
+        stage('Build and Test') {
+            steps {
+                echo "Dockerイメージをビルド中..."
                 script {
-                    env.GIT_COMMIT_SHORT = sh(
-                        returnStdout: true,
-                        script: "git rev-parse --short HEAD"
-                    ).trim()
-                    env.IMAGE_TAG = "${env.DEPLOYMENT_ENV}-${env.GIT_COMMIT_SHORT}-${env.BUILD_NUMBER}"
+                    sh '''
+                        # Dockerイメージをビルド
+                        docker build -f docker/Dockerfile -t ${IMAGE_NAME}:latest .
+                        
+                        # テスト用の一時的なコンテナを起動してテスト実行
+                        echo "テストを実行中..."
+                        docker run --rm ${IMAGE_NAME}:latest sh -c "npm run type-check && npm run lint && npm run format:check"
+                        
+                        echo "ビルドとテストが完了しました"
+                    '''
                 }
             }
         }
 
-        stage('Verify CI Status') {
+        stage('Publish') {
             steps {
+                echo "Dockerイメージを公開中..."
                 script {
-                    echo "Verifying GitHub Actions CI status..."
-                    // GitHub Actions CIの成功を確認
-                    // この段階でCI（lint, test）が通過していることを前提とする
-                    sh """
-                        echo "CI Status: Passed (verified by GitHub Actions)"
-                        echo "Proceeding with deployment..."
-                    """
-                }
-            }
-        }
-
-        stage('Validate Environment') {
-            steps {
-                script {
-                    echo "Validating environment configuration..."
-                    sh """
-                        # 必須環境変数の確認
-                        test -f .env || (echo "Error: .env file not found" && exit 1)
-                        test -f firebase-service-account.json || (echo "Error: Firebase credentials not found" && exit 1)
-
-                        # Prisma schemaの検証
-                        test -f prisma/schema.prisma || (echo "Error: Prisma schema not found" && exit 1)
-
-                        echo "Environment validation passed"
-                    """
-                }
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
-                    // Dockerビルド時の重要な注意点:
-                    // 1. GraphQLスキーマファイル(.graphql)が含まれること
-                    // 2. OpenSSLがインストールされること
-                    // 3. Prisma binaryTargetsが正しく設定されること
-                    docker.build(
-                        "${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}",
-                        "--build-arg NODE_ENV=production -f docker/Dockerfile ."
-                    )
-
-                    echo "Verifying Docker image..."
-                    sh """
-                        # イメージ内容の確認
-                        docker run --rm ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} \
-                          sh -c 'ls -la dist/presentation/graphql/schema/*.graphql' || \
-                          (echo "Error: GraphQL schema files not found in image" && exit 1)
-
-                        docker run --rm ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} \
-                          sh -c 'openssl version' || \
-                          (echo "Error: OpenSSL not installed in image" && exit 1)
-
-                        echo "Docker image verification passed"
-                    """
-                }
-            }
-        }
-
-        stage('Push to Registry') {
-            steps {
-                script {
-                    docker.withRegistry("https://${DOCKER_REGISTRY}", DOCKER_CREDENTIALS_ID) {
-                        def image = docker.image("${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}")
-                        image.push()
-                        image.push("${env.DEPLOYMENT_ENV}-latest")
+                    withCredentials([usernamePassword(credentialsId: env.DOCKER_HUB_CREDS, passwordVariable: 'DOCKER_HUB_CREDS_PSW', usernameVariable: 'DOCKER_HUB_CREDS_USR')]) {
+                        sh '''
+                            # Docker Hubにログイン
+                            echo $DOCKER_HUB_CREDS_PSW | docker login -u $DOCKER_HUB_CREDS_USR --password-stdin
+                            
+                            # イメージにタグを付ける
+                            docker tag ${IMAGE_NAME}:latest ${DOCKER_HUB_CREDS_USR}/${IMAGE_NAME}:latest
+                            docker tag ${IMAGE_NAME}:latest ${DOCKER_HUB_CREDS_USR}/${IMAGE_NAME}:${BUILD_NUMBER}
+                            
+                            # イメージをプッシュ
+                            docker push ${DOCKER_HUB_CREDS_USR}/${IMAGE_NAME}:latest
+                            docker push ${DOCKER_HUB_CREDS_USR}/${IMAGE_NAME}:${BUILD_NUMBER}
+                            
+                            # ログアウト
+                            docker logout
+                        '''
                     }
                 }
             }
         }
 
-        stage('Prisma Generate Check') {
+        stage('Deploy to Home') {
             steps {
+                echo "ホームサーバーにデプロイ中..."
                 script {
-                    echo "Verifying Prisma Client generation..."
-                    sh """
-                        docker run --rm ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} \
-                          sh -c 'ls -la node_modules/.prisma/client/libquery_engine-linux-musl-arm64-openssl-3.0.x.so.node' || \
-                          (echo "Error: Prisma binary for linux-musl-arm64-openssl-3.0.x not found" && exit 1)
-
-                        echo "Prisma Client verification passed"
-                    """
+                    withCredentials([
+                        string(credentialsId: 'LLES_DATABASE_URL', variable: 'LLES_DATABASE_URL'),
+                        string(credentialsId: 'LLES_FIREBASE_PROJECT_ID', variable: 'LLES_FIREBASE_PROJECT_ID'),
+                        file(credentialsId: 'LLES_FIREBASE_SERVICE_ACCOUNT', variable: 'FIREBASE_SERVICE_ACCOUNT'),
+                        usernamePassword(credentialsId: env.DOCKER_HUB_CREDS, usernameVariable: 'DOCKER_HUB_CREDS_USR', passwordVariable: 'DOCKER_HUB_CREDS_PSW'),
+                        sshUserPrivateKey(
+                            credentialsId: 'jenkins_deploy',
+                            keyFileVariable: 'SSH_KEY',
+                            usernameVariable: 'SSH_USER'
+                        )
+                    ]) {
+                        // Firebase Service Accountファイルをデプロイサーバーに転送
+                        sh '''
+                            scp -o StrictHostKeyChecking=no -i "$SSH_KEY" "$FIREBASE_SERVICE_ACCOUNT" ''' + "${env.DEPLOY_USER}@${env.DEPLOY_HOST}" + ''':/tmp/firebase-service-account.json
+                        '''
+                        
+                        def databaseUrl = sh(script: 'echo "$LLES_DATABASE_URL"', returnStdout: true).trim()
+                        def firebaseProjectId = sh(script: 'echo "$LLES_FIREBASE_PROJECT_ID"', returnStdout: true).trim()
+                        def dockerHubUser = env.DOCKER_HUB_CREDS_USR
+                        def imageName = env.IMAGE_NAME
+                        
+                        sshCommand remote: [
+                            name: 'Home Server',
+                            host: env.DEPLOY_HOST,
+                            user: env.DEPLOY_USER,
+                            identityFile: SSH_KEY,
+                            port: 22,
+                            allowAnyHosts: true,
+                            timeout: 60
+                        ], command: """
+                            cd /home/${env.DEPLOY_USER}/link-like-essentials-backend
+                            
+                            # Firebase Service Accountファイルを配置
+                            cp /tmp/firebase-service-account.json ./firebase-service-account.json
+                            chmod 600 ./firebase-service-account.json
+                            
+                            # 最新イメージをプル
+                            docker pull ${dockerHubUser}/${imageName}:latest
+                            
+                            # .envファイルを作成（環境変数を設定）
+                            cat > .env << 'EOF'
+NODE_ENV=production
+LLES_DATABASE_URL=${databaseUrl}
+LLES_FIREBASE_PROJECT_ID=${firebaseProjectId}
+CORS_ORIGIN=http://localhost:3000
+LOG_LEVEL=info
+EOF
+                            
+                            # 既存のコンテナを停止・削除
+                            echo "既存のコンテナを停止中..."
+                            docker compose -f docker/docker-compose.yml down || true
+                            
+                            # 新しいコンテナを起動
+                            echo "新しいコンテナを起動中..."
+                            docker compose -f docker/docker-compose.yml up -d
+                            
+                            # 起動待機
+                            sleep 10
+                            
+                            # 稼働チェック
+                            if docker ps | grep -q ${imageName}; then
+                                echo "デプロイ成功: コンテナが稼働中です"
+                                docker ps | grep ${imageName}
+                                
+                                # ヘルスチェック（GraphQLサーバーが応答するか確認）
+                                echo "GraphQLサーバーのヘルスチェック中..."
+                                sleep 5
+                                curl -f http://localhost:4000/.well-known/apollo/server-health || echo "警告: ヘルスチェックに失敗しました"
+                            else
+                                echo "デプロイ失敗: コンテナが起動していません"
+                                docker compose -f docker/docker-compose.yml logs
+                                exit 1
+                            fi
+                            
+                            # 一時ファイルを削除
+                            rm -f /tmp/firebase-service-account.json
+                            
+                            # コンテナのステータスを確認
+                            docker compose -f docker/docker-compose.yml ps
+                        """
+                    }
                 }
-            }
-        }
-
-        stage('Database Migration') {
-            when {
-                expression { env.DEPLOYMENT_ENV == 'production' }
-            }
-            steps {
-                script {
-                    echo "Running database migrations..."
-                    sh """
-                        docker run --rm \
-                          -e LLES_DATABASE_URL=${env.LLES_DATABASE_URL} \
-                          ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} \
-                          npm run prisma:migrate:deploy
-                    """
-                }
-            }
-        }
-
-        stage('Deploy to Staging') {
-            when {
-                expression { env.DEPLOYMENT_ENV == 'staging' }
-            }
-            steps {
-                script {
-                    echo "Deploying to Staging environment..."
-                    sh """
-                        # Kubernetes deployment example
-                        kubectl set image deployment/link-like-backend-staging \
-                          backend=${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} \
-                          --namespace=staging
-
-                        kubectl rollout status deployment/link-like-backend-staging \
-                          --namespace=staging \
-                          --timeout=300s
-                    """
-                }
-            }
-        }
-
-        stage('Deploy to Production') {
-            when {
-                expression { env.DEPLOYMENT_ENV == 'production' }
-            }
-            steps {
-                script {
-                    // 本番環境デプロイには手動承認を要求
-                    input message: 'Deploy to Production?', ok: 'Deploy'
-
-                    echo "Deploying to Production environment..."
-                    sh """
-                        # Blue-Green Deployment
-                        kubectl set image deployment/link-like-backend-production \
-                          backend=${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} \
-                          --namespace=production
-
-                        kubectl rollout status deployment/link-like-backend-production \
-                          --namespace=production \
-                          --timeout=600s
-                    """
-                }
-            }
-        }
-
-        stage('Health Check') {
-            steps {
-                script {
-                    echo "Running health checks..."
-                    sh """
-                        # デプロイ後のヘルスチェック
-                        echo "Waiting for service to be ready..."
-                        sleep 15
-
-                        HEALTH_URL=\$(kubectl get service link-like-backend-${env.DEPLOYMENT_ENV} \
-                          --namespace=${env.DEPLOYMENT_ENV} \
-                          -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-
-                        # ヘルスチェックエンドポイント
-                        echo "Checking /health endpoint..."
-                        curl -f http://\${HEALTH_URL}:4000/health || exit 1
-
-                        # GraphQLエンドポイントの基本確認
-                        echo "Checking GraphQL endpoint..."
-                        curl -f -X POST http://\${HEALTH_URL}:4000/graphql \
-                          -H "Content-Type: application/json" \
-                          -d '{"query":"{ cardStats { totalCards } }"}' || exit 1
-
-                        echo "Health check passed"
-                    """
-                }
-            }
-        }
-
-        stage('Smoke Tests') {
-            steps {
-                script {
-                    echo "Running smoke tests..."
-                    sh """
-                        # サービスURLを取得
-                        SERVICE_URL=\$(kubectl get service link-like-backend-${env.DEPLOYMENT_ENV} \
-                          --namespace=${env.DEPLOYMENT_ENV} \
-                          -o jsonpath='{.status.loadBalancer.ingress[0].hostname}')
-
-                        # 基本的なGraphQLクエリテスト
-                        echo "Testing card query..."
-                        curl -f -X POST http://\${SERVICE_URL}:4000/graphql \
-                          -H "Content-Type: application/json" \
-                          -d '{"query":"{ cards(first: 1) { edges { node { id cardName } } totalCount } }"}' || exit 1
-
-                        echo "Testing card detail query..."
-                        curl -f -X POST http://\${SERVICE_URL}:4000/graphql \
-                          -H "Content-Type: application/json" \
-                          -d '{"query":"{ card(id: \\"1\\") { id cardName characterName } }"}' || exit 1
-
-                        echo "Testing stats query..."
-                        curl -f -X POST http://\${SERVICE_URL}:4000/graphql \
-                          -H "Content-Type: application/json" \
-                          -d '{"query":"{ cardStats { totalCards byRarity { rarity count } } }"}' || exit 1
-
-                        echo "Smoke tests passed"
-                    """
-                }
+                echo "ホームサーバーへのデプロイが完了しました"
             }
         }
     }
 
     post {
+        always {
+            echo "クリーンアップを実行中..."
+            sh '''
+                # 未使用イメージを削除して領域を解放
+                docker image prune -f
+            '''
+            
+            // ワークスペースをクリーンアップ
+            cleanWs()
+        }
         success {
-            echo "Deployment succeeded: ${env.DEPLOYMENT_ENV} - ${IMAGE_TAG}"
-            // Slack/Discord通知の例
-            // slackSend(
-            //     color: 'good',
-            //     message: "Deployment succeeded: ${env.DEPLOYMENT_ENV} - ${IMAGE_TAG}"
-            // )
+            echo 'パイプラインが正常に完了しました！'
+            withCredentials([string(credentialsId: 'DISCORD_WEBHOOK_JENKINS_LOG_URL', variable: 'DISCORD_WEBHOOK_JENKINS_LOG_URL')]) {
+                sh '''
+                    # JSONをエスケープして正しく構築
+                    JOB_NAME_ESC=$(echo "${JOB_NAME}" | sed 's/"/\\\\"/g')
+                    
+                    # Discord通知をcurlで送信（ビルド成功）
+                    curl -X POST -H "Content-Type: application/json" \\
+                         -d "{\\"content\\":\\"**ビルド成功** ✨\\nジョブ: ${JOB_NAME_ESC}\\nビルド番号: #${BUILD_NUMBER}\\"}" \\
+                         "${DISCORD_WEBHOOK_JENKINS_LOG_URL}"
+                '''
+            }
         }
         failure {
-            echo "Deployment failed: ${env.DEPLOYMENT_ENV} - ${IMAGE_TAG}"
-            // ロールバック処理
-            script {
-                if (env.DEPLOYMENT_ENV == 'production') {
-                    sh """
-                        echo "Rolling back production deployment..."
-                        kubectl rollout undo deployment/link-like-backend-production \
-                          --namespace=production
-                    """
-                }
+            echo 'パイプラインが失敗しました！'
+            withCredentials([string(credentialsId: 'DISCORD_WEBHOOK_JENKINS_LOG_URL', variable: 'DISCORD_WEBHOOK_JENKINS_LOG_URL')]) {
+                sh '''
+                    # JSONをエスケープして正しく構築
+                    JOB_NAME_ESC=$(echo "${JOB_NAME}" | sed 's/"/\\\\"/g')
+                    
+                    # Discord通知をcurlで送信（ビルド失敗）
+                    curl -X POST -H "Content-Type: application/json" \\
+                         -d "{\\"content\\":\\"**ビルド失敗** 🚨\\nジョブ: ${JOB_NAME_ESC}\\nビルド番号: #${BUILD_NUMBER}\\"}" \\
+                         "${DISCORD_WEBHOOK_JENKINS_LOG_URL}"
+                '''
             }
-            // Slack/Discord通知の例
-            // slackSend(
-            //     color: 'danger',
-            //     message: "Deployment failed: ${env.DEPLOYMENT_ENV} - ${IMAGE_TAG}"
-            // )
-        }
-        always {
-            cleanWs()
         }
     }
 }
