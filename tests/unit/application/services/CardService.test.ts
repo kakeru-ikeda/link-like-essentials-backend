@@ -39,6 +39,8 @@ describe('CardService', () => {
       setCardByName: jest.fn(),
       getCardList: jest.fn(),
       setCardList: jest.fn(),
+      getStats: jest.fn(),
+      setStats: jest.fn(),
     } as unknown as jest.Mocked<CardCacheStrategy>;
 
     cardService = new CardService(mockRepository, mockCacheStrategy);
@@ -123,7 +125,7 @@ describe('CardService', () => {
   });
 
   describe('getStats', () => {
-    it('should return card statistics', async () => {
+    it('should return card statistics from cache if available', async () => {
       const mockStats = {
         totalCards: 100,
         byRarity: [
@@ -141,12 +143,42 @@ describe('CardService', () => {
         ],
       };
 
+      mockCacheStrategy.getStats.mockResolvedValue(mockStats);
+
+      const result = await cardService.getStats();
+
+      expect(result).toEqual(mockStats);
+      expect(mockCacheStrategy.getStats).toHaveBeenCalled();
+      expect(mockRepository.getStats).not.toHaveBeenCalled();
+    });
+
+    it('should fetch from repository and cache if not in cache', async () => {
+      const mockStats = {
+        totalCards: 100,
+        byRarity: [
+          { rarity: 'UR', count: 10 },
+          { rarity: 'SR', count: 20 },
+          { rarity: 'R', count: 70 },
+        ],
+        byStyleType: [
+          { styleType: 'CHEERLEADER', count: 30 },
+          { styleType: 'TRICKSTER', count: 40 },
+        ],
+        byCharacter: [
+          { characterName: 'Character 1', count: 50 },
+          { characterName: 'Character 2', count: 50 },
+        ],
+      };
+
+      mockCacheStrategy.getStats.mockResolvedValue(null);
       mockRepository.getStats.mockResolvedValue(mockStats);
 
       const result = await cardService.getStats();
 
       expect(result).toEqual(mockStats);
+      expect(mockCacheStrategy.getStats).toHaveBeenCalled();
       expect(mockRepository.getStats).toHaveBeenCalled();
+      expect(mockCacheStrategy.setStats).toHaveBeenCalledWith(mockStats);
     });
   });
 });
