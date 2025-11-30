@@ -10,7 +10,8 @@ import { logger } from './infrastructure/logger/Logger';
 import { requestLogger } from './presentation/middleware/requestLogger';
 
 const PORT = process.env.PORT || 4000;
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:3000';
+const LLES_CORS_ORIGIN =
+  process.env.LLES_CORS_ORIGIN || 'http://localhost:3000';
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 async function startServer(): Promise<void> {
@@ -23,7 +24,7 @@ async function startServer(): Promise<void> {
       cors({
         origin: isDevelopment
           ? ['http://localhost:3000', 'https://studio.apollographql.com']
-          : CORS_ORIGIN,
+          : LLES_CORS_ORIGIN,
         credentials: true,
       })
     );
