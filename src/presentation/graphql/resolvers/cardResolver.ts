@@ -1,4 +1,4 @@
-import type { CardFilterInput, CardSortInput } from '@/application/dto/CardDTO';
+import type { CardFilterInput } from '@/application/dto/CardDTO';
 import { EnumMapper } from '@/infrastructure/mappers/EnumMapper';
 import { requireAuth } from '@/presentation/middleware/authGuard';
 
@@ -9,7 +9,6 @@ interface QueryResolvers {
     parent: unknown,
     args: {
       filter?: CardFilterInput;
-      sort?: CardSortInput;
     },
     context: GraphQLContext
   ) => Promise<unknown>;
@@ -54,12 +53,9 @@ export const cardResolvers: {
     cards: async (_, args, context) => {
       requireAuth(context);
 
-      const { filter, sort } = args;
+      const { filter } = args;
 
-      const result = await context.dataSources.cardService.findAll(
-        filter,
-        sort
-      );
+      const result = await context.dataSources.cardService.findAll(filter);
 
       return result;
     },

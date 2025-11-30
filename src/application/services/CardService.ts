@@ -5,11 +5,7 @@ import { NotFoundError } from '@/domain/errors/AppError';
 import type { ICardRepository } from '@/domain/repositories/ICardRepository';
 import type { CardCacheStrategy } from '@/infrastructure/cache/strategies/CardCacheStrategy';
 
-import type {
-  CardFilterInput,
-  CardSortInput,
-  CardStatsResult,
-} from '../dto/CardDTO';
+import type { CardFilterInput, CardStatsResult } from '../dto/CardDTO';
 
 export class CardService {
   constructor(
@@ -63,12 +59,9 @@ export class CardService {
     return card;
   }
 
-  async findAll(
-    filter?: CardFilterInput,
-    sort?: CardSortInput
-  ): Promise<Card[]> {
+  async findAll(filter?: CardFilterInput): Promise<Card[]> {
     // フィルター条件からハッシュを生成
-    const filterHash = this.generateFilterHash(filter, sort);
+    const filterHash = this.generateFilterHash(filter);
 
     // キャッシュチェック
     const cached = await this.cacheStrategy.getCardList(filterHash);
@@ -77,7 +70,7 @@ export class CardService {
     }
 
     // DBから取得
-    const cards = await this.cardRepository.findAll(filter, sort);
+    const cards = await this.cardRepository.findAll(filter);
 
     // キャッシュに保存
     await this.cacheStrategy.setCardList(filterHash, cards);
@@ -108,11 +101,8 @@ export class CardService {
     return result;
   }
 
-  private generateFilterHash(
-    filter?: CardFilterInput,
-    sort?: CardSortInput
-  ): string {
-    const data = JSON.stringify({ filter, sort });
+  private generateFilterHash(filter?: CardFilterInput): string {
+    const data = JSON.stringify({ filter });
     return crypto.createHash('md5').update(data).digest('hex');
   }
 }

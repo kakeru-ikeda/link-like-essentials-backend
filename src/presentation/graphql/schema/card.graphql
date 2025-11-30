@@ -25,19 +25,6 @@ input CardFilterInput {
   accessoryEffectContains: String
 }
 
-input CardSortInput {
-  field: CardSortField!
-  direction: SortDirection!
-}
-
-enum CardSortField {
-  ID
-  CARD_NAME
-  CHARACTER_NAME
-  CREATED_AT
-  UPDATED_AT
-}
-
 type CardStats {
   totalCards: Int!
   byRarity: [RarityCount!]!

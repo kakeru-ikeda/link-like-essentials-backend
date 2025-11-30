@@ -3,7 +3,6 @@ import type { Card as PrismaCard, PrismaClient } from '@prisma/client';
 import type { Card } from '@/domain/entities/Card';
 import type {
   CardFilterInput,
-  CardSortInput,
   CardStats,
   ICardRepository,
 } from '@/domain/repositories/ICardRepository';
@@ -43,23 +42,53 @@ export class CardRepository implements ICardRepository {
     return card ? this.mapToEntity(card) : null;
   }
 
-  async findAll(
-    filter?: CardFilterInput,
-    sort?: CardSortInput
-  ): Promise<Card[]> {
+  async findAll(filter?: CardFilterInput): Promise<Card[]> {
     const where = this.buildWhereClause(filter);
-    const orderBy = this.buildOrderByClause(sort);
 
+    // レアリティ優先ソート（LR→UR→SR→R→BR→DR）、その次にID降順
     const cards = await this.prisma.card.findMany({
       where,
-      orderBy,
+      orderBy: [
+        {
+          rarity: {
+            sort: 'asc',
+            nulls: 'last',
+          },
+        },
+        {
+          id: 'desc',
+        },
+      ],
       include: {
         detail: true,
         accessories: true,
       },
     });
 
-    return cards.map((card) => this.mapToEntity(card));
+    // レアリティの優先順位でソート（LR→UR→SR→R→BR→DR）
+    const rarityOrder: Record<string, number> = {
+      LR: 1,
+      UR: 2,
+      SR: 3,
+      R: 4,
+      BR: 5,
+      DR: 6,
+    };
+
+    const sortedCards = cards.sort((a, b) => {
+      // レアリティでソート
+      const rarityA = a.rarity ? (rarityOrder[a.rarity] ?? 999) : 999;
+      const rarityB = b.rarity ? (rarityOrder[b.rarity] ?? 999) : 999;
+
+      if (rarityA !== rarityB) {
+        return rarityA - rarityB;
+      }
+
+      // レアリティが同じ場合はID降順
+      return b.id - a.id;
+    });
+
+    return sortedCards.map((card) => this.mapToEntity(card));
   }
 
   async findByIds(ids: number[]): Promise<Card[]> {
@@ -210,25 +239,6 @@ export class CardRepository implements ICardRepository {
     }
 
     return conditions;
-  }
-
-  private buildOrderByClause(
-    sort?: CardSortInput
-  ): Record<string, 'asc' | 'desc'> {
-    if (!sort) return { id: 'desc' };
-
-    const fieldMap: Record<string, string> = {
-      ID: 'id',
-      CARD_NAME: 'cardName',
-      CHARACTER_NAME: 'characterName',
-      CREATED_AT: 'createdAt',
-      UPDATED_AT: 'updatedAt',
-    };
-
-    const field = fieldMap[sort.field] || 'id';
-    const direction = sort.direction.toLowerCase() as 'asc' | 'desc';
-
-    return { [field]: direction };
   }
 
   private mapToEntity(

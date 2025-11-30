@@ -12,11 +12,6 @@ export interface CardFilterInput {
   accessoryEffectContains?: string;
 }
 
-export interface CardSortInput {
-  field: 'ID' | 'CARD_NAME' | 'CHARACTER_NAME' | 'CREATED_AT' | 'UPDATED_AT';
-  direction: 'ASC' | 'DESC';
-}
-
 export interface CardStats {
   totalCards: number;
   byRarity: Array<{ rarity: string; count: number }>;
@@ -30,7 +25,7 @@ export interface ICardRepository {
     cardName: string,
     characterName: string
   ): Promise<Card | null>;
-  findAll(filter?: CardFilterInput, sort?: CardSortInput): Promise<Card[]>;
+  findAll(filter?: CardFilterInput): Promise<Card[]>;
   findByIds(ids: number[]): Promise<Card[]>;
   getStats(): Promise<CardStats>;
 }
