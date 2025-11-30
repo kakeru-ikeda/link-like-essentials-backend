@@ -14,17 +14,25 @@ const LLES_CORS_ORIGIN =
   process.env.LLES_CORS_ORIGIN || 'http://localhost:3000';
 const isDevelopment = process.env.NODE_ENV === 'development';
 
+// CORS_ORIGINをカンマ区切りで配列に変換
+const getAllowedOrigins = (): string[] => {
+  if (isDevelopment) {
+    return ['http://localhost:3000', 'https://studio.apollographql.com'];
+  }
+  return LLES_CORS_ORIGIN.split(',').map((origin) => origin.trim());
+};
+
 async function startServer(): Promise<void> {
   try {
     // Express app作成
     const app = express();
 
+    const allowedOrigins = getAllowedOrigins();
+
     // ミドルウェア
     app.use(
       cors({
-        origin: isDevelopment
-          ? ['http://localhost:3000', 'https://studio.apollographql.com']
-          : LLES_CORS_ORIGIN,
+        origin: allowedOrigins,
         credentials: true,
       })
     );
