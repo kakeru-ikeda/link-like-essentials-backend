@@ -1,3 +1,4 @@
+import type { Accessory } from './Accessory';
 import type { CardDetail } from './CardDetail';
 
 export interface Card {
@@ -12,4 +13,5 @@ export interface Card {
   createdAt: Date | null;
   updatedAt: Date | null;
   detail?: CardDetail;
+  accessories?: Accessory[];
 }

@@ -3,11 +3,9 @@ import type { Card as PrismaCard, PrismaClient } from '@prisma/client';
 import type { Card } from '@/domain/entities/Card';
 import type {
   CardFilterInput,
-  CardListResult,
   CardSortInput,
   CardStats,
   ICardRepository,
-  PaginationInput,
 } from '@/domain/repositories/ICardRepository';
 
 export class CardRepository implements ICardRepository {
@@ -18,6 +16,7 @@ export class CardRepository implements ICardRepository {
       where: { id },
       include: {
         detail: true,
+        accessories: true,
       },
     });
 
@@ -37,6 +36,7 @@ export class CardRepository implements ICardRepository {
       },
       include: {
         detail: true,
+        accessories: true,
       },
     });
 
@@ -45,47 +45,21 @@ export class CardRepository implements ICardRepository {
 
   async findAll(
     filter?: CardFilterInput,
-    sort?: CardSortInput,
-    pagination?: PaginationInput
-  ): Promise<CardListResult> {
+    sort?: CardSortInput
+  ): Promise<Card[]> {
     const where = this.buildWhereClause(filter);
     const orderBy = this.buildOrderByClause(sort);
-    const take = pagination?.first || 20;
 
-    const findManyOptions: {
-      where: Record<string, unknown>;
-      orderBy: Record<string, 'asc' | 'desc'>;
-      take: number;
-      skip?: number;
-      cursor?: { id: number };
-      include: { detail: boolean };
-    } = {
+    const cards = await this.prisma.card.findMany({
       where,
       orderBy,
-      take: take + 1, // +1 for hasNextPage check
       include: {
         detail: true,
+        accessories: true,
       },
-    };
+    });
 
-    if (pagination?.after) {
-      findManyOptions.cursor = { id: parseInt(pagination.after, 10) };
-      findManyOptions.skip = 1;
-    }
-
-    const [cards, totalCount] = await Promise.all([
-      this.prisma.card.findMany(findManyOptions),
-      this.prisma.card.count({ where }),
-    ]);
-
-    const hasNextPage = cards.length > take;
-    const resultCards = hasNextPage ? cards.slice(0, take) : cards;
-
-    return {
-      cards: resultCards.map((card) => this.mapToEntity(card)),
-      totalCount,
-      hasNextPage,
-    };
+    return cards.map((card) => this.mapToEntity(card));
   }
 
   async findByIds(ids: number[]): Promise<Card[]> {
@@ -95,6 +69,7 @@ export class CardRepository implements ICardRepository {
       },
       include: {
         detail: true,
+        accessories: true,
       },
     });
 
@@ -256,8 +231,10 @@ export class CardRepository implements ICardRepository {
     return { [field]: direction };
   }
 
-  private mapToEntity(card: PrismaCard & { detail?: unknown }): Card {
-    return {
+  private mapToEntity(
+    card: PrismaCard & { detail?: unknown; accessories?: unknown[] }
+  ): Card {
+    const mappedCard: Card = {
       id: card.id,
       rarity: card.rarity,
       limited: card.limited,
@@ -269,6 +246,14 @@ export class CardRepository implements ICardRepository {
       createdAt: card.createdAt,
       updatedAt: card.updatedAt,
       detail: card.detail as Card['detail'],
+      accessories: card.accessories as Card['accessories'],
     };
+
+    // detailにaccessoriesを追加
+    if (mappedCard.detail && card.accessories) {
+      mappedCard.detail.accessories = card.accessories as Card['accessories'];
+    }
+
+    return mappedCard;
   }
 }

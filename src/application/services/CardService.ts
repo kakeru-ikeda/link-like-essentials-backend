@@ -8,8 +8,6 @@ import type { CardCacheStrategy } from '@/infrastructure/cache/strategies/CardCa
 import type {
   CardFilterInput,
   CardSortInput,
-  PaginationInput,
-  CardConnectionResult,
   CardStatsResult,
 } from '../dto/CardDTO';
 
@@ -67,70 +65,54 @@ export class CardService {
 
   async findAll(
     filter?: CardFilterInput,
-    sort?: CardSortInput,
-    pagination?: PaginationInput
-  ): Promise<CardConnectionResult> {
+    sort?: CardSortInput
+  ): Promise<Card[]> {
     // フィルター条件からハッシュを生成
-    const filterHash = this.generateFilterHash(filter, sort, pagination);
+    const filterHash = this.generateFilterHash(filter, sort);
 
     // キャッシュチェック
     const cached = await this.cacheStrategy.getCardList(filterHash);
-    if (cached) {
-      return this.buildConnectionResult(cached, pagination);
+    if (cached && Array.isArray(cached)) {
+      return cached;
     }
 
     // DBから取得
-    const result = await this.cardRepository.findAll(filter, sort, pagination);
+    const cards = await this.cardRepository.findAll(filter, sort);
 
     // キャッシュに保存
-    await this.cacheStrategy.setCardList(filterHash, result.cards);
+    await this.cacheStrategy.setCardList(filterHash, cards);
 
-    return this.buildConnectionResult(result.cards, pagination, result);
+    return cards;
   }
 
   async getStats(): Promise<CardStatsResult> {
+    // キャッシュチェック
+    const cached = await this.cacheStrategy.getStats<CardStatsResult>();
+    if (cached) {
+      return cached;
+    }
+
+    // DBから取得
     const stats = await this.cardRepository.getStats();
 
-    return {
+    const result: CardStatsResult = {
       totalCards: stats.totalCards,
       byRarity: stats.byRarity,
       byStyleType: stats.byStyleType,
       byCharacter: stats.byCharacter,
     };
+
+    // キャッシュに保存
+    await this.cacheStrategy.setStats<CardStatsResult>(result);
+
+    return result;
   }
 
   private generateFilterHash(
     filter?: CardFilterInput,
-    sort?: CardSortInput,
-    pagination?: PaginationInput
+    sort?: CardSortInput
   ): string {
-    const data = JSON.stringify({ filter, sort, pagination });
+    const data = JSON.stringify({ filter, sort });
     return crypto.createHash('md5').update(data).digest('hex');
-  }
-
-  private buildConnectionResult(
-    cards: Card[],
-    _pagination?: PaginationInput,
-    result?: { totalCount: number; hasNextPage: boolean }
-  ): CardConnectionResult {
-    const edges = cards.map((card) => ({
-      node: card,
-      cursor: Buffer.from(`${card.id}`).toString('base64'),
-    }));
-
-    const hasNextPage = result?.hasNextPage ?? false;
-    const totalCount = result?.totalCount ?? cards.length;
-
-    return {
-      edges,
-      pageInfo: {
-        hasNextPage,
-        hasPreviousPage: false,
-        startCursor: edges.length > 0 ? (edges[0]?.cursor ?? null) : null,
-        endCursor:
-          edges.length > 0 ? (edges[edges.length - 1]?.cursor ?? null) : null,
-      },
-      totalCount,
-    };
   }
 }

@@ -13,17 +13,6 @@ type Card {
   accessories: [Accessory!]!
 }
 
-type CardConnection {
-  edges: [CardEdge!]!
-  pageInfo: PageInfo!
-  totalCount: Int!
-}
-
-type CardEdge {
-  node: Card!
-  cursor: String!
-}
-
 input CardFilterInput {
   rarity: Rarity
   limited: LimitedType

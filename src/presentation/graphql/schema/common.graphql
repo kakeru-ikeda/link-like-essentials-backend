@@ -78,11 +78,3 @@ type Trait {
   name: String!
   effect: String
 }
-
-# ページネーション情報
-type PageInfo {
-  hasNextPage: Boolean!
-  hasPreviousPage: Boolean!
-  startCursor: String
-  endCursor: String
-}
