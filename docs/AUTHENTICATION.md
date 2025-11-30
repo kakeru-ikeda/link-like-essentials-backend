@@ -389,7 +389,7 @@ app.use(
   cors({
     origin: isDevelopment
       ? ['http://localhost:3000', 'https://studio.apollographql.com']
-      : CORS_ORIGIN,
+      : LLES_CORS_ORIGIN,
     credentials: true,
   })
 );
@@ -406,7 +406,7 @@ app.use(
 FIREBASE_SERVICE_ACCOUNT_PATH=./firebase-service-account.json
 
 # CORS（本番環境）
-CORS_ORIGIN=https://your-frontend-domain.com
+LLES_CORS_ORIGIN=https://your-frontend-domain.com
 
 # Node環境（重要: 開発環境では認証バイパス）
 NODE_ENV=development  # 開発環境: 認証なしでアクセス可能

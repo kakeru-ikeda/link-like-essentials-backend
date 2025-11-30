@@ -11,7 +11,7 @@ services:
       REDIS_PORT: 6379
       FIREBASE_SERVICE_ACCOUNT_PATH: /app/firebase-service-account.json
       LLES_FIREBASE_PROJECT_ID: ${LLES_FIREBASE_PROJECT_ID}
-      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost:3000}
+      LLES_CORS_ORIGIN: ${LLES_CORS_ORIGIN:-http://localhost:3000}
       LOG_LEVEL: ${LOG_LEVEL:-info}
     depends_on:
       - redis

@@ -1360,7 +1360,7 @@ FIREBASE_SERVICE_ACCOUNT_PATH=./firebase-service-account.json
 LLES_FIREBASE_PROJECT_ID=your-project-id
 
 # CORS
-CORS_ORIGIN=http://localhost:3000
+LLES_CORS_ORIGIN=http://localhost:3000
 
 # Logging
 LOG_LEVEL=info
