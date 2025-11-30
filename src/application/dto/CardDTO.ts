@@ -4,11 +4,10 @@ export interface CardFilterInput {
   characterName?: string;
   styleType?: string;
   cardName?: string;
-}
-
-export interface CardSortInput {
-  field: 'ID' | 'CARD_NAME' | 'CHARACTER_NAME' | 'CREATED_AT' | 'UPDATED_AT';
-  direction: 'ASC' | 'DESC';
+  skillEffectContains?: string;
+  traitEffectContains?: string;
+  specialAppealEffectContains?: string;
+  accessoryEffectContains?: string;
 }
 
 export interface CardStatsResult {

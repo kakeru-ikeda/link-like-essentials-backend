@@ -1,6 +1,6 @@
 type Query {
-  # カード一覧取得
-  cards(filter: CardFilterInput, sort: CardSortInput): [Card!]!
+  # カード一覧取得（レアリティ優先: LR→UR→SR→R→BR→DR、ID降順）
+  cards(filter: CardFilterInput): [Card!]!
 
   # 単一カード取得
   card(id: ID!): Card
