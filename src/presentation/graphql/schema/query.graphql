@@ -1,11 +1,6 @@
 type Query {
-  # カード一覧取得（ページネーション対応）
-  cards(
-    first: Int
-    after: String
-    filter: CardFilterInput
-    sort: CardSortInput
-  ): CardConnection!
+  # カード一覧取得
+  cards(filter: CardFilterInput, sort: CardSortInput): [Card!]!
 
   # 単一カード取得
   card(id: ID!): Card

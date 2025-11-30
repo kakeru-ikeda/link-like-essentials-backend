@@ -8,8 +8,6 @@ interface QueryResolvers {
   cards: (
     parent: unknown,
     args: {
-      first?: number;
-      after?: string;
       filter?: CardFilterInput;
       sort?: CardSortInput;
     },
@@ -39,7 +37,7 @@ export interface CardResolvers {
     context: GraphQLContext
   ) => Promise<unknown>;
   accessories: (
-    parent: { id: number },
+    parent: { id: number; accessories?: unknown[] },
     args: Record<string, never>,
     context: GraphQLContext
   ) => Promise<unknown>;
@@ -56,12 +54,11 @@ export const cardResolvers: {
     cards: async (_, args, context) => {
       requireAuth(context);
 
-      const { first, after, filter, sort } = args;
+      const { filter, sort } = args;
 
       const result = await context.dataSources.cardService.findAll(
         filter,
-        sort,
-        { first, after }
+        sort
       );
 
       return result;
@@ -99,6 +96,10 @@ export const cardResolvers: {
     },
 
     accessories: async (parent, _, context) => {
+      // 事前ロード済みの場合はそれを返す
+      if (parent.accessories) return parent.accessories;
+
+      // フィールドリゾルバーでのフォールバック（通常は使われない）
       return await context.dataSources.accessoryService.findByCardId(parent.id);
     },
 

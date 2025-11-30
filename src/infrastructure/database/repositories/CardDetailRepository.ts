@@ -13,7 +13,11 @@ export class CardDetailRepository implements ICardDetailRepository {
     const detail = await this.prisma.cardDetail.findUnique({
       where: { cardId },
       include: {
-        card: true,
+        card: {
+          include: {
+            accessories: true,
+          },
+        },
       },
     });
 
@@ -26,7 +30,11 @@ export class CardDetailRepository implements ICardDetailRepository {
         cardId: { in: cardIds },
       },
       include: {
-        card: true,
+        card: {
+          include: {
+            accessories: true,
+          },
+        },
       },
     });
 
@@ -34,7 +42,7 @@ export class CardDetailRepository implements ICardDetailRepository {
   }
 
   private mapToEntity(
-    detail: PrismaCardDetail & { card?: unknown }
+    detail: PrismaCardDetail & { card?: { accessories?: unknown[] } }
   ): CardDetail {
     return {
       id: detail.id,
@@ -61,6 +69,7 @@ export class CardDetailRepository implements ICardDetailRepository {
       createdAt: detail.createdAt,
       updatedAt: detail.updatedAt,
       card: detail.card as CardDetail['card'],
+      accessories: detail.card?.accessories as CardDetail['accessories'],
     };
   }
 }

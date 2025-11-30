@@ -17,17 +17,6 @@ export interface CardSortInput {
   direction: 'ASC' | 'DESC';
 }
 
-export interface PaginationInput {
-  first?: number;
-  after?: string;
-}
-
-export interface CardListResult {
-  cards: Card[];
-  totalCount: number;
-  hasNextPage: boolean;
-}
-
 export interface CardStats {
   totalCards: number;
   byRarity: Array<{ rarity: string; count: number }>;
@@ -41,11 +30,7 @@ export interface ICardRepository {
     cardName: string,
     characterName: string
   ): Promise<Card | null>;
-  findAll(
-    filter?: CardFilterInput,
-    sort?: CardSortInput,
-    pagination?: PaginationInput
-  ): Promise<CardListResult>;
+  findAll(filter?: CardFilterInput, sort?: CardSortInput): Promise<Card[]>;
   findByIds(ids: number[]): Promise<Card[]>;
   getStats(): Promise<CardStats>;
 }

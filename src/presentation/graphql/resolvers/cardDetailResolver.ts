@@ -78,6 +78,10 @@ export const cardDetailResolvers: {
     },
 
     accessories: async (parent, _, context) => {
+      // 事前ロード済みの場合はそれを返す
+      if (parent.accessories) return parent.accessories;
+
+      // フィールドリゾルバーでのフォールバック（通常は使われない）
       return await context.dataSources.accessoryService.findByCardId(
         parent.cardId
       );

@@ -51,4 +51,12 @@ export class CardCacheStrategy {
     await this.cache.invalidatePattern('card:*');
     await this.cache.invalidatePattern('cards:*');
   }
+
+  async getStats<T>(): Promise<T | null> {
+    return await this.cache.get<T>('cards:stats');
+  }
+
+  async setStats<T>(stats: T): Promise<void> {
+    await this.cache.set('cards:stats', stats, TTL.STATS);
+  }
 }
