@@ -6,6 +6,7 @@ type Card {
   cardUrl: String
   characterName: String!
   styleType: StyleType
+  releaseDate: DateTime
   isLocked: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime!
