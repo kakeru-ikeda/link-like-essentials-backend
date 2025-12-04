@@ -8,7 +8,7 @@ pipeline {
         DEPLOY_HOST = '192.168.40.99'
         DEPLOY_USER = 'server'
         IMAGE_NAME = 'link-like-essentials-backend'
-        DISCORD_WEBHOOK = credentials('DISCORD_WEBHOOK_JENKINS_LOG_URL')
+        DISCORD_WEBHOOK = credentials('LLES_JENKINS_WEBHOOK_URL')
     }
 
     options {
@@ -20,7 +20,7 @@ pipeline {
         stage('Notification') {
             steps {
                 echo 'パイプラインの実行を開始しました'
-                withCredentials([string(credentialsId: 'DISCORD_WEBHOOK_JENKINS_LOG_URL', variable: 'DISCORD_WEBHOOK_JENKINS_LOG_URL')]) {
+                withCredentials([string(credentialsId: 'LLES_JENKINS_WEBHOOK_URL', variable: 'LLES_JENKINS_WEBHOOK_URL')]) {
                     sh '''
                         # JSONをエスケープして正しく構築
                         JOB_NAME_ESC=$(echo "${JOB_NAME}" | sed 's/"/\\\\"/g')
@@ -28,7 +28,7 @@ pipeline {
                         # Discord通知をcurlで送信（ビルド開始）
                         curl -X POST -H "Content-Type: application/json" \\
                              -d "{\\"content\\":\\"**Jenkinsがビルドを受け付けました** 🚀\\nジョブ: ${JOB_NAME_ESC}\\nビルド番号: #${BUILD_NUMBER}\\"}" \\
-                             "${DISCORD_WEBHOOK_JENKINS_LOG_URL}"
+                             "${LLES_JENKINS_WEBHOOK_URL}"
                     '''
                 }
             }
@@ -223,7 +223,7 @@ EOF
         }
         success {
             echo 'パイプラインが正常に完了しました！'
-            withCredentials([string(credentialsId: 'DISCORD_WEBHOOK_JENKINS_LOG_URL', variable: 'DISCORD_WEBHOOK_JENKINS_LOG_URL')]) {
+            withCredentials([string(credentialsId: 'LLES_JENKINS_WEBHOOK_URL', variable: 'LLES_JENKINS_WEBHOOK_URL')]) {
                 sh '''
                     # JSONをエスケープして正しく構築
                     JOB_NAME_ESC=$(echo "${JOB_NAME}" | sed 's/"/\\\\"/g')
@@ -231,13 +231,13 @@ EOF
                     # Discord通知をcurlで送信（ビルド成功）
                     curl -X POST -H "Content-Type: application/json" \\
                          -d "{\\"content\\":\\"**ビルド成功** ✨\\nジョブ: ${JOB_NAME_ESC}\\nビルド番号: #${BUILD_NUMBER}\\"}" \\
-                         "${DISCORD_WEBHOOK_JENKINS_LOG_URL}"
+                         "${LLES_JENKINS_WEBHOOK_URL}"
                 '''
             }
         }
         failure {
             echo 'パイプラインが失敗しました！'
-            withCredentials([string(credentialsId: 'DISCORD_WEBHOOK_JENKINS_LOG_URL', variable: 'DISCORD_WEBHOOK_JENKINS_LOG_URL')]) {
+            withCredentials([string(credentialsId: 'LLES_JENKINS_WEBHOOK_URL', variable: 'LLES_JENKINS_WEBHOOK_URL')]) {
                 sh '''
                     # JSONをエスケープして正しく構築
                     JOB_NAME_ESC=$(echo "${JOB_NAME}" | sed 's/"/\\\\"/g')
@@ -245,7 +245,7 @@ EOF
                     # Discord通知をcurlで送信（ビルド失敗）
                     curl -X POST -H "Content-Type: application/json" \\
                          -d "{\\"content\\":\\"**ビルド失敗** 🚨\\nジョブ: ${JOB_NAME_ESC}\\nビルド番号: #${BUILD_NUMBER}\\"}" \\
-                         "${DISCORD_WEBHOOK_JENKINS_LOG_URL}"
+                         "${LLES_JENKINS_WEBHOOK_URL}"
                 '''
             }
         }
