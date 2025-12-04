@@ -16,6 +16,7 @@ model Card {
   cardUrl       String?         @map("card_url")
   characterName String          @map("character_name") @db.VarChar(255)
   styleType     String?         @map("style_type") @db.VarChar(100)
+  releaseDate   DateTime?       @map("release_date") @db.Date
   createdAt     DateTime?       @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt     DateTime?       @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
   isLocked      Boolean?        @default(false) @map("is_locked")
