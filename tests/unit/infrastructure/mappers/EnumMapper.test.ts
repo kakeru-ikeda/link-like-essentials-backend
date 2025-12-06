@@ -46,6 +46,10 @@ describe('EnumMapper', () => {
     it('should return null for null input', () => {
       expect(EnumMapper.toFavoriteModeEnum(null)).toBeNull();
     });
+
+    it('should return null for unknown values', () => {
+      expect(EnumMapper.toFavoriteModeEnum('unknown')).toBeNull();
+    });
   });
 
   describe('toParentTypeEnum', () => {
@@ -59,6 +63,10 @@ describe('EnumMapper', () => {
 
     it('should return null for null input', () => {
       expect(EnumMapper.toParentTypeEnum(null)).toBeNull();
+    });
+
+    it('should return null for unknown values', () => {
+      expect(EnumMapper.toParentTypeEnum('unknown')).toBeNull();
     });
   });
 
