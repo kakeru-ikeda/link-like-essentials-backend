@@ -46,6 +46,10 @@ describe('EnumMapper', () => {
     it('should return null for null input', () => {
       expect(EnumMapper.toFavoriteModeEnum(null)).toBeNull();
     });
+
+    it('should return null for unknown values', () => {
+      expect(EnumMapper.toFavoriteModeEnum('unknown')).toBeNull();
+    });
   });
 
   describe('toParentTypeEnum', () => {
@@ -59,6 +63,91 @@ describe('EnumMapper', () => {
 
     it('should return null for null input', () => {
       expect(EnumMapper.toParentTypeEnum(null)).toBeNull();
+    });
+
+    it('should return null for unknown values', () => {
+      expect(EnumMapper.toParentTypeEnum('unknown')).toBeNull();
+    });
+  });
+
+  // Reverse mapping tests
+  describe('fromLimitedTypeEnum', () => {
+    it('should map English enum to Japanese values', () => {
+      expect(EnumMapper.fromLimitedTypeEnum('PERMANENT')).toBe('恒常');
+      expect(EnumMapper.fromLimitedTypeEnum('LIMITED')).toBe('限定');
+      expect(EnumMapper.fromLimitedTypeEnum('SPRING_LIMITED')).toBe('春限定');
+      expect(EnumMapper.fromLimitedTypeEnum('SUMMER_LIMITED')).toBe('夏限定');
+      expect(EnumMapper.fromLimitedTypeEnum('AUTUMN_LIMITED')).toBe('秋限定');
+      expect(EnumMapper.fromLimitedTypeEnum('WINTER_LIMITED')).toBe('冬限定');
+      expect(EnumMapper.fromLimitedTypeEnum('BIRTHDAY_LIMITED')).toBe('誕限定');
+      expect(EnumMapper.fromLimitedTypeEnum('LEG_LIMITED')).toBe('LEG限定');
+      expect(EnumMapper.fromLimitedTypeEnum('BATTLE_LIMITED')).toBe('撃限定');
+      expect(EnumMapper.fromLimitedTypeEnum('PARTY_LIMITED')).toBe('宴限定');
+      expect(EnumMapper.fromLimitedTypeEnum('ACTIVITY_LIMITED')).toBe('活限定');
+      expect(EnumMapper.fromLimitedTypeEnum('GRADUATE_LIMITED')).toBe('卒限定');
+      expect(EnumMapper.fromLimitedTypeEnum('LOGIN_BONUS')).toBe('ログボ');
+      expect(EnumMapper.fromLimitedTypeEnum('REWARD')).toBe('報酬');
+    });
+
+    it('should return null for null input', () => {
+      expect(EnumMapper.fromLimitedTypeEnum(null)).toBeNull();
+    });
+
+    it('should return null for unknown values', () => {
+      expect(EnumMapper.fromLimitedTypeEnum('UNKNOWN')).toBeNull();
+    });
+  });
+
+  describe('fromStyleTypeEnum', () => {
+    it('should map English enum to Japanese values', () => {
+      expect(EnumMapper.fromStyleTypeEnum('CHEERLEADER')).toBe('チアリーダー');
+      expect(EnumMapper.fromStyleTypeEnum('TRICKSTER')).toBe('トリックスター');
+      expect(EnumMapper.fromStyleTypeEnum('PERFORMER')).toBe('パフォーマー');
+      expect(EnumMapper.fromStyleTypeEnum('MOODMAKER')).toBe('ムードメーカー');
+      expect(EnumMapper.fromStyleTypeEnum('MOODOMAKER')).toBe('ムードーメーカー');
+    });
+
+    it('should return null for null input', () => {
+      expect(EnumMapper.fromStyleTypeEnum(null)).toBeNull();
+    });
+
+    it('should return null for unknown values', () => {
+      expect(EnumMapper.fromStyleTypeEnum('UNKNOWN')).toBeNull();
+    });
+  });
+
+  describe('fromFavoriteModeEnum', () => {
+    it('should map English enum to Japanese values', () => {
+      expect(EnumMapper.fromFavoriteModeEnum('HAPPY')).toBe('ハッピー');
+      expect(EnumMapper.fromFavoriteModeEnum('MELLOW')).toBe('メロウ');
+      expect(EnumMapper.fromFavoriteModeEnum('NEUTRAL')).toBe('ニュートラル');
+      expect(EnumMapper.fromFavoriteModeEnum('NONE')).toBe('--');
+    });
+
+    it('should return null for null input', () => {
+      expect(EnumMapper.fromFavoriteModeEnum(null)).toBeNull();
+    });
+
+    it('should return null for unknown values', () => {
+      expect(EnumMapper.fromFavoriteModeEnum('UNKNOWN')).toBeNull();
+    });
+  });
+
+  describe('fromParentTypeEnum', () => {
+    it('should map English enum to original values', () => {
+      expect(EnumMapper.fromParentTypeEnum('SPECIAL_APPEAL')).toBe(
+        'special_appeal'
+      );
+      expect(EnumMapper.fromParentTypeEnum('SKILL')).toBe('skill');
+      expect(EnumMapper.fromParentTypeEnum('TRAIT')).toBe('trait');
+    });
+
+    it('should return null for null input', () => {
+      expect(EnumMapper.fromParentTypeEnum(null)).toBeNull();
+    });
+
+    it('should return null for unknown values', () => {
+      expect(EnumMapper.fromParentTypeEnum('UNKNOWN')).toBeNull();
     });
   });
 });

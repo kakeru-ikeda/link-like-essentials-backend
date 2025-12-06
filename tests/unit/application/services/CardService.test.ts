@@ -182,4 +182,67 @@ describe('CardService', () => {
       expect(mockCacheStrategy.setStats).toHaveBeenCalledWith(mockStats);
     });
   });
+
+  describe('findAll', () => {
+    it('should return cards from cache if available', async () => {
+      const mockCards = [mockCard];
+      mockCacheStrategy.getCardList.mockResolvedValue(mockCards);
+
+      const result = await cardService.findAll();
+
+      expect(result).toEqual(mockCards);
+      expect(mockCacheStrategy.getCardList).toHaveBeenCalled();
+      expect(mockRepository.findAll).not.toHaveBeenCalled();
+    });
+
+    it('should fetch from repository and cache if not in cache', async () => {
+      const mockCards = [mockCard];
+      mockCacheStrategy.getCardList.mockResolvedValue(null);
+      mockRepository.findAll.mockResolvedValue(mockCards);
+
+      const result = await cardService.findAll();
+
+      expect(result).toEqual(mockCards);
+      expect(mockCacheStrategy.getCardList).toHaveBeenCalled();
+      expect(mockRepository.findAll).toHaveBeenCalledWith(undefined);
+      expect(mockCacheStrategy.setCardList).toHaveBeenCalled();
+    });
+
+    it('should fetch from repository with filter if cache returns non-array', async () => {
+      const mockCards = [mockCard];
+      mockCacheStrategy.getCardList.mockResolvedValue({} as unknown as null);
+      mockRepository.findAll.mockResolvedValue(mockCards);
+
+      const filter = { rarity: 'UR' };
+      const result = await cardService.findAll(filter);
+
+      expect(result).toEqual(mockCards);
+      expect(mockRepository.findAll).toHaveBeenCalledWith(filter);
+    });
+
+    it('should pass filter to repository', async () => {
+      const mockCards = [mockCard];
+      const filter = { rarity: 'UR', characterName: 'Test' };
+      mockCacheStrategy.getCardList.mockResolvedValue(null);
+      mockRepository.findAll.mockResolvedValue(mockCards);
+
+      await cardService.findAll(filter);
+
+      expect(mockRepository.findAll).toHaveBeenCalledWith(filter);
+    });
+
+    it('should generate consistent hash for same filter', async () => {
+      mockCacheStrategy.getCardList.mockResolvedValue(null);
+      mockRepository.findAll.mockResolvedValue([]);
+
+      const filter = { rarity: 'UR' };
+      await cardService.findAll(filter);
+      const firstCall = mockCacheStrategy.getCardList.mock.calls[0]?.[0];
+
+      await cardService.findAll(filter);
+      const secondCall = mockCacheStrategy.getCardList.mock.calls[1]?.[0];
+
+      expect(firstCall).toBe(secondCall);
+    });
+  });
 });

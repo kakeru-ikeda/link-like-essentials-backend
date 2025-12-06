@@ -3,10 +3,10 @@ import type { CardDetailService } from '../../../../src/application/services/Car
 import type { CardService } from '../../../../src/application/services/CardService';
 import type { AuthUser } from '../../../../src/infrastructure/auth/AuthService';
 import type { GraphQLContext } from '../../../../src/presentation/graphql/context';
-import {
-  getAuthenticatedUser,
-  requireAuth,
-} from '../../../../src/presentation/middleware/authGuard';
+
+// Note: authGuard uses module-level isDevelopment constant evaluated at load time
+// Testing both environments requires separate test files or dynamic imports
+// For unit tests, we test the logic paths that are reachable in test environment
 
 describe('AuthGuard', () => {
   const mockDataSources = {
@@ -21,6 +21,22 @@ describe('AuthGuard', () => {
     emailVerified: true,
   };
 
+  // Import fresh module for each test to reset isDevelopment
+  let requireAuth: typeof import('../../../../src/presentation/middleware/authGuard').requireAuth;
+  let getAuthenticatedUser: typeof import('../../../../src/presentation/middleware/authGuard').getAuthenticatedUser;
+
+  beforeEach(async () => {
+    // Clear the module cache to get fresh imports
+    jest.resetModules();
+
+    // Re-import to get fresh module with current NODE_ENV
+    const authGuardModule = await import(
+      '../../../../src/presentation/middleware/authGuard'
+    );
+    requireAuth = authGuardModule.requireAuth;
+    getAuthenticatedUser = authGuardModule.getAuthenticatedUser;
+  });
+
   describe('requireAuth', () => {
     it('認証済みユーザーの場合、エラーをスローしない', () => {
       const context: GraphQLContext = {
@@ -31,9 +47,15 @@ describe('AuthGuard', () => {
       expect(() => requireAuth(context)).not.toThrow();
     });
 
-    // 開発環境（NODE_ENV=development）ではバイパスされるため、
-    // テスト環境（NODE_ENV=test）では認証チェックが実行される
-    // 実際の開発環境での動作確認は手動テストで行う
+    it('テスト環境で未認証の場合、AuthenticationErrorをスローする', () => {
+      // In test environment (NODE_ENV=test), isDevelopment is false
+      const context: GraphQLContext = {
+        user: undefined,
+        dataSources: mockDataSources,
+      };
+
+      expect(() => requireAuth(context)).toThrow('認証が必要です');
+    });
   });
 
   describe('getAuthenticatedUser', () => {
@@ -50,6 +72,13 @@ describe('AuthGuard', () => {
       expect(user?.email).toBe('test@example.com');
     });
 
-    // 開発環境での動作は手動テストで確認
+    it('テスト環境で未認証の場合、AuthenticationErrorをスローする', () => {
+      const context: GraphQLContext = {
+        user: undefined,
+        dataSources: mockDataSources,
+      };
+
+      expect(() => getAuthenticatedUser(context)).toThrow('認証が必要です');
+    });
   });
 });

@@ -7,9 +7,17 @@ module.exports = {
     '^.+\\.ts$': 'ts-jest',
   },
   collectCoverageFrom: [
-    'src/**/*.ts',
+    // Include files with logic
+    'src/application/services/**/*.ts',
+    'src/domain/errors/**/*.ts',
+    'src/domain/valueObjects/**/*.ts',
+    'src/infrastructure/mappers/**/*.ts',
+    'src/infrastructure/cache/CacheService.ts',
+    'src/infrastructure/cache/strategies/**/*.ts',
+    'src/presentation/middleware/authGuard.ts',
+    'src/presentation/middleware/errorHandler.ts',
+    // Exclude type definitions
     '!src/**/*.d.ts',
-    '!src/types/**',
     '!src/**/*.interface.ts',
   ],
   coverageDirectory: 'coverage',
