@@ -1,6 +1,7 @@
 import type { AccessoryService } from '../../../../src/application/services/AccessoryService';
 import type { CardDetailService } from '../../../../src/application/services/CardDetailService';
 import type { CardService } from '../../../../src/application/services/CardService';
+import type { SongService } from '../../../../src/application/services/SongService';
 import type { AuthUser } from '../../../../src/infrastructure/auth/AuthService';
 import type { GraphQLContext } from '../../../../src/presentation/graphql/context';
 
@@ -13,6 +14,7 @@ describe('AuthGuard', () => {
     cardService: {} as CardService,
     cardDetailService: {} as CardDetailService,
     accessoryService: {} as AccessoryService,
+    songService: {} as SongService,
   };
 
   const mockUser: AuthUser = {
