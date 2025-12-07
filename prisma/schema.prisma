@@ -82,3 +82,42 @@ model CardAccessory {
   @@index([isLocked], map: "idx_card_accessories_is_locked")
   @@map("card_accessories")
 }
+
+model Song {
+  id                   Int                    @id @default(autoincrement())
+  songName             String                 @map("song_name") @db.VarChar(255)
+  songUrl              String?                @map("song_url")
+  category             String                 @db.VarChar(100)
+  attribute            String                 @db.VarChar(100)
+  centerCharacter      String                 @map("center_character") @db.VarChar(255)
+  singers              String                 @db.VarChar(500)
+  liveAnalyzerImageUrl String?                @map("live_analyzer_image_url")
+  jacketImageUrl       String?                @map("jacket_image_url")
+  isLocked             Boolean?               @default(false) @map("is_locked")
+  createdAt            DateTime?              @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt            DateTime?              @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  moodProgressions     SongMoodProgression[]
+
+  @@index([songName], map: "idx_songs_song_name")
+  @@index([category], map: "idx_songs_category")
+  @@index([attribute], map: "idx_songs_attribute")
+  @@index([centerCharacter], map: "idx_songs_center_character")
+  @@index([isLocked], map: "idx_songs_is_locked")
+  @@map("songs")
+}
+
+model SongMoodProgression {
+  id           Int       @id @default(autoincrement())
+  songId       Int       @map("song_id")
+  section      String    @db.VarChar(100)
+  progression  String
+  sectionOrder Int       @map("section_order")
+  isLocked     Boolean?  @default(false) @map("is_locked")
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  song         Song      @relation(fields: [songId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([songId], map: "idx_song_mood_progressions_song_id")
+  @@index([isLocked], map: "idx_song_mood_progressions_is_locked")
+  @@map("song_mood_progressions")
+}
