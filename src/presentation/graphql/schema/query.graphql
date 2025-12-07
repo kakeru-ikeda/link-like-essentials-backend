@@ -14,4 +14,14 @@ type Query {
 
   # 統計情報
   cardStats: CardStats!
+
+  # 楽曲一覧取得
+  songs(filter: SongFilterInput): [Song!]!
+
+  # 単一楽曲取得
+  song(id: ID!): Song
+  songByName(songName: String!): Song
+
+  # 楽曲統計情報
+  songStats: SongStats!
 }

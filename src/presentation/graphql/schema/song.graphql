@@ -1,0 +1,56 @@
+type Song {
+  id: ID!
+  songName: String!
+  songUrl: String
+  category: String!
+  attribute: String!
+  centerCharacter: String!
+  singers: String!
+  liveAnalyzerImageUrl: String
+  jacketImageUrl: String
+  isLocked: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  moodProgressions: [SongMoodProgression!]!
+}
+
+type SongMoodProgression {
+  id: ID!
+  songId: Int!
+  section: String!
+  progression: String!
+  sectionOrder: Int!
+  isLocked: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+input SongFilterInput {
+  category: String
+  attribute: String
+  centerCharacter: String
+  songName: String
+  singersContains: String
+}
+
+type SongStats {
+  totalSongs: Int!
+  byCategory: [CategoryCount!]!
+  byAttribute: [AttributeCount!]!
+  byCenterCharacter: [CenterCharacterCount!]!
+}
+
+type CategoryCount {
+  category: String!
+  count: Int!
+}
+
+type AttributeCount {
+  attribute: String!
+  count: Int!
+}
+
+type CenterCharacterCount {
+  centerCharacter: String!
+  count: Int!
+}
