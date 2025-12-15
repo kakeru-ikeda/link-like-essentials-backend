@@ -6,6 +6,7 @@ type Song {
   attribute: String!
   centerCharacter: String!
   singers: String!
+  participations: [String!]!
   liveAnalyzerImageUrl: String
   jacketImageUrl: String
   isLocked: Boolean!

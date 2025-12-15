@@ -34,6 +34,11 @@ export interface SongResolvers {
     args: Record<string, never>,
     context: GraphQLContext
   ) => unknown[];
+  participations: (
+    parent: { participations: string | null },
+    args: Record<string, never>,
+    context: GraphQLContext
+  ) => string[];
 }
 
 export const songResolvers: {
@@ -77,6 +82,16 @@ export const songResolvers: {
 
       // 事前ロードされていない場合は空配列を返す
       return [];
+    },
+
+    participations: (parent) => {
+      // participationsがnullまたは空文字列の場合は空配列を返す
+      if (!parent.participations || parent.participations.trim() === '') {
+        return [];
+      }
+
+      // カンマ区切りで分割し、前後の空白を削除
+      return parent.participations.split(',').map((p) => p.trim());
     },
   },
 };

@@ -8,6 +8,7 @@ export interface Song {
   attribute: string;
   centerCharacter: string;
   singers: string;
+  participations: string | null;
   liveAnalyzerImageUrl: string | null;
   jacketImageUrl: string | null;
   isLocked: boolean | null;

@@ -10,6 +10,7 @@ describe('Song Entity', () => {
       attribute: 'クール',
       centerCharacter: 'Test Character',
       singers: 'Singer1,Singer2',
+      participations: 'Character1,Character2,Character3',
       liveAnalyzerImageUrl: 'https://example.com/live.png',
       jacketImageUrl: 'https://example.com/jacket.png',
       isLocked: false,
@@ -34,6 +35,7 @@ describe('Song Entity', () => {
       attribute: 'ピュア',
       centerCharacter: 'Character',
       singers: 'Singer',
+      participations: null,
       liveAnalyzerImageUrl: null,
       jacketImageUrl: null,
       isLocked: null,
@@ -44,6 +46,7 @@ describe('Song Entity', () => {
     expect(minimalSong).toBeDefined();
     expect(minimalSong.songUrl).toBeNull();
     expect(minimalSong.jacketImageUrl).toBeNull();
+    expect(minimalSong.participations).toBeNull();
   });
 
   it('should support optional moodProgressions field', () => {
@@ -55,6 +58,7 @@ describe('Song Entity', () => {
       attribute: 'スマイル',
       centerCharacter: 'Character',
       singers: 'Singer1,Singer2,Singer3',
+      participations: 'Character1,Character2',
       liveAnalyzerImageUrl: null,
       jacketImageUrl: null,
       isLocked: false,
@@ -101,6 +105,7 @@ describe('Song Entity', () => {
       attribute: 'クール',
       centerCharacter: '夕霧綴理',
       singers: '乙宗梢,夕霧綴理,藤島慈,日野下花帆,村野さやか,大沢瑠璃乃',
+      participations: '乙宗梢,夕霧綴理,藤島慈,日野下花帆,村野さやか,大沢瑠璃乃',
       liveAnalyzerImageUrl: null,
       jacketImageUrl: null,
       isLocked: false,
@@ -112,5 +117,9 @@ describe('Song Entity', () => {
       '乙宗梢,夕霧綴理,藤島慈,日野下花帆,村野さやか,大沢瑠璃乃'
     );
     expect(song.singers.split(',')).toHaveLength(6);
+    expect(song.participations).toBe(
+      '乙宗梢,夕霧綴理,藤島慈,日野下花帆,村野さやか,大沢瑠璃乃'
+    );
+    expect(song.participations?.split(',')).toHaveLength(6);
   });
 });
