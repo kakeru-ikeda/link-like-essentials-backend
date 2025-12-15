@@ -170,6 +170,7 @@ export class SongRepository implements ISongRepository {
       attribute: song.attribute,
       centerCharacter: song.centerCharacter,
       singers: song.singers,
+      participations: song.participations,
       liveAnalyzerImageUrl: song.liveAnalyzerImageUrl,
       jacketImageUrl: song.jacketImageUrl,
       isLocked: song.isLocked,

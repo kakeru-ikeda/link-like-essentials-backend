@@ -17,6 +17,7 @@ describe('SongCacheStrategy', () => {
     attribute: 'クール',
     centerCharacter: 'Test Character',
     singers: 'Singer1,Singer2',
+    participations: 'Character1,Character2',
     liveAnalyzerImageUrl: 'https://example.com/live.png',
     jacketImageUrl: 'https://example.com/jacket.png',
     isLocked: false,

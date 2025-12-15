@@ -91,6 +91,7 @@ model Song {
   attribute            String                 @db.VarChar(100)
   centerCharacter      String                 @map("center_character") @db.VarChar(255)
   singers              String                 @db.VarChar(500)
+  participations       String?                @db.Text
   liveAnalyzerImageUrl String?                @map("live_analyzer_image_url")
   jacketImageUrl       String?                @map("jacket_image_url")
   isLocked             Boolean?               @default(false) @map("is_locked")
