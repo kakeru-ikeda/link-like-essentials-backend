@@ -110,7 +110,37 @@ query {
 }
 ```
 
-### 5. ID指定取得
+### 5. デッキタイプの曲を含むライブグランプリ取得
+
+指定したデッキタイプ（期）の曲を含むライブグランプリを取得します。
+例えば、105期のライブグランプリに104期の曲が含まれている場合、`hasSongWithDeckType: "104期"`で検索すると、その105期ライブグランプリも取得できます。
+
+```graphql
+query {
+  liveGrandPrix(filter: { hasSongWithDeckType: "105期" }) {
+    id
+    eventName
+    yearTerm
+    startDate
+    endDate
+    details {
+      stageName
+      song {
+        songName
+        category
+      }
+    }
+  }
+}
+```
+
+**ユースケース例:**
+
+- デッキタイプ「105期」を選択 → `hasSongWithDeckType: "105期"`で検索
+- ステージ選択で「104期」の曲を選択 → デッキタイプが「104期」に変更
+- `hasSongWithDeckType: "104期"`で再検索 → 104期の曲を含むライブグランプリ（元の105期ライブグランプリも含む）が表示される
+
+### 6. ID指定取得
 
 ```graphql
 query {
@@ -144,7 +174,7 @@ query {
 }
 ```
 
-### 6. イベント名指定取得
+### 7. イベント名指定取得
 
 ```graphql
 query {
@@ -172,7 +202,7 @@ query {
 }
 ```
 
-### 7. 開催中のライブグランプリ取得
+### 8. 開催中のライブグランプリ取得
 
 ```graphql
 query {
@@ -202,7 +232,7 @@ query {
 }
 ```
 
-### 8. 統計情報取得
+### 9. 統計情報取得
 
 ```graphql
 query {
@@ -216,7 +246,7 @@ query {
 }
 ```
 
-### 9. 楽曲とのリレーション込みで取得
+### 10. 楽曲とのリレーション込みで取得
 
 ```graphql
 query {
@@ -255,7 +285,7 @@ query {
 
 ## 複合フィルタ例
 
-### 10. 複数条件でフィルタリング
+### 11. 複数条件でフィルタリング
 
 ```graphql
 query {
@@ -280,6 +310,34 @@ query {
   }
 }
 ```
+
+### 12. デッキタイプと期を組み合わせたフィルタリング
+
+特定の期のライブグランプリの中から、指定したデッキタイプの曲を含むものだけを取得します。
+
+```graphql
+query {
+  liveGrandPrix(filter: { yearTerm: "105期", hasSongWithDeckType: "104期" }) {
+    id
+    eventName
+    yearTerm
+    startDate
+    endDate
+    details {
+      stageName
+      song {
+        songName
+        category
+      }
+    }
+  }
+}
+```
+
+**このクエリの結果:**
+
+- 105期のライブグランプリのうち、104期の曲を含むもののみが返却されます
+- 105期の曲しか含まれていないライブグランプリは除外されます
 
 ---
 
