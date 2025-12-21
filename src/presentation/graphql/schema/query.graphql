@@ -24,4 +24,14 @@ type Query {
 
   # 楽曲統計情報
   songStats: SongStats!
+
+  # ライブグランプリ一覧取得
+  liveGrandPrix(filter: LiveGrandPrixFilterInput): [LiveGrandPrix!]!
+
+  # 単一ライブグランプリ取得
+  liveGrandPrixById(id: ID!): LiveGrandPrix
+  liveGrandPrixByEventName(eventName: String!): LiveGrandPrix
+
+  # ライブグランプリ統計情報
+  liveGrandPrixStats: LiveGrandPrixStats!
 }

@@ -1,0 +1,52 @@
+type LiveGrandPrix {
+  id: ID!
+  startDate: DateTime!
+  endDate: DateTime!
+  eventName: String!
+  eventUrl: String
+  yearTerm: String!
+  isLocked: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  details: [LiveGrandPrixDetail!]!
+}
+
+type LiveGrandPrixDetail {
+  id: ID!
+  liveGrandPrixId: Int!
+  stageName: String!
+  specialEffect: String
+  songId: Int
+  isLocked: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  song: Song
+  sectionEffects: [LiveGrandPrixSectionEffect!]!
+}
+
+type LiveGrandPrixSectionEffect {
+  id: ID!
+  detailId: Int!
+  sectionName: String!
+  effect: String!
+  sectionOrder: Int!
+  isLocked: Boolean!
+  createdAt: DateTime!
+}
+
+input LiveGrandPrixFilterInput {
+  yearTerm: String
+  eventName: String
+  startDateFrom: DateTime
+  startDateTo: DateTime
+}
+
+type LiveGrandPrixStats {
+  totalEvents: Int!
+  byYearTerm: [YearTermCount!]!
+}
+
+type YearTermCount {
+  yearTerm: String!
+  count: Int!
+}
