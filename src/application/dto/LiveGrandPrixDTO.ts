@@ -18,6 +18,7 @@ export interface LiveGrandPrixFilterInput {
   eventName?: string;
   startDateFrom?: Date;
   startDateTo?: Date;
+  hasSongWithDeckType?: string;
 }
 
 export interface LiveGrandPrixStatsResult {

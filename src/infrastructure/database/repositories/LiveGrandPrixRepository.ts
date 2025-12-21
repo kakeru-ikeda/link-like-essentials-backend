@@ -229,6 +229,13 @@ export class LiveGrandPrixRepository implements ILiveGrandPrixRepository {
       yearTerm?: string;
       eventName?: { contains: string; mode: string };
       startDate?: { gte?: Date; lte?: Date };
+      details?: {
+        some: {
+          song?: {
+            category?: string;
+          };
+        };
+      };
     };
 
     const conditions: WhereCondition = {
@@ -243,6 +250,17 @@ export class LiveGrandPrixRepository implements ILiveGrandPrixRepository {
       conditions.startDate = {
         ...(filter.startDateFrom && { gte: filter.startDateFrom }),
         ...(filter.startDateTo && { lte: filter.startDateTo }),
+      };
+    }
+
+    // 指定されたデッキタイプの曲を含むライブグランプリでフィルタ
+    if (filter.hasSongWithDeckType) {
+      conditions.details = {
+        some: {
+          song: {
+            category: filter.hasSongWithDeckType,
+          },
+        },
       };
     }
 
