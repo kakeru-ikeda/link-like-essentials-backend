@@ -17,5 +17,6 @@ export interface ILiveGrandPrixRepository {
   findByEventName(eventName: string): Promise<LiveGrandPrix | null>;
   findAll(filter?: LiveGrandPrixFilterInput): Promise<LiveGrandPrix[]>;
   findByIds(ids: number[]): Promise<LiveGrandPrix[]>;
+  findOngoing(): Promise<LiveGrandPrix[]>;
   getStats(): Promise<LiveGrandPrixStats>;
 }
