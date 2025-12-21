@@ -39,6 +39,7 @@ input LiveGrandPrixFilterInput {
   eventName: String
   startDateFrom: DateTime
   startDateTo: DateTime
+  hasSongWithDeckType: String
 }
 
 type LiveGrandPrixStats {
