@@ -51,6 +51,7 @@ describe('LiveGrandPrixService', () => {
       findByEventName: jest.fn(),
       findAll: jest.fn(),
       findByIds: jest.fn(),
+      findOngoing: jest.fn(),
       getStats: jest.fn(),
     } as unknown as jest.Mocked<ILiveGrandPrixRepository>;
 
@@ -192,6 +193,50 @@ describe('LiveGrandPrixService', () => {
       expect(mockRepository.findAll).toHaveBeenCalledWith(filter);
       expect(mockCacheStrategy.getLiveGrandPrixList).toHaveBeenCalled();
       expect(mockCacheStrategy.setLiveGrandPrixList).toHaveBeenCalled();
+    });
+  });
+
+  describe('findOngoing', () => {
+    it('should return ongoing liveGrandPrix from cache if available', async () => {
+      const mockOngoingList = [mockLiveGrandPrix];
+      mockCacheStrategy.getLiveGrandPrixList.mockResolvedValue(mockOngoingList);
+
+      const result = await liveGrandPrixService.findOngoing();
+
+      expect(result).toEqual(mockOngoingList);
+      expect(mockCacheStrategy.getLiveGrandPrixList).toHaveBeenCalledWith(
+        'ongoing'
+      );
+      expect(mockRepository.findOngoing).not.toHaveBeenCalled();
+    });
+
+    it('should fetch from repository if not in cache', async () => {
+      const mockOngoingList = [mockLiveGrandPrix];
+      mockCacheStrategy.getLiveGrandPrixList.mockResolvedValue(null);
+      mockRepository.findOngoing.mockResolvedValue(mockOngoingList);
+
+      const result = await liveGrandPrixService.findOngoing();
+
+      expect(result).toEqual(mockOngoingList);
+      expect(mockRepository.findOngoing).toHaveBeenCalled();
+      expect(mockCacheStrategy.setLiveGrandPrixList).toHaveBeenCalledWith(
+        'ongoing',
+        mockOngoingList
+      );
+    });
+
+    it('should return empty array if no ongoing events', async () => {
+      mockCacheStrategy.getLiveGrandPrixList.mockResolvedValue(null);
+      mockRepository.findOngoing.mockResolvedValue([]);
+
+      const result = await liveGrandPrixService.findOngoing();
+
+      expect(result).toEqual([]);
+      expect(mockRepository.findOngoing).toHaveBeenCalled();
+      expect(mockCacheStrategy.setLiveGrandPrixList).toHaveBeenCalledWith(
+        'ongoing',
+        []
+      );
     });
   });
 
