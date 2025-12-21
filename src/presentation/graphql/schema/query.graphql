@@ -32,6 +32,9 @@ type Query {
   liveGrandPrixById(id: ID!): LiveGrandPrix
   liveGrandPrixByEventName(eventName: String!): LiveGrandPrix
 
+  # 開催中のライブグランプリ取得
+  ongoingLiveGrandPrix: [LiveGrandPrix!]!
+
   # ライブグランプリ統計情報
   liveGrandPrixStats: LiveGrandPrixStats!
 }

@@ -78,6 +78,25 @@ export class LiveGrandPrixService {
     return liveGrandPrixList;
   }
 
+  async findOngoing(): Promise<LiveGrandPrix[]> {
+    // キャッシュキー
+    const cacheKey = 'ongoing';
+
+    // キャッシュチェック
+    const cached = await this.cacheStrategy.getLiveGrandPrixList(cacheKey);
+    if (cached && Array.isArray(cached)) {
+      return cached;
+    }
+
+    // DBから取得
+    const ongoingEvents = await this.liveGrandPrixRepository.findOngoing();
+
+    // キャッシュに保存（開催中のイベントは頻繁に変わらないので1時間キャッシュ）
+    await this.cacheStrategy.setLiveGrandPrixList(cacheKey, ongoingEvents);
+
+    return ongoingEvents;
+  }
+
   async getStats(): Promise<LiveGrandPrixStatsResult> {
     // キャッシュチェック
     const cached =

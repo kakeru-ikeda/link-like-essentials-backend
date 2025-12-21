@@ -172,7 +172,37 @@ query {
 }
 ```
 
-### 7. 統計情報取得
+### 7. 開催中のライブグランプリ取得
+
+```graphql
+query {
+  ongoingLiveGrandPrix {
+    id
+    eventName
+    yearTerm
+    startDate
+    endDate
+    eventUrl
+    details {
+      stageName
+      specialEffect
+      song {
+        id
+        songName
+        category
+        attribute
+      }
+      sectionEffects {
+        sectionName
+        effect
+        sectionOrder
+      }
+    }
+  }
+}
+```
+
+### 8. 統計情報取得
 
 ```graphql
 query {
@@ -186,7 +216,7 @@ query {
 }
 ```
 
-### 8. 楽曲とのリレーション込みで取得
+### 9. 楽曲とのリレーション込みで取得
 
 ```graphql
 query {
@@ -225,7 +255,7 @@ query {
 
 ## 複合フィルタ例
 
-### 9. 複数条件でフィルタリング
+### 10. 複数条件でフィルタリング
 
 ```graphql
 query {
@@ -332,7 +362,9 @@ query {
 - すべてのクエリで認証が必須です
 - `isLocked: true`のデータも取得可能です
 - N+1問題対策のため、関連データは事前ロード済みです
+- `ongoingLiveGrandPrix`は現在開催中（`startDate <= 現在時刻 <= endDate`）のイベントのみを返却します
 - キャッシュ機能により、同一クエリは高速に応答します
   - 単一イベント: 24時間
   - 一覧: 1時間
+  - 開催中イベント: 1時間
   - 統計情報: 30分

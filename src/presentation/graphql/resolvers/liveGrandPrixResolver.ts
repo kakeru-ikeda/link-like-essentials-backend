@@ -26,6 +26,11 @@ interface QueryResolvers {
     args: Record<string, never>,
     context: GraphQLContext
   ) => Promise<unknown>;
+  ongoingLiveGrandPrix: (
+    parent: unknown,
+    args: Record<string, never>,
+    context: GraphQLContext
+  ) => Promise<unknown>;
 }
 
 export interface LiveGrandPrixResolvers {
@@ -86,6 +91,12 @@ export const liveGrandPrixResolvers: {
       requireAuth(context);
 
       return await context.dataSources.liveGrandPrixService.getStats();
+    },
+
+    ongoingLiveGrandPrix: async (_, __, context) => {
+      requireAuth(context);
+
+      return await context.dataSources.liveGrandPrixService.findOngoing();
     },
   },
 

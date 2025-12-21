@@ -151,6 +151,54 @@ export class LiveGrandPrixRepository implements ILiveGrandPrixRepository {
     return liveGrandPrixList.map((lgp) => this.mapToEntity(lgp));
   }
 
+  async findOngoing(): Promise<LiveGrandPrix[]> {
+    const now = new Date();
+
+    const liveGrandPrixList = await this.prisma.liveGrandPrix.findMany({
+      where: {
+        startDate: {
+          lte: now,
+        },
+        endDate: {
+          gte: now,
+        },
+      },
+      include: {
+        details: {
+          include: {
+            song: {
+              include: {
+                moodProgressions: {
+                  orderBy: {
+                    sectionOrder: 'asc',
+                  },
+                },
+              },
+            },
+            sectionEffects: {
+              orderBy: {
+                sectionOrder: 'asc',
+              },
+            },
+          },
+          orderBy: {
+            stageName: 'asc',
+          },
+        },
+      },
+      orderBy: [
+        {
+          startDate: 'desc',
+        },
+        {
+          id: 'desc',
+        },
+      ],
+    });
+
+    return liveGrandPrixList.map((lgp) => this.mapToEntity(lgp));
+  }
+
   async getStats(): Promise<LiveGrandPrixStats> {
     const [totalEvents, byYearTerm] = await Promise.all([
       this.prisma.liveGrandPrix.count(),
