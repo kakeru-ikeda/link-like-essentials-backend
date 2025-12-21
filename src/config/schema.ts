@@ -18,6 +18,10 @@ const accessoryTypeDefs = readFileSync(
   'utf-8'
 );
 const songTypeDefs = readFileSync(join(schemaDir, 'song.graphql'), 'utf-8');
+const liveGrandPrixTypeDefs = readFileSync(
+  join(schemaDir, 'liveGrandPrix.graphql'),
+  'utf-8'
+);
 const queryTypeDefs = readFileSync(join(schemaDir, 'query.graphql'), 'utf-8');
 
 const typeDefs = [
@@ -26,6 +30,7 @@ const typeDefs = [
   cardDetailTypeDefs,
   accessoryTypeDefs,
   songTypeDefs,
+  liveGrandPrixTypeDefs,
   queryTypeDefs,
 ];
 
