@@ -2,6 +2,7 @@ import type { GraphQLError, GraphQLFormattedError } from 'graphql';
 
 import { AppError } from '@/domain/errors/AppError';
 import { logger } from '@/infrastructure/logger/Logger';
+import { SentryService } from '@/infrastructure/monitoring/SentryService';
 
 export function formatError(
   formattedError: GraphQLFormattedError,
@@ -28,6 +29,16 @@ export function formatError(
     path: formattedError.path,
     extensions: formattedError.extensions,
   });
+
+  // Sentryに送信（本番環境）
+  if (process.env.NODE_ENV === 'production') {
+    SentryService.captureException(
+      originalError instanceof Error
+        ? originalError
+        : new Error(formattedError.message),
+      { path: formattedError.path }
+    );
+  }
 
   // 本番環境では詳細を隠す
   if (process.env.NODE_ENV === 'production') {

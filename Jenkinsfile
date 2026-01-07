@@ -117,6 +117,7 @@ pipeline {
                     withCredentials([
                         string(credentialsId: 'LLES_DATABASE_URL', variable: 'LLES_DATABASE_URL'),
                         string(credentialsId: 'LLES_FIREBASE_PROJECT_ID', variable: 'LLES_FIREBASE_PROJECT_ID'),
+                        string(credentialsId: 'LLES_SENTRY_DSN', variable: 'LLES_SENTRY_DSN'),
                         file(credentialsId: 'LLES_FIREBASE_SERVICE_ACCOUNT', variable: 'FIREBASE_SERVICE_ACCOUNT'),
                         usernamePassword(credentialsId: env.DOCKER_HUB_CREDS, usernameVariable: 'DOCKER_HUB_CREDS_USR', passwordVariable: 'DOCKER_HUB_CREDS_PSW'),
                         sshUserPrivateKey(
@@ -133,6 +134,7 @@ pipeline {
 
                         def databaseUrl = sh(script: 'echo "$LLES_DATABASE_URL"', returnStdout: true).trim()
                         def firebaseProjectId = sh(script: 'echo "$LLES_FIREBASE_PROJECT_ID"', returnStdout: true).trim()
+                        def sentryDsn = sh(script: 'echo "$LLES_SENTRY_DSN"', returnStdout: true).trim()
                         def dockerHubUser = env.DOCKER_HUB_CREDS_USR
                         def imageName = env.IMAGE_NAME
 
@@ -168,6 +170,7 @@ pipeline {
                             cat > docker/.env << 'EOF'
 NODE_ENV=production
 LLES_DATABASE_URL=${databaseUrl}
+SENTRY_DSN=${sentryDsn}
 LLES_FIREBASE_PROJECT_ID=${firebaseProjectId}
 LLES_CORS_ORIGIN=http://localhost:3000
 LOG_LEVEL=info
