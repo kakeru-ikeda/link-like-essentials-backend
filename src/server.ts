@@ -34,10 +34,6 @@ async function startServer(): Promise<void> {
 
     const allowedOrigins = getAllowedOrigins();
 
-    // Sentryリクエストハンドラー（最初のミドルウェア）
-    app.use(Sentry.Handlers.requestHandler());
-    app.use(Sentry.Handlers.tracingHandler());
-
     // ミドルウェア
     app.use(
       cors({
@@ -66,7 +62,7 @@ async function startServer(): Promise<void> {
     );
 
     // Sentryエラーハンドラー（GraphQL後に配置）
-    app.use(Sentry.Handlers.errorHandler());
+    Sentry.setupExpressErrorHandler(app);
 
     // サーバー起動
     app.listen(PORT, () => {

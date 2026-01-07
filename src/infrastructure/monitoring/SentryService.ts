@@ -23,7 +23,7 @@ export class SentryService {
       profilesSampleRate: 1.0,
 
       // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-      integrations: [nodeProfilingIntegration()],
+      integrations: [Sentry.expressIntegration(), nodeProfilingIntegration()],
 
       // GraphQL操作のフィルタリング
       beforeSend(event, _hint) {
@@ -35,7 +35,10 @@ export class SentryService {
       },
     });
 
-    logger.info('Sentry initialized', { environment, enabled: environment === 'production' });
+    logger.info('Sentry initialized', {
+      environment,
+      enabled: environment === 'production',
+    });
   }
 
   static captureException(
