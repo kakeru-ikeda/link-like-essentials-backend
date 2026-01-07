@@ -1,4 +1,5 @@
 import { expressMiddleware } from '@apollo/server/express4';
+import * as Sentry from '@sentry/node';
 import cors from 'cors';
 import express from 'express';
 
@@ -7,6 +8,7 @@ import { createContext } from './config/context';
 import { RedisClient } from './infrastructure/cache/RedisClient';
 import { prisma } from './infrastructure/database/client';
 import { logger } from './infrastructure/logger/Logger';
+import { SentryService } from './infrastructure/monitoring/SentryService';
 import { requestLogger } from './presentation/middleware/requestLogger';
 
 const PORT = process.env.PORT || 4000;
@@ -24,10 +26,17 @@ const getAllowedOrigins = (): string[] => {
 
 async function startServer(): Promise<void> {
   try {
+    // Sentry初期化（最優先）
+    SentryService.initialize();
+
     // Express app作成
     const app = express();
 
     const allowedOrigins = getAllowedOrigins();
+
+    // Sentryリクエストハンドラー（最初のミドルウェア）
+    app.use(Sentry.Handlers.requestHandler());
+    app.use(Sentry.Handlers.tracingHandler());
 
     // ミドルウェア
     app.use(
@@ -56,6 +65,9 @@ async function startServer(): Promise<void> {
       })
     );
 
+    // Sentryエラーハンドラー（GraphQL後に配置）
+    app.use(Sentry.Handlers.errorHandler());
+
     // サーバー起動
     app.listen(PORT, () => {
       logger.info(`Server running on http://localhost:${PORT}/graphql`);
@@ -65,6 +77,7 @@ async function startServer(): Promise<void> {
     const shutdown = async (): Promise<void> => {
       logger.info('Shutting down gracefully...');
 
+      await SentryService.close();
       await apolloServer.stop();
       await prisma.$disconnect();
       await RedisClient.disconnect();
@@ -79,6 +92,9 @@ async function startServer(): Promise<void> {
       void shutdown();
     });
   } catch (error) {
+    SentryService.captureException(
+      error instanceof Error ? error : new Error('Unknown server error')
+    );
     logger.error('Failed to start server', {
       error: error instanceof Error ? error.message : 'Unknown error',
     });
