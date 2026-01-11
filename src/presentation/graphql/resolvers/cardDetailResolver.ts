@@ -10,6 +10,11 @@ interface QueryResolvers {
     args: { cardId: string },
     context: GraphQLContext
   ) => Promise<unknown>;
+  cardDetails: (
+    parent: unknown,
+    args: { cardIds: string[] },
+    context: GraphQLContext
+  ) => Promise<unknown>;
 }
 
 export interface CardDetailResolvers {
@@ -56,6 +61,15 @@ export const cardDetailResolvers: {
 
       return await context.dataSources.cardDetailService.findByCardId(
         parseInt(cardId, 10)
+      );
+    },
+
+    cardDetails: async (_, { cardIds }, context) => {
+      requireAuth(context);
+
+      const parsedIds = cardIds.map((id) => parseInt(id, 10));
+      return await context.dataSources.cardDetailService.findByCardIds(
+        parsedIds
       );
     },
   },

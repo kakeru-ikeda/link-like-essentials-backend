@@ -29,6 +29,40 @@ export class CardDetailService {
     return detail;
   }
 
+  async findByCardIds(cardIds: number[]): Promise<CardDetail[]> {
+    // キャッシュから並列取得
+    const cacheResults = await Promise.all(
+      cardIds.map((id) => this.cacheStrategy.getDetail(id))
+    );
+
+    // キャッシュミスしたIDを特定
+    const cachedDetails: CardDetail[] = [];
+    const missedIds: number[] = [];
+
+    cardIds.forEach((id, index) => {
+      const cached = cacheResults[index];
+      if (cached) {
+        cachedDetails.push(cached);
+      } else {
+        missedIds.push(id);
+      }
+    });
+
+    // キャッシュミスしたものをDBから取得
+    if (missedIds.length > 0) {
+      const dbDetails = await this.detailRepository.findByCardIds(missedIds);
+
+      // DBから取得したものをキャッシュに保存（並列）
+      await Promise.all(
+        dbDetails.map((detail) => this.cacheStrategy.setDetail(detail))
+      );
+
+      return [...cachedDetails, ...dbDetails];
+    }
+
+    return cachedDetails;
+  }
+
   buildStats(detail: CardDetail): Stats {
     return {
       smile: this.parseIntOrNull(detail.smileMaxLevel),

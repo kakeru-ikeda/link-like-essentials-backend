@@ -9,6 +9,9 @@ type Query {
   # カード詳細取得
   cardDetail(cardId: ID!): CardDetail
 
+  # 複数カード詳細取得
+  cardDetails(cardIds: [ID!]!): [CardDetail!]!
+
   # アクセサリー一覧取得
   accessories(cardId: ID!, filter: AccessoryFilterInput): [Accessory!]!
 
