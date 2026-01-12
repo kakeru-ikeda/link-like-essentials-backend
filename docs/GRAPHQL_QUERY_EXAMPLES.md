@@ -780,6 +780,53 @@ query SortByCardName {
 
 ## 複数カードを同時取得
 
+### 複数カードの詳細情報を一度に取得
+
+```graphql
+query GetMultipleCardDetails {
+  cardDetails(cardIds: ["1", "2", "3"]) {
+    id
+    cardId
+    favoriteMode
+    acquisitionMethod
+    stats {
+      smile
+      pure
+      cool
+      mental
+    }
+    specialAppeal {
+      name
+      ap
+      effect
+    }
+    skill {
+      name
+      ap
+      effect
+    }
+    trait {
+      name
+      effect
+    }
+    accessories {
+      id
+      parentType
+      name
+      ap
+      effect
+      traitName
+      traitEffect
+    }
+    card {
+      cardName
+      characterName
+      rarity
+    }
+  }
+}
+```
+
 ### エイリアスを使用した複数クエリ
 
 ```graphql

@@ -212,4 +212,103 @@ describe('CardDetailService', () => {
       expect(result).toBeNull();
     });
   });
+
+  describe('findByCardIds', () => {
+    const mockDetail2: CardDetail = {
+      ...mockDetail,
+      id: 2,
+      cardId: 2,
+      favoriteMode: 'メロウ',
+    };
+
+    const mockDetail3: CardDetail = {
+      ...mockDetail,
+      id: 3,
+      cardId: 3,
+      favoriteMode: 'ニュートラル',
+    };
+
+    it('should return all details from cache if all are cached', async () => {
+      mockCacheStrategy.getDetail
+        .mockResolvedValueOnce(mockDetail)
+        .mockResolvedValueOnce(mockDetail2)
+        .mockResolvedValueOnce(mockDetail3);
+
+      const result = await cardDetailService.findByCardIds([1, 2, 3]);
+
+      expect(result).toEqual([mockDetail, mockDetail2, mockDetail3]);
+      expect(mockCacheStrategy.getDetail).toHaveBeenCalledTimes(3);
+      expect(mockRepository.findByCardIds).not.toHaveBeenCalled();
+      expect(mockCacheStrategy.setDetail).not.toHaveBeenCalled();
+    });
+
+    it('should fetch from repository for cache misses and cache them', async () => {
+      // cardId 1: cached, cardId 2: not cached, cardId 3: cached
+      mockCacheStrategy.getDetail
+        .mockResolvedValueOnce(mockDetail)
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(mockDetail3);
+      mockRepository.findByCardIds.mockResolvedValue([mockDetail2]);
+
+      const result = await cardDetailService.findByCardIds([1, 2, 3]);
+
+      expect(result).toHaveLength(3);
+      expect(result).toContainEqual(mockDetail);
+      expect(result).toContainEqual(mockDetail2);
+      expect(result).toContainEqual(mockDetail3);
+      expect(mockCacheStrategy.getDetail).toHaveBeenCalledTimes(3);
+      expect(mockRepository.findByCardIds).toHaveBeenCalledWith([2]);
+      expect(mockCacheStrategy.setDetail).toHaveBeenCalledWith(mockDetail2);
+    });
+
+    it('should fetch all from repository if none are cached', async () => {
+      mockCacheStrategy.getDetail
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(null)
+        .mockResolvedValueOnce(null);
+      mockRepository.findByCardIds.mockResolvedValue([
+        mockDetail,
+        mockDetail2,
+        mockDetail3,
+      ]);
+
+      const result = await cardDetailService.findByCardIds([1, 2, 3]);
+
+      expect(result).toEqual([mockDetail, mockDetail2, mockDetail3]);
+      expect(mockCacheStrategy.getDetail).toHaveBeenCalledTimes(3);
+      expect(mockRepository.findByCardIds).toHaveBeenCalledWith([1, 2, 3]);
+      expect(mockCacheStrategy.setDetail).toHaveBeenCalledTimes(3);
+    });
+
+    it('should return only cached details if no cache misses', async () => {
+      mockCacheStrategy.getDetail
+        .mockResolvedValueOnce(mockDetail)
+        .mockResolvedValueOnce(mockDetail2);
+
+      const result = await cardDetailService.findByCardIds([1, 2]);
+
+      expect(result).toEqual([mockDetail, mockDetail2]);
+      expect(mockRepository.findByCardIds).not.toHaveBeenCalled();
+    });
+
+    it('should handle empty array', async () => {
+      const result = await cardDetailService.findByCardIds([]);
+
+      expect(result).toEqual([]);
+      expect(mockCacheStrategy.getDetail).not.toHaveBeenCalled();
+      expect(mockRepository.findByCardIds).not.toHaveBeenCalled();
+    });
+
+    it('should handle single ID', async () => {
+      mockCacheStrategy.getDetail.mockResolvedValue(null);
+      mockRepository.findByCardIds.mockResolvedValue([mockDetail]);
+
+      const result = await cardDetailService.findByCardIds([1]);
+
+      expect(result).toEqual([mockDetail]);
+      expect(mockCacheStrategy.getDetail).toHaveBeenCalledWith(1);
+      expect(mockRepository.findByCardIds).toHaveBeenCalledWith([1]);
+      expect(mockCacheStrategy.setDetail).toHaveBeenCalledWith(mockDetail);
+    });
+  });
 });
