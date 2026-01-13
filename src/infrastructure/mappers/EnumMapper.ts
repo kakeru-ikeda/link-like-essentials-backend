@@ -20,6 +20,7 @@ export class EnumMapper {
       撃限定: 'BATTLE_LIMITED',
       宴限定: 'PARTY_LIMITED',
       活限定: 'ACTIVITY_LIMITED',
+      団限定: 'BANGDREAM_LIMITED',
       卒限定: 'GRADUATE_LIMITED',
       ログボ: 'LOGIN_BONUS',
       報酬: 'REWARD',

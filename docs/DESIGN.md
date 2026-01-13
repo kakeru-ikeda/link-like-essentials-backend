@@ -258,6 +258,7 @@ enum LimitedType {
   BATTLE_LIMITED # 撃限定
   PARTY_LIMITED # 宴限定
   ACTIVITY_LIMITED # 活限定
+  BANGDREAM_LIMITED # 団限定
   GRADUATE_LIMITED # 卒限定
   LOGIN_BONUS # ログボ
   REWARD # 報酬
@@ -486,6 +487,7 @@ export enum LimitedType {
   BATTLE_LIMITED = '撃限定',
   PARTY_LIMITED = '宴限定',
   ACTIVITY_LIMITED = '活限定',
+  BANGDREAM_LIMITED = '団限定',
   GRADUATE_LIMITED = '卒限定',
   LOGIN_BONUS = 'ログボ',
   REWARD = '報酬',
@@ -537,6 +539,7 @@ export class EnumMapper {
       撃限定: 'BATTLE_LIMITED',
       宴限定: 'PARTY_LIMITED',
       活限定: 'ACTIVITY_LIMITED',
+      団限定: 'BANGDREAM_LIMITED',
       卒限定: 'GRADUATE_LIMITED',
       ログボ: 'LOGIN_BONUS',
       報酬: 'REWARD',

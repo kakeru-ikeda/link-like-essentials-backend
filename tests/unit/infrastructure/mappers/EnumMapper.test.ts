@@ -84,6 +84,7 @@ describe('EnumMapper', () => {
       expect(EnumMapper.fromLimitedTypeEnum('BATTLE_LIMITED')).toBe('撃限定');
       expect(EnumMapper.fromLimitedTypeEnum('PARTY_LIMITED')).toBe('宴限定');
       expect(EnumMapper.fromLimitedTypeEnum('ACTIVITY_LIMITED')).toBe('活限定');
+      expect(EnumMapper.fromLimitedTypeEnum('BANGDREAM_LIMITED')).toBe('団限定');
       expect(EnumMapper.fromLimitedTypeEnum('GRADUATE_LIMITED')).toBe('卒限定');
       expect(EnumMapper.fromLimitedTypeEnum('LOGIN_BONUS')).toBe('ログボ');
       expect(EnumMapper.fromLimitedTypeEnum('REWARD')).toBe('報酬');
