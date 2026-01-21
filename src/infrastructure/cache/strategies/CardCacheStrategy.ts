@@ -3,9 +3,11 @@ import type { Card } from '@/domain/entities/Card';
 import type { CacheService } from '../CacheService';
 
 export const TTL = {
-  CARD: 24 * 60 * 60, // 24時間
+  // CARD: 24 * 60 * 60, // 24時間
+  CARD: 60 * 60, // 1時間
   CARD_LIST: 60 * 60, // 1時間
-  CARD_DETAIL: 6 * 60 * 60, // 6時間
+  // CARD_DETAIL: 6 * 60 * 60, // 6時間
+  CARD_DETAIL: 60 * 60, // 1時間
   STATS: 30 * 60, // 30分
 } as const;
 
