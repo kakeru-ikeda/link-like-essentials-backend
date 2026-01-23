@@ -1,0 +1,53 @@
+name: Deploy to Cloud Run (tag)
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      PROJECT_ID: link-like-essentials
+      REGION: asia-northeast1
+      AR_REPOSITORY: lles-backend
+      SERVICE_NAME: lles-backend
+      IMAGE_NAME: lles-backend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Auth to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: '${{ secrets.GCP_WIF_PROVIDER }}'
+          service_account: '${{ secrets.GCP_SERVICE_ACCOUNT }}'
+
+      - name: Set up gcloud
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Build and push image
+        run: |
+          gcloud builds submit \
+            --tag ${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPOSITORY}/${IMAGE_NAME}:latest \
+            .
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${SERVICE_NAME} \
+            --image ${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPOSITORY}/${IMAGE_NAME}:latest \
+            --region ${REGION} \
+            --platform managed \
+            --allow-unauthenticated \
+            --port 4000 \
+            --vpc-connector lles-connector \
+            --vpc-egress private-ranges-only \
+            --set-env-vars NODE_ENV=production,FIREBASE_SERVICE_ACCOUNT_PATH=/var/secrets/firebase-service-account.json,LLES_FIREBASE_SERVICE_ACCOUNT_PATH=/var/secrets/firebase-service-account.json \
+            --set-secrets LLES_DATABASE_URL=lles-database-url:latest,REDIS_HOST=lles-redis-host:latest,REDIS_PORT=lles-redis-port:latest,LLES_FIREBASE_PROJECT_ID=lles-firebase-project-id:latest,LLES_CORS_ORIGIN=lles-cors-origin:latest,SENTRY_DSN=lles-sentry-dsn:latest,/var/secrets/firebase-service-account.json=lles-firebase-service-account-json:latest \
+            --max-instances 5
