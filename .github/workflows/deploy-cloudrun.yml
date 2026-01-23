@@ -35,6 +35,7 @@ jobs:
       - name: Build and push image
         run: |
           gcloud builds submit \
+            --no-log-streaming \
             --tag ${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPOSITORY}/${IMAGE_NAME}:latest \
             .
 
