@@ -163,11 +163,9 @@ describe('CardCacheStrategy', () => {
 
   describe('TTL constants', () => {
     it('should have correct TTL values', () => {
-      // expect(TTL.CARD).toBe(24 * 60 * 60); // 24 hours
-      expect(TTL.CARD).toBe(60 * 60); // 1 hour
+      expect(TTL.CARD).toBe(24 * 60 * 60); // 24 hours
       expect(TTL.CARD_LIST).toBe(60 * 60); // 1 hour
-      // expect(TTL.CARD_DETAIL).toBe(6 * 60 * 60); // 6 hours
-      expect(TTL.CARD_DETAIL).toBe(60 * 60); // 1 hour
+      expect(TTL.CARD_DETAIL).toBe(6 * 60 * 60); // 6 hours
       expect(TTL.STATS).toBe(30 * 60); // 30 minutes
     });
   });
