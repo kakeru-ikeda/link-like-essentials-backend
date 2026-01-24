@@ -17,7 +17,7 @@ services:
     depends_on:
       - serverless-redis-http
     volumes:
-      - ../firebase-service-account.json:/app/firebase-service-account.json:ro
+      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
     restart: unless-stopped
     networks:
       - app-network
