@@ -1,9 +1,9 @@
-import Redis from 'ioredis';
+import { Redis } from '@upstash/redis';
 
 import { logger } from '../logger/Logger';
 
-function getEnvVar(key: string, defaultValue?: string): string {
-  const value = process.env[key] || defaultValue;
+function getEnvVarOrDefault(key: string, defaultValue?: string): string {
+  const value = process.env[key] ?? defaultValue;
   if (!value) {
     throw new Error(`Environment variable ${key} is not set`);
   }
@@ -17,38 +17,28 @@ export class RedisClient {
 
   static getInstance(): Redis {
     if (!RedisClient.instance) {
+      const isProduction = process.env.NODE_ENV === 'production';
+      const url = isProduction
+        ? getEnvVarOrDefault('UPSTASH_REDIS_REST_URL')
+        : getEnvVarOrDefault('UPSTASH_REDIS_REST_URL', 'http://localhost:8079');
+      const token = isProduction
+        ? getEnvVarOrDefault('UPSTASH_REDIS_REST_TOKEN')
+        : getEnvVarOrDefault('UPSTASH_REDIS_REST_TOKEN', 'example_token');
+
       RedisClient.instance = new Redis({
-        host: getEnvVar('REDIS_HOST', 'localhost'),
-        port: parseInt(getEnvVar('REDIS_PORT', '6379')),
-        password: process.env.REDIS_PASSWORD,
-        retryStrategy: (times: number) => {
-          const delay = Math.min(times * 50, 2000);
-          logger.warn(`Redis retry attempt ${times}, waiting ${delay}ms`);
-          return delay;
-        },
-        maxRetriesPerRequest: 3,
+        url,
+        token,
       });
 
-      RedisClient.instance.on('connect', () => {
-        logger.info('Redis connected successfully');
-      });
-
-      RedisClient.instance.on('error', (error: Error) => {
-        logger.error('Redis connection error', { error: error.message });
-      });
-
-      RedisClient.instance.on('close', () => {
-        logger.warn('Redis connection closed');
-      });
+      logger.info('Upstash Redis client initialized');
     }
 
     return RedisClient.instance;
   }
 
-  static async disconnect(): Promise<void> {
+  static disconnect(): void {
     if (RedisClient.instance) {
-      await RedisClient.instance.quit();
-      logger.info('Redis disconnected');
+      logger.info('Upstash Redis client shutdown requested');
     }
   }
 }

@@ -76,7 +76,7 @@ async function startServer(): Promise<void> {
       await SentryService.close();
       await apolloServer.stop();
       await prisma.$disconnect();
-      await RedisClient.disconnect();
+      RedisClient.disconnect();
 
       process.exit(0);
     };

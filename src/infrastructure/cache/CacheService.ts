@@ -1,14 +1,31 @@
-import type Redis from 'ioredis';
-
 import { logger } from '../logger/Logger';
 
+export interface IRedisClient {
+  get<T = string>(key: string): Promise<T | null>;
+  set(
+    key: string,
+    value: string,
+    options?: {
+      ex?: number;
+    }
+  ): Promise<unknown>;
+  del(...keys: string[]): Promise<number>;
+  keys(pattern: string): Promise<string[]>;
+  exists(key: string): Promise<number>;
+  ttl(key: string): Promise<number>;
+}
+
 export class CacheService {
-  constructor(private readonly redis: Redis) {}
+  constructor(private readonly redis: IRedisClient) {}
 
   async get<T>(key: string): Promise<T | null> {
     try {
-      const data = await this.redis.get(key);
-      if (!data) return null;
+      const data = await this.redis.get<unknown>(key);
+      if (data === null) return null;
+
+      if (typeof data !== 'string') {
+        return data as T;
+      }
 
       return JSON.parse(data) as T;
     } catch (error) {
@@ -25,7 +42,7 @@ export class CacheService {
       const serialized = JSON.stringify(value);
 
       if (ttlSeconds) {
-        await this.redis.setex(key, ttlSeconds, serialized);
+        await this.redis.set(key, serialized, { ex: ttlSeconds });
       } else {
         await this.redis.set(key, serialized);
       }
