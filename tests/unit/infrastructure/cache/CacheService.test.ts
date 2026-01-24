@@ -52,6 +52,16 @@ describe('CacheService', () => {
 
       expect(result).toBeNull();
     });
+
+    it('should return object directly when redis returns non-string', async () => {
+      const mockData = { id: 2, name: 'direct-object' };
+      mockRedis.get.mockResolvedValue(mockData as unknown as string);
+
+      const result = await cacheService.get<typeof mockData>('object-key');
+
+      expect(result).toEqual(mockData);
+      expect(mockRedis.get).toHaveBeenCalledWith('object-key');
+    });
   });
 
   describe('set', () => {

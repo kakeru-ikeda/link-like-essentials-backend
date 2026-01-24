@@ -1,14 +1,8 @@
 import { Redis } from '@upstash/redis';
 
-import { logger } from '../logger/Logger';
+import { getEnvVar } from '@/config/env';
 
-function getEnvVarOrDefault(key: string, defaultValue?: string): string {
-  const value = process.env[key] ?? defaultValue;
-  if (!value) {
-    throw new Error(`Environment variable ${key} is not set`);
-  }
-  return value;
-}
+import { logger } from '../logger/Logger';
 
 export class RedisClient {
   private static instance: Redis;
@@ -19,11 +13,11 @@ export class RedisClient {
     if (!RedisClient.instance) {
       const isProduction = process.env.NODE_ENV === 'production';
       const url = isProduction
-        ? getEnvVarOrDefault('UPSTASH_REDIS_REST_URL')
-        : getEnvVarOrDefault('UPSTASH_REDIS_REST_URL', 'http://localhost:8079');
+        ? getEnvVar('UPSTASH_REDIS_REST_URL')
+        : getEnvVar('UPSTASH_REDIS_REST_URL', 'http://localhost:8079');
       const token = isProduction
-        ? getEnvVarOrDefault('UPSTASH_REDIS_REST_TOKEN')
-        : getEnvVarOrDefault('UPSTASH_REDIS_REST_TOKEN', 'example_token');
+        ? getEnvVar('UPSTASH_REDIS_REST_TOKEN')
+        : getEnvVar('UPSTASH_REDIS_REST_TOKEN', 'example_token');
 
       RedisClient.instance = new Redis({
         url,
