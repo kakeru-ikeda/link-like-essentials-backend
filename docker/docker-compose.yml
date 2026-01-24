@@ -7,38 +7,34 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       LLES_DATABASE_URL: ${LLES_DATABASE_URL}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+      UPSTASH_REDIS_REST_URL: ${UPSTASH_REDIS_REST_URL:-http://serverless-redis-http:80}
+      UPSTASH_REDIS_REST_TOKEN: ${UPSTASH_REDIS_REST_TOKEN:-example_token}
       FIREBASE_SERVICE_ACCOUNT_PATH: /app/firebase-service-account.json
       LLES_FIREBASE_PROJECT_ID: ${LLES_FIREBASE_PROJECT_ID}
       LLES_CORS_ORIGIN: ${LLES_CORS_ORIGIN:-http://localhost:3000}
       LOG_LEVEL: ${LOG_LEVEL:-info}
       SENTRY_DSN: ${SENTRY_DSN:-}
     depends_on:
-      - redis
+      - serverless-redis-http
     volumes:
       - ../firebase-service-account.json:/app/firebase-service-account.json:ro
     restart: unless-stopped
     networks:
       - app-network
-      - jenkins
-
-  redis:
-    container_name: link-like-essentials-redis
-    image: redis:7-alpine
+  serverless-redis-http:
+    container_name: link-like-essentials-redis-http
+    image: docker.io/hiett/serverless-redis-http:latest
     ports:
-      - '6379:6379'
-    volumes:
-      - redis_data:/data
-    command: redis-server --appendonly yes
+      - '8079:80'
+    environment:
+      SRH_MODE: env
+      SRH_TOKEN: ${UPSTASH_REDIS_REST_TOKEN:-example_token}
+      SRH_CONNECTION_STRING: 'redis://redis:6379'
+    depends_on:
+      - redis
     restart: unless-stopped
     networks:
       - app-network
-    healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
-      interval: 10s
-      timeout: 3s
-      retries: 5
 
 volumes:
   redis_data:
@@ -46,5 +42,3 @@ volumes:
 networks:
   app-network:
     driver: bridge
-  jenkins:
-    external: true
