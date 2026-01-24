@@ -1,21 +1,19 @@
-import type Redis from 'ioredis';
-
+import type { IRedisClient } from '@/infrastructure/cache/CacheService';
 import { CacheService } from '@/infrastructure/cache/CacheService';
 
 describe('CacheService', () => {
   let cacheService: CacheService;
-  let mockRedis: jest.Mocked<Redis>;
+  let mockRedis: jest.Mocked<IRedisClient>;
 
   beforeEach(() => {
     mockRedis = {
       get: jest.fn(),
       set: jest.fn(),
-      setex: jest.fn(),
       del: jest.fn(),
       keys: jest.fn(),
       exists: jest.fn(),
       ttl: jest.fn(),
-    } as unknown as jest.Mocked<Redis>;
+    } as unknown as jest.Mocked<IRedisClient>;
 
     cacheService = new CacheService(mockRedis);
   });
@@ -54,18 +52,28 @@ describe('CacheService', () => {
 
       expect(result).toBeNull();
     });
+
+    it('should return object directly when redis returns non-string', async () => {
+      const mockData = { id: 2, name: 'direct-object' };
+      mockRedis.get.mockResolvedValue(mockData as unknown as string);
+
+      const result = await cacheService.get<typeof mockData>('object-key');
+
+      expect(result).toEqual(mockData);
+      expect(mockRedis.get).toHaveBeenCalledWith('object-key');
+    });
   });
 
   describe('set', () => {
     it('should set value with TTL when provided', async () => {
-      mockRedis.setex.mockResolvedValue('OK');
+      mockRedis.set.mockResolvedValue('OK');
 
       await cacheService.set('key', { data: 'value' }, 3600);
 
-      expect(mockRedis.setex).toHaveBeenCalledWith(
+      expect(mockRedis.set).toHaveBeenCalledWith(
         'key',
-        3600,
-        JSON.stringify({ data: 'value' })
+        JSON.stringify({ data: 'value' }),
+        { ex: 3600 }
       );
     });
 

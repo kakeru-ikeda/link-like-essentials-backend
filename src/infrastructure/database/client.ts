@@ -1,14 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 
-import { logger } from '../logger/Logger';
+import { getEnvVar } from '@/config/env';
 
-function getEnvVar(key: string): string {
-  const value = process.env[key];
-  if (!value) {
-    throw new Error(`Environment variable ${key} is not set`);
-  }
-  return value;
-}
+import { logger } from '../logger/Logger';
 
 const databaseUrl = getEnvVar('LLES_DATABASE_URL');
 

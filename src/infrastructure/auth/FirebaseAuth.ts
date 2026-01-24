@@ -1,14 +1,8 @@
 import admin from 'firebase-admin';
 
-import { logger } from '../logger/Logger';
+import { getEnvVar } from '@/config/env';
 
-function getEnvVar(key: string): string {
-  const value = process.env[key];
-  if (!value) {
-    throw new Error(`Environment variable ${key} is not set`);
-  }
-  return value;
-}
+import { logger } from '../logger/Logger';
 
 export class FirebaseAuth {
   private auth: admin.auth.Auth;
