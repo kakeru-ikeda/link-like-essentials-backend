@@ -4,6 +4,7 @@ import { getEnvVar, getOptionalEnvVar } from '@/config/env';
 
 import type { IRedisClient } from './CacheService';
 import { logger } from '../logger/Logger';
+import { SentryService } from '../monitoring/SentryService';
 
 type RedisRole = 'primary' | 'fallback';
 
@@ -44,6 +45,7 @@ class FailoverRedisClient implements IRedisClient {
   private readonly enablePolling: boolean;
   private pollingTimer?: NodeJS.Timeout;
   private pollingInitTimer?: NodeJS.Timeout;
+  private hasReportedPrimaryFailure = false;
 
   constructor(
     primary: Redis | undefined,
@@ -70,6 +72,13 @@ class FailoverRedisClient implements IRedisClient {
         );
       } catch (error) {
         this.current = 'fallback';
+        if (!this.hasReportedPrimaryFailure) {
+          this.hasReportedPrimaryFailure = true;
+          SentryService.captureMessage(
+            'Primary Redis unreachable, switched to fallback (sukisuki-club-http-redis)',
+            'warning'
+          );
+        }
         logger.warn('Primary Redis unreachable, switched to fallback', {
           error: getErrorMessage(error),
         });
@@ -126,6 +135,7 @@ class FailoverRedisClient implements IRedisClient {
       );
       if (this.current !== 'primary') {
         this.current = 'primary';
+        this.hasReportedPrimaryFailure = false;
         logger.info('Primary Redis restored (sukisuki-club-http-redis)');
       }
       return true;
@@ -200,7 +210,7 @@ export class RedisClient {
         );
         RedisClient.instance = client;
         RedisClient.failoverClient = client;
-        logger.info('Local Redis client initialized');
+        logger.info('Local Redis client initialized', { url });
         return RedisClient.instance;
       }
 
@@ -230,10 +240,14 @@ export class RedisClient {
       });
 
       if (primaryClient) {
-        logger.info('Primary Redis configured (sukisuki-club-http-redis)');
+        logger.info('Primary Redis configured (sukisuki-club-http-redis)', {
+          url: primaryUrl,
+        });
       } else {
         logger.warn('Primary Redis not configured, using Upstash only');
       }
+
+      logger.info('Fallback Redis configured (Upstash)', { url: fallbackUrl });
 
       const client = new FailoverRedisClient(
         primaryClient,
