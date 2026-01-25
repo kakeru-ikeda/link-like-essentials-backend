@@ -71,6 +71,24 @@ class FailoverRedisClient implements IRedisClient {
           'sukisuki-club-http-redis'
         );
       } catch (error) {
+        const errorMsg = getErrorMessage(error);
+
+        // 413 Request Entity Too Largeはリクエストサイズの問題であり、Redis自体の問題ではない
+        // この場合はfallbackせずにそのままエラーをスロー
+        if (
+          errorMsg.includes('413') ||
+          errorMsg.includes('Request Entity Too Large')
+        ) {
+          logger.warn(
+            'Primary Redis request too large (413), not switching to fallback',
+            {
+              error: errorMsg,
+            }
+          );
+          throw error;
+        }
+
+        // その他のエラー（404含む）はRedis接続の問題と判断してfallback
         this.current = 'fallback';
         if (!this.hasReportedPrimaryFailure) {
           this.hasReportedPrimaryFailure = true;
@@ -80,7 +98,7 @@ class FailoverRedisClient implements IRedisClient {
           );
         }
         logger.warn('Primary Redis unreachable, switched to fallback', {
-          error: getErrorMessage(error),
+          error: errorMsg,
         });
       }
     }
@@ -137,6 +155,8 @@ class FailoverRedisClient implements IRedisClient {
         this.current = 'primary';
         this.hasReportedPrimaryFailure = false;
         logger.info('Primary Redis restored (sukisuki-club-http-redis)');
+      } else {
+        logger.debug('Primary Redis handshake successful');
       }
       return true;
     } catch (error) {
@@ -148,21 +168,38 @@ class FailoverRedisClient implements IRedisClient {
   }
 
   startPolling(): void {
-    if (!this.enablePolling || !this.primary) return;
-    if (this.pollingTimer || this.pollingInitTimer) return;
+    if (!this.enablePolling || !this.primary) {
+      logger.info('Redis polling disabled or no primary Redis configured');
+      return;
+    }
+    if (this.pollingTimer || this.pollingInitTimer) {
+      logger.info('Redis polling already started');
+      return;
+    }
 
     const now = new Date();
     const minutes = now.getMinutes();
-    const nextMinutes = minutes < 30 ? 30 : 60;
-    const msToNext =
-      (nextMinutes - minutes) * 60 * 1000 -
-      now.getSeconds() * 1000 -
-      now.getMilliseconds();
+    const seconds = now.getSeconds();
+    const milliseconds = now.getMilliseconds();
+
+    // 次の30分区切り（:00または:30）までの時間を計算
+    const nextMinutes = minutes < 30 ? 30 : 0;
+    const minutesToNext =
+      nextMinutes === 0 ? 60 - minutes : nextMinutes - minutes;
+    const msToNext = minutesToNext * 60 * 1000 - seconds * 1000 - milliseconds;
+
+    logger.info('Redis polling scheduled', {
+      currentTime: now.toISOString(),
+      nextPollIn: `${Math.floor(msToNext / 60000)}分${Math.floor((msToNext % 60000) / 1000)}秒`,
+      intervalMinutes: POLLING_INTERVAL_MS / 60000,
+    });
 
     this.pollingInitTimer = setTimeout(
       () => {
+        logger.info('Redis polling started - first handshake');
         void this.handshakePrimary();
         this.pollingTimer = setInterval(() => {
+          logger.info('Redis polling - periodic handshake');
           void this.handshakePrimary();
         }, POLLING_INTERVAL_MS);
       },
