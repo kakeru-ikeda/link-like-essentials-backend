@@ -71,6 +71,18 @@ class FailoverRedisClient implements IRedisClient {
           'sukisuki-club-http-redis'
         );
       } catch (error) {
+        const errorMsg = getErrorMessage(error);
+        
+        // 413 Request Entity Too Largeはリクエストサイズの問題であり、Redis自体の問題ではない
+        // この場合はfallbackせずにそのままエラーをスロー
+        if (errorMsg.includes('413') || errorMsg.includes('Request Entity Too Large')) {
+          logger.warn('Primary Redis request too large (413), not switching to fallback', {
+            error: errorMsg,
+          });
+          throw error;
+        }
+
+        // その他のエラー（404含む）はRedis接続の問題と判断してfallback
         this.current = 'fallback';
         if (!this.hasReportedPrimaryFailure) {
           this.hasReportedPrimaryFailure = true;
@@ -80,7 +92,7 @@ class FailoverRedisClient implements IRedisClient {
           );
         }
         logger.warn('Primary Redis unreachable, switched to fallback', {
-          error: getErrorMessage(error),
+          error: errorMsg,
         });
       }
     }
