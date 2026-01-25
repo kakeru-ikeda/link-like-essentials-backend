@@ -58,7 +58,9 @@ class FailoverRedisClient implements IRedisClient {
     this.current = primary ? 'primary' : 'fallback';
   }
 
-  private async execute<T>(operation: (client: Redis) => Promise<T>): Promise<T> {
+  private async execute<T>(
+    operation: (client: Redis) => Promise<T>
+  ): Promise<T> {
     if (this.current === 'primary' && this.primary) {
       try {
         return await withTimeout(
@@ -90,7 +92,9 @@ class FailoverRedisClient implements IRedisClient {
   ): Promise<unknown> {
     const redisOptions = options?.ex ? { ex: options.ex } : undefined;
     if (redisOptions) {
-      return await this.execute((client) => client.set(key, value, redisOptions));
+      return await this.execute((client) =>
+        client.set(key, value, redisOptions)
+      );
     }
     return await this.execute((client) => client.set(key, value));
   }
@@ -145,12 +149,15 @@ class FailoverRedisClient implements IRedisClient {
       now.getSeconds() * 1000 -
       now.getMilliseconds();
 
-    this.pollingInitTimer = setTimeout(() => {
-      void this.handshakePrimary();
-      this.pollingTimer = setInterval(() => {
+    this.pollingInitTimer = setTimeout(
+      () => {
         void this.handshakePrimary();
-      }, POLLING_INTERVAL_MS);
-    }, Math.max(msToNext, 0));
+        this.pollingTimer = setInterval(() => {
+          void this.handshakePrimary();
+        }, POLLING_INTERVAL_MS);
+      },
+      Math.max(msToNext, 0)
+    );
   }
 
   stopPolling(): void {
@@ -176,7 +183,10 @@ export class RedisClient {
       const isProduction = process.env.NODE_ENV === 'production';
 
       if (!isProduction) {
-        const url = getEnvVar('UPSTASH_REDIS_REST_URL', DEFAULT_LOCAL_REDIS_URL);
+        const url = getEnvVar(
+          'UPSTASH_REDIS_REST_URL',
+          DEFAULT_LOCAL_REDIS_URL
+        );
         const token = getEnvVar(
           'UPSTASH_REDIS_REST_TOKEN',
           DEFAULT_LOCAL_REDIS_TOKEN
