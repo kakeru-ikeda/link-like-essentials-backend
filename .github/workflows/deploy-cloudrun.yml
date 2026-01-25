@@ -49,6 +49,6 @@ jobs:
             --port 4000 \
             --vpc-connector lles-connector \
             --vpc-egress private-ranges-only \
-            --set-env-vars NODE_ENV=production,FIREBASE_SERVICE_ACCOUNT_PATH=/var/secrets/firebase-service-account.json,LLES_FIREBASE_SERVICE_ACCOUNT_PATH=/var/secrets/firebase-service-account.json \
-            --set-secrets LLES_DATABASE_URL=lles-database-url:latest,UPSTASH_REDIS_REST_URL=lles-upstash-redis-rest-url:latest,UPSTASH_REDIS_REST_TOKEN=lles-upstash-redis-rest-token:latest,LLES_FIREBASE_PROJECT_ID=lles-firebase-project-id:latest,LLES_CORS_ORIGIN=lles-cors-origin:latest,SENTRY_DSN=lles-sentry-dsn:latest,/var/secrets/firebase-service-account.json=lles-firebase-service-account-json:latest \
+            --set-env-vars NODE_ENV=production,FIREBASE_SERVICE_ACCOUNT_PATH=/var/secrets/firebase-service-account.json,LLES_FIREBASE_SERVICE_ACCOUNT_PATH=/var/secrets/firebase-service-account.json,SUKISUKI_CLUB_HTTP_REDIS_TIMEOUT_MS=10000 \
+            --set-secrets LLES_DATABASE_URL=lles-database-url:latest,UPSTASH_REDIS_REST_URL=lles-upstash-redis-rest-url:latest,UPSTASH_REDIS_REST_TOKEN=lles-upstash-redis-rest-token:latest,SUKISUKI_CLUB_HTTP_REDIS_URL=lles-sukisuki-club-http-redis-url:latest,SUKISUKI_CLUB_HTTP_REDIS_TOKEN=lles-sukisuki-club-http-redis-token:latest,LLES_FIREBASE_PROJECT_ID=lles-firebase-project-id:latest,LLES_CORS_ORIGIN=lles-cors-origin:latest,SENTRY_DSN=lles-sentry-dsn:latest,/var/secrets/firebase-service-account.json=lles-firebase-service-account-json:latest \
             --max-instances 5

@@ -5,3 +5,10 @@ export function getEnvVar(key: string, defaultValue?: string): string {
   }
   return value;
 }
+
+export function getOptionalEnvVar(
+  key: string,
+  defaultValue?: string
+): string | undefined {
+  return process.env[key] ?? defaultValue;
+}

@@ -53,6 +53,9 @@ async function startServer(): Promise<void> {
     await apolloServer.start();
     logger.info('Apollo Server started');
 
+    // Redisフェイルオーバーのポーリング開始
+    RedisClient.startPolling();
+
     // GraphQLエンドポイント
     app.use(
       '/graphql',
