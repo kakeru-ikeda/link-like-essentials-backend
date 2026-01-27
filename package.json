@@ -22,8 +22,8 @@
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:migrate:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
-    "redis:up": "docker-compose up -d serverless-redis-http",
-    "redis:down": "docker-compose down serverless-redis-http",
+    "redis:up": "docker-compose up -d redis serverless-redis-http",
+    "redis:down": "docker-compose down redis serverless-redis-http",
     "ci:local": "npm run lint && npm run format:check && npm run type-check && npm run test:unit"
   },
   "keywords": [
