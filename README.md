@@ -27,7 +27,7 @@ GraphQLバックエンドシステム - Link! Like! ラブライブ! のカー�
 - **ランタイム**: Node.js 20+
 - **GraphQL**: Apollo Server 4.x
 - **ORM**: Prisma
-- **キャッシュ**: Redis (ioredis)
+- **キャッシュ**: Redis (Upstash互換HTTP, serverless-redis-http経由)
 - **認証**: Firebase Authentication
 - **データベース**: Neon PostgreSQL
 - **テスト**: Jest
@@ -65,12 +65,17 @@ npm run prisma:migrate:dev
 ### 開発サーバー起動
 
 ```bash
+# Redisプロキシ + ローカルRedis起動
+npm run redis:up
+
 # 開発モード（ホットリロード）
 npm run dev
 
 # GraphQL Playground
 # http://localhost:4000/graphql
 ```
+
+> 停止する場合: `npm run redis:down`
 
 ### Dockerで起動
 
