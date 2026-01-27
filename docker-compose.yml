@@ -36,6 +36,16 @@ services:
     networks:
       - app-network
 
+  redis:
+    image: redis:7-alpine
+    container_name: link-like-essentials-redis
+    command: redis-server --save "" --appendonly no
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - app-network
+
 volumes:
   redis_data:
 
