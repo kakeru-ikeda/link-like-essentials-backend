@@ -45,23 +45,20 @@ export class CardRepository implements ICardRepository {
   async findAll(filter?: CardFilterInput): Promise<Card[]> {
     const where = this.buildWhereClause(filter);
 
-    // リリース日が新しい順にソート
+    // リリース日が新しい順にソート（NULL値は最後）、同じ日付の場合はID昇順
     const cards = await this.prisma.card.findMany({
       where,
       include: {
         detail: true,
         accessories: true,
       },
+      orderBy: [
+        { releaseDate: { sort: 'desc', nulls: 'last' } },
+        { id: 'asc' },
+      ],
     });
 
-    const sortedCards = cards.sort((a, b) => {
-      // リリース日降順（新しい順）
-      const dateA = a.releaseDate ? a.releaseDate.getTime() : 0;
-      const dateB = b.releaseDate ? b.releaseDate.getTime() : 0;
-      return dateB - dateA;
-    });
-
-    return sortedCards.map((card) => this.mapToEntity(card));
+    return cards.map((card) => this.mapToEntity(card));
   }
 
   async findByIds(ids: number[]): Promise<Card[]> {
