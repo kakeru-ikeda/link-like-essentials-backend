@@ -34,9 +34,12 @@ jobs:
 
       - name: Build and push image
         run: |
-          gcloud builds submit \
+          BUILD_ID=$(gcloud builds submit \
             --tag ${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPOSITORY}/${IMAGE_NAME}:latest \
-            .
+            --suppress-logs \
+            --format='value(id)' \
+            .)
+          gcloud builds wait "$BUILD_ID"
 
       - name: Deploy to Cloud Run
         id: deploy
