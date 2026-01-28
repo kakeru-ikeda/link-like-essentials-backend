@@ -1,0 +1,53 @@
+type GradeChallenge {
+  id: ID!
+  title: String!
+  startDate: DateTime
+  endDate: DateTime
+  detailUrl: String
+  termName: String
+  isLocked: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  details: [GradeChallengeDetail!]!
+}
+
+type GradeChallengeDetail {
+  id: ID!
+  gradeChallengeId: Int!
+  stageName: String!
+  specialEffect: String
+  songId: Int
+  isLocked: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  song: Song
+  sectionEffects: [GradeChallengeSectionEffect!]!
+}
+
+type GradeChallengeSectionEffect {
+  id: ID!
+  detailId: Int!
+  sectionName: String!
+  effect: String!
+  sectionOrder: Int!
+  isLocked: Boolean!
+  createdAt: DateTime!
+}
+
+input GradeChallengeFilterInput {
+  termName: String
+  title: String
+  startDateFrom: DateTime
+  startDateTo: DateTime
+  hasSongWithDeckType: String
+}
+
+type GradeChallengeStats {
+  totalEvents: Int!
+  byTermName: [TermNameCount!]!
+}
+
+type TermNameCount {
+  termName: String!
+  count: Int!
+}
