@@ -45,41 +45,20 @@ export class CardRepository implements ICardRepository {
   async findAll(filter?: CardFilterInput): Promise<Card[]> {
     const where = this.buildWhereClause(filter);
 
-    // レアリティ優先ソート（LR→UR→SR→R→BR→DR）、その次にリリース日が新しい順
+    // リリース日が新しい順にソート（NULL値は最後）、同じ日付の場合はID昇順
     const cards = await this.prisma.card.findMany({
       where,
       include: {
         detail: true,
         accessories: true,
       },
+      orderBy: [
+        { releaseDate: { sort: 'desc', nulls: 'last' } },
+        { id: 'asc' },
+      ],
     });
 
-    // レアリティの優先順位でソート（LR→UR→SR→R→BR→DR）
-    const rarityOrder: Record<string, number> = {
-      LR: 1,
-      UR: 2,
-      SR: 3,
-      R: 4,
-      BR: 5,
-      DR: 6,
-    };
-
-    const sortedCards = cards.sort((a, b) => {
-      // レアリティでソート
-      const rarityA = a.rarity ? (rarityOrder[a.rarity] ?? 999) : 999;
-      const rarityB = b.rarity ? (rarityOrder[b.rarity] ?? 999) : 999;
-
-      if (rarityA !== rarityB) {
-        return rarityA - rarityB;
-      }
-
-      // レアリティが同じ場合はリリース日降順（新しい順）
-      const dateA = a.releaseDate ? a.releaseDate.getTime() : 0;
-      const dateB = b.releaseDate ? b.releaseDate.getTime() : 0;
-      return dateB - dateA;
-    });
-
-    return sortedCards.map((card) => this.mapToEntity(card));
+    return cards.map((card) => this.mapToEntity(card));
   }
 
   async findByIds(ids: number[]): Promise<Card[]> {
