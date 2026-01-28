@@ -36,6 +36,7 @@ jobs:
         run: |
           BUILD_ID=$(gcloud builds submit \
             --tag ${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPOSITORY}/${IMAGE_NAME}:latest \
+            --default-buckets-behavior=regional-user-owned-bucket \
             --suppress-logs \
             --format='value(id)' \
             .)
