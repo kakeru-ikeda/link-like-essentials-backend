@@ -37,10 +37,23 @@ jobs:
           BUILD_ID=$(gcloud builds submit \
             --tag ${REGION}-docker.pkg.dev/${PROJECT_ID}/${AR_REPOSITORY}/${IMAGE_NAME}:latest \
             --default-buckets-behavior=regional-user-owned-bucket \
-            --suppress-logs \
+            --async \
             --format='value(id)' \
             .)
-          gcloud builds wait "$BUILD_ID"
+
+          while true; do
+            STATUS=$(gcloud builds describe "$BUILD_ID" --format='value(status)')
+            case "$STATUS" in
+              SUCCESS)
+                break
+                ;;
+              FAILURE|CANCELLED|TIMEOUT)
+                echo "Build finished with status: $STATUS"
+                exit 1
+                ;;
+            esac
+            sleep 5
+          done
 
       - name: Deploy to Cloud Run
         id: deploy
