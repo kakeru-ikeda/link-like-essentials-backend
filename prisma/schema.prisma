@@ -84,21 +84,22 @@ model CardAccessory {
 }
 
 model Song {
-  id                   Int                    @id @default(autoincrement())
-  songName             String                 @map("song_name") @db.VarChar(255)
-  songUrl              String?                @map("song_url")
-  category             String                 @db.VarChar(100)
-  attribute            String                 @db.VarChar(100)
-  centerCharacter      String                 @map("center_character") @db.VarChar(255)
-  singers              String                 @db.VarChar(500)
-  participations       String?                @db.Text
-  liveAnalyzerImageUrl String?                @map("live_analyzer_image_url")
-  jacketImageUrl       String?                @map("jacket_image_url")
-  isLocked             Boolean?               @default(false) @map("is_locked")
-  createdAt            DateTime?              @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt            DateTime?              @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
-  moodProgressions     SongMoodProgression[]
-  liveGrandPrixDetails LiveGrandPrixDetail[]
+  id                    Int                    @id @default(autoincrement())
+  songName              String                 @map("song_name") @db.VarChar(255)
+  songUrl               String?                @map("song_url")
+  category              String                 @db.VarChar(100)
+  attribute             String                 @db.VarChar(100)
+  centerCharacter       String                 @map("center_character") @db.VarChar(255)
+  singers               String                 @db.VarChar(500)
+  participations        String?                @db.Text
+  liveAnalyzerImageUrl  String?                @map("live_analyzer_image_url")
+  jacketImageUrl        String?                @map("jacket_image_url")
+  isLocked              Boolean?               @default(false) @map("is_locked")
+  createdAt             DateTime?              @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt             DateTime?              @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  moodProgressions      SongMoodProgression[]
+  liveGrandPrixDetails  LiveGrandPrixDetail[]
+  gradeChallengeDetails GradeChallengeDetail[]
 
   @@index([songName], map: "idx_songs_song_name")
   @@index([category], map: "idx_songs_category")
@@ -125,15 +126,15 @@ model SongMoodProgression {
 }
 
 model LiveGrandPrix {
-  id        Int                    @id @default(autoincrement())
-  startDate DateTime               @map("start_date") @db.Timestamp(6)
-  endDate   DateTime               @map("end_date") @db.Timestamp(6)
-  eventName String                 @map("event_name") @db.VarChar(255)
-  eventUrl  String?                @map("event_url")
-  yearTerm  String                 @map("year_term") @db.VarChar(100)
-  isLocked  Boolean?               @default(false) @map("is_locked")
-  createdAt DateTime?              @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt DateTime?              @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  id        Int                   @id @default(autoincrement())
+  startDate DateTime              @map("start_date") @db.Timestamp(6)
+  endDate   DateTime              @map("end_date") @db.Timestamp(6)
+  eventName String                @map("event_name") @db.VarChar(255)
+  eventUrl  String?               @map("event_url")
+  yearTerm  String                @map("year_term") @db.VarChar(100)
+  isLocked  Boolean?              @default(false) @map("is_locked")
+  createdAt DateTime?             @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime?             @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
   details   LiveGrandPrixDetail[]
 
   @@index([eventName], map: "idx_live_grand_prix_event_name")
@@ -144,17 +145,17 @@ model LiveGrandPrix {
 }
 
 model LiveGrandPrixDetail {
-  id                Int                           @id @default(autoincrement())
-  liveGrandPrixId   Int                           @map("live_grand_prix_id")
-  stageName         String                        @map("stage_name") @db.VarChar(100)
-  specialEffect     String?                       @map("special_effect")
-  songId            Int?                          @map("song_id")
-  isLocked          Boolean?                      @default(false) @map("is_locked")
-  createdAt         DateTime?                     @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt         DateTime?                     @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
-  liveGrandPrix     LiveGrandPrix                 @relation(fields: [liveGrandPrixId], references: [id], onDelete: Cascade, onUpdate: NoAction)
-  song              Song?                         @relation(fields: [songId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  sectionEffects    LiveGrandPrixSectionEffect[]
+  id              Int                          @id @default(autoincrement())
+  liveGrandPrixId Int                          @map("live_grand_prix_id")
+  stageName       String                       @map("stage_name") @db.VarChar(100)
+  specialEffect   String?                      @map("special_effect")
+  songId          Int?                         @map("song_id")
+  isLocked        Boolean?                     @default(false) @map("is_locked")
+  createdAt       DateTime?                    @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt       DateTime?                    @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  liveGrandPrix   LiveGrandPrix                @relation(fields: [liveGrandPrixId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  song            Song?                        @relation(fields: [songId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sectionEffects  LiveGrandPrixSectionEffect[]
 
   @@index([liveGrandPrixId], map: "idx_live_grand_prix_details_live_grand_prix_id")
   @@index([songId], map: "idx_live_grand_prix_details_song_id")
@@ -175,4 +176,60 @@ model LiveGrandPrixSectionEffect {
   @@index([detailId], map: "idx_live_grand_prix_section_effects_detail_id")
   @@index([isLocked], map: "idx_live_grand_prix_section_effects_is_locked")
   @@map("live_grand_prix_section_effects")
+}
+
+model GradeChallenge {
+  id        Int                    @id @default(autoincrement())
+  title     String                 @db.VarChar(255)
+  startDate DateTime?              @map("start_date") @db.Timestamp(6)
+  endDate   DateTime?              @map("end_date") @db.Timestamp(6)
+  detailUrl String?                @map("detail_url")
+  termName  String?                @map("term_name") @db.VarChar(100)
+  isLocked  Boolean?               @default(false) @map("is_locked")
+  createdAt DateTime?              @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt DateTime?              @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  details   GradeChallengeDetail[]
+
+  @@unique([title])
+  @@index([title], map: "idx_grade_challenges_title")
+  @@index([termName], map: "idx_grade_challenges_term_name")
+  @@index([startDate], map: "idx_grade_challenges_start_date")
+  @@index([isLocked], map: "idx_grade_challenges_is_locked")
+  @@map("grade_challenges")
+}
+
+model GradeChallengeDetail {
+  id               Int                           @id @default(autoincrement())
+  gradeChallengeId Int                           @map("grade_challenge_id")
+  stageName        String                        @map("stage_name") @db.VarChar(100)
+  specialEffect    String?                       @map("special_effect")
+  songId           Int?                          @map("song_id")
+  isLocked         Boolean?                      @default(false) @map("is_locked")
+  createdAt        DateTime?                     @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime?                     @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  gradeChallenge   GradeChallenge                @relation(fields: [gradeChallengeId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  song             Song?                         @relation(fields: [songId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sectionEffects   GradeChallengeSectionEffect[]
+
+  @@unique([gradeChallengeId, stageName])
+  @@index([gradeChallengeId], map: "idx_grade_challenge_details_grade_challenge_id")
+  @@index([songId], map: "idx_grade_challenge_details_song_id")
+  @@index([isLocked], map: "idx_grade_challenge_details_is_locked")
+  @@map("grade_challenge_details")
+}
+
+model GradeChallengeSectionEffect {
+  id           Int                  @id @default(autoincrement())
+  detailId     Int                  @map("detail_id")
+  sectionName  String               @map("section_name") @db.VarChar(100)
+  effect       String
+  sectionOrder Int                  @map("section_order")
+  isLocked     Boolean?             @default(false) @map("is_locked")
+  createdAt    DateTime?            @default(now()) @map("created_at") @db.Timestamp(6)
+  detail       GradeChallengeDetail @relation(fields: [detailId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([detailId, sectionName])
+  @@index([detailId], map: "idx_grade_challenge_section_effects_detail_id")
+  @@index([isLocked], map: "idx_grade_challenge_section_effects_is_locked")
+  @@map("grade_challenge_section_effects")
 }

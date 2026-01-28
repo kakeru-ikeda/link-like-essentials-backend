@@ -40,4 +40,17 @@ type Query {
 
   # ライブグランプリ統計情報
   liveGrandPrixStats: LiveGrandPrixStats!
+
+  # グレードチャレンジ一覧取得
+  gradeChallenges(filter: GradeChallengeFilterInput): [GradeChallenge!]!
+
+  # 単一グレードチャレンジ取得
+  gradeChallengeById(id: ID!): GradeChallenge
+  gradeChallengeByTitle(title: String!): GradeChallenge
+
+  # 開催中のグレードチャレンジ取得
+  ongoingGradeChallenges: [GradeChallenge!]!
+
+  # グレードチャレンジ統計情報
+  gradeChallengeStats: GradeChallengeStats!
 }
