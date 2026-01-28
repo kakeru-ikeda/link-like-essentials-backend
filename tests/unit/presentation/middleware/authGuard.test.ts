@@ -1,6 +1,7 @@
 import type { AccessoryService } from '../../../../src/application/services/AccessoryService';
 import type { CardDetailService } from '../../../../src/application/services/CardDetailService';
 import type { CardService } from '../../../../src/application/services/CardService';
+import type { GradeChallengeService } from '../../../../src/application/services/GradeChallengeService';
 import type { LiveGrandPrixService } from '../../../../src/application/services/LiveGrandPrixService';
 import type { SongService } from '../../../../src/application/services/SongService';
 import type { AuthUser } from '../../../../src/infrastructure/auth/AuthService';
@@ -17,6 +18,7 @@ describe('AuthGuard', () => {
     accessoryService: {} as AccessoryService,
     songService: {} as SongService,
     liveGrandPrixService: {} as LiveGrandPrixService,
+    gradeChallengeService: {} as GradeChallengeService,
   };
 
   const mockUser: AuthUser = {
@@ -26,8 +28,8 @@ describe('AuthGuard', () => {
   };
 
   // Import fresh module for each test to reset isDevelopment
-  let requireAuth: typeof import('../../../../src/presentation/middleware/authGuard').requireAuth;
-  let getAuthenticatedUser: typeof import('../../../../src/presentation/middleware/authGuard').getAuthenticatedUser;
+  let requireAuth: (context: GraphQLContext) => void;
+  let getAuthenticatedUser: (context: GraphQLContext) => AuthUser | undefined;
 
   beforeEach(async () => {
     // Clear the module cache to get fresh imports
