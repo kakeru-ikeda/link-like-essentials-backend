@@ -1,5 +1,6 @@
 import type {
   CardAccessory as PrismaAccessory,
+  Prisma,
   PrismaClient,
 } from '@prisma/client';
 
@@ -17,21 +18,30 @@ export class AccessoryRepository implements IAccessoryRepository {
     filter?: AccessoryFilterInput
   ): Promise<Accessory[]> {
     const where = this.buildWhereClause(cardId, filter);
+    const include = {
+      card: true,
+      heartCollectAnalysis: true,
+      unDrawAnalysis: true,
+    } as unknown as Prisma.CardAccessoryInclude;
 
     const accessories = await this.prisma.cardAccessory.findMany({
       where,
       orderBy: {
         displayOrder: 'asc',
       },
-      include: {
-        card: true,
-      },
+      include,
     });
 
     return accessories.map((accessory) => this.mapToEntity(accessory));
   }
 
   async findByCardIds(cardIds: number[]): Promise<Accessory[]> {
+    const include = {
+      card: true,
+      heartCollectAnalysis: true,
+      unDrawAnalysis: true,
+    } as unknown as Prisma.CardAccessoryInclude;
+
     const accessories = await this.prisma.cardAccessory.findMany({
       where: {
         cardId: { in: cardIds },
@@ -39,9 +49,7 @@ export class AccessoryRepository implements IAccessoryRepository {
       orderBy: {
         displayOrder: 'asc',
       },
-      include: {
-        card: true,
-      },
+      include,
     });
 
     return accessories.map((accessory) => this.mapToEntity(accessory));
@@ -91,7 +99,11 @@ export class AccessoryRepository implements IAccessoryRepository {
   }
 
   private mapToEntity(
-    accessory: PrismaAccessory & { card?: unknown }
+    accessory: PrismaAccessory & {
+      card?: unknown;
+      heartCollectAnalysis?: unknown;
+      unDrawAnalysis?: unknown;
+    }
   ): Accessory {
     return {
       id: accessory.id,
@@ -107,6 +119,9 @@ export class AccessoryRepository implements IAccessoryRepository {
       createdAt: accessory.createdAt,
       updatedAt: accessory.updatedAt,
       card: accessory.card as Accessory['card'],
+      heartCollectAnalysis:
+        accessory.heartCollectAnalysis as Accessory['heartCollectAnalysis'],
+      unDrawAnalysis: accessory.unDrawAnalysis as Accessory['unDrawAnalysis'],
     };
   }
 }

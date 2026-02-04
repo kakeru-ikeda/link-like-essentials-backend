@@ -1,0 +1,26 @@
+type SectionActivation {
+  section1: Boolean!
+  section2: Boolean!
+  section3: Boolean!
+  section4: Boolean!
+  section5: Boolean!
+  sectionFever: Boolean!
+}
+
+type HeartCollectAnalysis {
+  id: ID!
+  cardId: Int
+  accessoryId: Int
+  sections: SectionActivation!
+  conditionDetail: JSON
+  analyzedAt: DateTime
+}
+
+type UnDrawAnalysis {
+  id: ID!
+  cardId: Int
+  accessoryId: Int
+  sections: SectionActivation!
+  conditionDetail: JSON
+  analyzedAt: DateTime
+}

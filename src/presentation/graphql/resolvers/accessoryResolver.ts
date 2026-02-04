@@ -34,6 +34,16 @@ export interface AccessoryResolvers {
     args: Record<string, never>,
     context: GraphQLContext
   ) => Promise<unknown>;
+  heartCollectAnalysis: (
+    parent: Accessory,
+    args: Record<string, never>,
+    context: GraphQLContext
+  ) => Promise<unknown>;
+  unDrawAnalysis: (
+    parent: Accessory,
+    args: Record<string, never>,
+    context: GraphQLContext
+  ) => Promise<unknown>;
 }
 
 export const accessoryResolvers: {
@@ -71,6 +81,22 @@ export const accessoryResolvers: {
     card: async (parent, _, context) => {
       if (parent.card) return parent.card;
       return await context.dataSources.cardService.findById(parent.cardId);
+    },
+
+    heartCollectAnalysis: async (parent, _, context) => {
+      if (parent.heartCollectAnalysis) return parent.heartCollectAnalysis;
+
+      return await context.dataSources.heartCollectAnalysisService.findByAccessoryId(
+        parent.id
+      );
+    },
+
+    unDrawAnalysis: async (parent, _, context) => {
+      if (parent.unDrawAnalysis) return parent.unDrawAnalysis;
+
+      return await context.dataSources.unDrawAnalysisService.findByAccessoryId(
+        parent.id
+      );
     },
   },
 };

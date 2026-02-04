@@ -4,23 +4,29 @@ import { AccessoryService } from '@/application/services/AccessoryService';
 import { CardDetailService } from '@/application/services/CardDetailService';
 import { CardService } from '@/application/services/CardService';
 import { GradeChallengeService } from '@/application/services/GradeChallengeService';
+import { HeartCollectAnalysisService } from '@/application/services/HeartCollectAnalysisService';
 import { LiveGrandPrixService } from '@/application/services/LiveGrandPrixService';
 import { SongService } from '@/application/services/SongService';
+import { UnDrawAnalysisService } from '@/application/services/UnDrawAnalysisService';
 import { AuthService } from '@/infrastructure/auth/AuthService';
 import { CacheService } from '@/infrastructure/cache/CacheService';
 import { RedisClient } from '@/infrastructure/cache/RedisClient';
 import { CardCacheStrategy } from '@/infrastructure/cache/strategies/CardCacheStrategy';
 import { DetailCacheStrategy } from '@/infrastructure/cache/strategies/DetailCacheStrategy';
 import { GradeChallengeCacheStrategy } from '@/infrastructure/cache/strategies/GradeChallengeCacheStrategy';
+import { HeartCollectAnalysisCacheStrategy } from '@/infrastructure/cache/strategies/HeartCollectAnalysisCacheStrategy';
 import { LiveGrandPrixCacheStrategy } from '@/infrastructure/cache/strategies/LiveGrandPrixCacheStrategy';
 import { SongCacheStrategy } from '@/infrastructure/cache/strategies/SongCacheStrategy';
+import { UnDrawAnalysisCacheStrategy } from '@/infrastructure/cache/strategies/UnDrawAnalysisCacheStrategy';
 import { prisma } from '@/infrastructure/database/client';
 import { AccessoryRepository } from '@/infrastructure/database/repositories/AccessoryRepository';
 import { CardDetailRepository } from '@/infrastructure/database/repositories/CardDetailRepository';
 import { CardRepository } from '@/infrastructure/database/repositories/CardRepository';
 import { GradeChallengeRepository } from '@/infrastructure/database/repositories/GradeChallengeRepository';
+import { HeartCollectAnalysisRepository } from '@/infrastructure/database/repositories/HeartCollectAnalysisRepository';
 import { LiveGrandPrixRepository } from '@/infrastructure/database/repositories/LiveGrandPrixRepository';
 import { SongRepository } from '@/infrastructure/database/repositories/SongRepository';
+import { UnDrawAnalysisRepository } from '@/infrastructure/database/repositories/UnDrawAnalysisRepository';
 import { logger } from '@/infrastructure/logger/Logger';
 import type { GraphQLContext } from '@/presentation/graphql/context';
 
@@ -52,6 +58,11 @@ export async function createContext(req: Request): Promise<GraphQLContext> {
   const gradeChallengeCacheStrategy = new GradeChallengeCacheStrategy(
     cacheService
   );
+  const heartCollectAnalysisCacheStrategy =
+    new HeartCollectAnalysisCacheStrategy(cacheService);
+  const unDrawAnalysisCacheStrategy = new UnDrawAnalysisCacheStrategy(
+    cacheService
+  );
 
   const cardRepository = new CardRepository(prisma);
   const cardDetailRepository = new CardDetailRepository(prisma);
@@ -59,6 +70,10 @@ export async function createContext(req: Request): Promise<GraphQLContext> {
   const songRepository = new SongRepository(prisma);
   const liveGrandPrixRepository = new LiveGrandPrixRepository(prisma);
   const gradeChallengeRepository = new GradeChallengeRepository(prisma);
+  const heartCollectAnalysisRepository = new HeartCollectAnalysisRepository(
+    prisma
+  );
+  const unDrawAnalysisRepository = new UnDrawAnalysisRepository(prisma);
 
   const cardService = new CardService(cardRepository, cardCacheStrategy);
   const cardDetailService = new CardDetailService(
@@ -66,6 +81,14 @@ export async function createContext(req: Request): Promise<GraphQLContext> {
     detailCacheStrategy
   );
   const accessoryService = new AccessoryService(accessoryRepository);
+  const heartCollectAnalysisService = new HeartCollectAnalysisService(
+    heartCollectAnalysisRepository,
+    heartCollectAnalysisCacheStrategy
+  );
+  const unDrawAnalysisService = new UnDrawAnalysisService(
+    unDrawAnalysisRepository,
+    unDrawAnalysisCacheStrategy
+  );
   const songService = new SongService(songRepository, songCacheStrategy);
   const liveGrandPrixService = new LiveGrandPrixService(
     liveGrandPrixRepository,
@@ -82,6 +105,8 @@ export async function createContext(req: Request): Promise<GraphQLContext> {
       cardService,
       cardDetailService,
       accessoryService,
+      heartCollectAnalysisService,
+      unDrawAnalysisService,
       songService,
       liveGrandPrixService,
       gradeChallengeService,

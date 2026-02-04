@@ -40,6 +40,16 @@ export interface CardResolvers {
     args: Record<string, never>,
     context: GraphQLContext
   ) => Promise<unknown>;
+  heartCollectAnalysis: (
+    parent: { id: number; heartCollectAnalysis?: unknown },
+    args: Record<string, never>,
+    context: GraphQLContext
+  ) => Promise<unknown>;
+  unDrawAnalysis: (
+    parent: { id: number; unDrawAnalysis?: unknown },
+    args: Record<string, never>,
+    context: GraphQLContext
+  ) => Promise<unknown>;
   rarity: (parent: { rarity: string | null }) => string | null;
   limited: (parent: { limited: string | null }) => string | null;
   styleType: (parent: { styleType: string | null }) => string | null;
@@ -97,6 +107,22 @@ export const cardResolvers: {
 
       // フィールドリゾルバーでのフォールバック（通常は使われない）
       return await context.dataSources.accessoryService.findByCardId(parent.id);
+    },
+
+    heartCollectAnalysis: async (parent, _, context) => {
+      if (parent.heartCollectAnalysis) return parent.heartCollectAnalysis;
+
+      return await context.dataSources.heartCollectAnalysisService.findByCardId(
+        parent.id
+      );
+    },
+
+    unDrawAnalysis: async (parent, _, context) => {
+      if (parent.unDrawAnalysis) return parent.unDrawAnalysis;
+
+      return await context.dataSources.unDrawAnalysisService.findByCardId(
+        parent.id
+      );
     },
 
     rarity: (parent) => {

@@ -1,4 +1,4 @@
-import type { Card as PrismaCard, PrismaClient } from '@prisma/client';
+import type { Card as PrismaCard, Prisma, PrismaClient } from '@prisma/client';
 
 import type { Card } from '@/domain/entities/Card';
 import type {
@@ -11,12 +11,16 @@ export class CardRepository implements ICardRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async findById(id: number): Promise<Card | null> {
+    const include = {
+      detail: true,
+      accessories: true,
+      heartCollectAnalysis: true,
+      unDrawAnalysis: true,
+    } as unknown as Prisma.CardInclude;
+
     const card = await this.prisma.card.findUnique({
       where: { id },
-      include: {
-        detail: true,
-        accessories: true,
-      },
+      include,
     });
 
     return card ? this.mapToEntity(card) : null;
@@ -26,6 +30,13 @@ export class CardRepository implements ICardRepository {
     cardName: string,
     characterName: string
   ): Promise<Card | null> {
+    const include = {
+      detail: true,
+      accessories: true,
+      heartCollectAnalysis: true,
+      unDrawAnalysis: true,
+    } as unknown as Prisma.CardInclude;
+
     const card = await this.prisma.card.findUnique({
       where: {
         cardName_characterName: {
@@ -33,10 +44,7 @@ export class CardRepository implements ICardRepository {
           characterName,
         },
       },
-      include: {
-        detail: true,
-        accessories: true,
-      },
+      include,
     });
 
     return card ? this.mapToEntity(card) : null;
@@ -44,14 +52,17 @@ export class CardRepository implements ICardRepository {
 
   async findAll(filter?: CardFilterInput): Promise<Card[]> {
     const where = this.buildWhereClause(filter);
+    const include = {
+      detail: true,
+      accessories: true,
+      heartCollectAnalysis: true,
+      unDrawAnalysis: true,
+    } as unknown as Prisma.CardInclude;
 
     // リリース日が新しい順にソート（NULL値は最後）、同じ日付の場合はID昇順
     const cards = await this.prisma.card.findMany({
       where,
-      include: {
-        detail: true,
-        accessories: true,
-      },
+      include,
       orderBy: [
         { releaseDate: { sort: 'desc', nulls: 'last' } },
         { id: 'asc' },
@@ -62,14 +73,18 @@ export class CardRepository implements ICardRepository {
   }
 
   async findByIds(ids: number[]): Promise<Card[]> {
+    const include = {
+      detail: true,
+      accessories: true,
+      heartCollectAnalysis: true,
+      unDrawAnalysis: true,
+    } as unknown as Prisma.CardInclude;
+
     const cards = await this.prisma.card.findMany({
       where: {
         id: { in: ids },
       },
-      include: {
-        detail: true,
-        accessories: true,
-      },
+      include,
     });
 
     return cards.map((card) => this.mapToEntity(card));
@@ -212,7 +227,12 @@ export class CardRepository implements ICardRepository {
   }
 
   private mapToEntity(
-    card: PrismaCard & { detail?: unknown; accessories?: unknown[] }
+    card: PrismaCard & {
+      detail?: unknown;
+      accessories?: unknown[];
+      heartCollectAnalysis?: unknown;
+      unDrawAnalysis?: unknown;
+    }
   ): Card {
     const mappedCard: Card = {
       id: card.id,
@@ -228,6 +248,9 @@ export class CardRepository implements ICardRepository {
       updatedAt: card.updatedAt,
       detail: card.detail as Card['detail'],
       accessories: card.accessories as Card['accessories'],
+      heartCollectAnalysis:
+        card.heartCollectAnalysis as Card['heartCollectAnalysis'],
+      unDrawAnalysis: card.unDrawAnalysis as Card['unDrawAnalysis'],
     };
 
     // detailにaccessoriesを追加

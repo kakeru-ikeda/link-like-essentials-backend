@@ -1,4 +1,5 @@
 scalar DateTime
+scalar JSON
 
 # レアリティ
 enum Rarity {

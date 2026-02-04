@@ -12,6 +12,8 @@ type Card {
   updatedAt: DateTime!
   detail: CardDetail
   accessories: [Accessory!]!
+  heartCollectAnalysis: HeartCollectAnalysis
+  unDrawAnalysis: UnDrawAnalysis
 }
 
 input CardFilterInput {
