@@ -66,7 +66,7 @@ describe('CardService', () => {
 
       expect(result).toEqual(mockCard);
       expect(mockCacheStrategy.getCard).toHaveBeenCalledWith(1);
-      expect(mockRepository.findById).toHaveBeenCalledWith(1);
+      expect(mockRepository.findById).toHaveBeenCalledWith(1, undefined);
       expect(mockCacheStrategy.setCard).toHaveBeenCalledWith(mockCard);
     });
 
@@ -110,7 +110,8 @@ describe('CardService', () => {
       expect(result).toEqual(mockCard);
       expect(mockRepository.findByCardNameAndCharacter).toHaveBeenCalledWith(
         'Test Card',
-        'Test Character'
+        'Test Character',
+        undefined
       );
       expect(mockCacheStrategy.setCardByName).toHaveBeenCalledWith(mockCard);
     });
@@ -204,7 +205,7 @@ describe('CardService', () => {
 
       expect(result).toEqual(mockCards);
       expect(mockCacheStrategy.getCardList).toHaveBeenCalled();
-      expect(mockRepository.findAll).toHaveBeenCalledWith(undefined);
+      expect(mockRepository.findAll).toHaveBeenCalledWith(undefined, undefined);
       expect(mockCacheStrategy.setCardList).toHaveBeenCalled();
     });
 
@@ -217,7 +218,7 @@ describe('CardService', () => {
       const result = await cardService.findAll(filter);
 
       expect(result).toEqual(mockCards);
-      expect(mockRepository.findAll).toHaveBeenCalledWith(filter);
+      expect(mockRepository.findAll).toHaveBeenCalledWith(filter, undefined);
     });
 
     it('should pass filter to repository', async () => {
@@ -228,7 +229,7 @@ describe('CardService', () => {
 
       await cardService.findAll(filter);
 
-      expect(mockRepository.findAll).toHaveBeenCalledWith(filter);
+      expect(mockRepository.findAll).toHaveBeenCalledWith(filter, undefined);
     });
 
     it('should generate consistent hash for same filter', async () => {
