@@ -1,6 +1,5 @@
 import type {
   CardAccessory as PrismaAccessory,
-  Prisma,
   PrismaClient,
 } from '@prisma/client';
 
@@ -18,30 +17,21 @@ export class AccessoryRepository implements IAccessoryRepository {
     filter?: AccessoryFilterInput
   ): Promise<Accessory[]> {
     const where = this.buildWhereClause(cardId, filter);
-    const include = {
-      card: true,
-      heartCollectAnalysis: true,
-      unDrawAnalysis: true,
-    } as unknown as Prisma.CardAccessoryInclude;
 
     const accessories = await this.prisma.cardAccessory.findMany({
       where,
       orderBy: {
         displayOrder: 'asc',
       },
-      include,
+      include: {
+        card: true,
+      },
     });
 
     return accessories.map((accessory) => this.mapToEntity(accessory));
   }
 
   async findByCardIds(cardIds: number[]): Promise<Accessory[]> {
-    const include = {
-      card: true,
-      heartCollectAnalysis: true,
-      unDrawAnalysis: true,
-    } as unknown as Prisma.CardAccessoryInclude;
-
     const accessories = await this.prisma.cardAccessory.findMany({
       where: {
         cardId: { in: cardIds },
@@ -49,7 +39,9 @@ export class AccessoryRepository implements IAccessoryRepository {
       orderBy: {
         displayOrder: 'asc',
       },
-      include,
+      include: {
+        card: true,
+      },
     });
 
     return accessories.map((accessory) => this.mapToEntity(accessory));

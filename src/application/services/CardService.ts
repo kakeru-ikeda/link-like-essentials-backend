@@ -2,7 +2,10 @@ import crypto from 'crypto';
 
 import type { Card } from '@/domain/entities/Card';
 import { NotFoundError } from '@/domain/errors/AppError';
-import type { ICardRepository } from '@/domain/repositories/ICardRepository';
+import type {
+  CardIncludeOptions,
+  ICardRepository,
+} from '@/domain/repositories/ICardRepository';
 import type { CardCacheStrategy } from '@/infrastructure/cache/strategies/CardCacheStrategy';
 
 import type { CardFilterInput, CardStatsResult } from '../dto/CardDTO';
@@ -13,67 +16,85 @@ export class CardService {
     private readonly cacheStrategy: CardCacheStrategy
   ) {}
 
-  async findById(id: number): Promise<Card> {
-    // キャッシュチェック
-    const cached = await this.cacheStrategy.getCard(id);
-    if (cached) {
-      return cached;
+  async findById(id: number, options?: CardIncludeOptions): Promise<Card> {
+    const useCache = !options?.heartCollectAnalysis && !options?.unDrawAnalysis;
+    if (useCache) {
+      // キャッシュチェック
+      const cached = await this.cacheStrategy.getCard(id);
+      if (cached) {
+        return cached;
+      }
     }
 
     // DBから取得
-    const card = await this.cardRepository.findById(id);
+    const card = await this.cardRepository.findById(id, options);
     if (!card) {
       throw new NotFoundError(`Card with id ${id} not found`);
     }
 
-    // キャッシュに保存
-    await this.cacheStrategy.setCard(card);
+    if (useCache) {
+      // キャッシュに保存
+      await this.cacheStrategy.setCard(card);
+    }
 
     return card;
   }
 
   async findByName(
     cardName: string,
-    characterName: string
+    characterName: string,
+    options?: CardIncludeOptions
   ): Promise<Card | null> {
-    // キャッシュチェック
-    const cached = await this.cacheStrategy.getCardByName(
-      cardName,
-      characterName
-    );
-    if (cached) {
-      return cached;
+    const useCache = !options?.heartCollectAnalysis && !options?.unDrawAnalysis;
+    if (useCache) {
+      // キャッシュチェック
+      const cached = await this.cacheStrategy.getCardByName(
+        cardName,
+        characterName
+      );
+      if (cached) {
+        return cached;
+      }
     }
 
     // DBから取得
     const card = await this.cardRepository.findByCardNameAndCharacter(
       cardName,
-      characterName
+      characterName,
+      options
     );
 
     // キャッシュに保存
-    if (card) {
+    if (useCache && card) {
       await this.cacheStrategy.setCardByName(card);
     }
 
     return card;
   }
 
-  async findAll(filter?: CardFilterInput): Promise<Card[]> {
+  async findAll(
+    filter?: CardFilterInput,
+    options?: CardIncludeOptions
+  ): Promise<Card[]> {
     // フィルター条件からハッシュを生成
     const filterHash = this.generateFilterHash(filter);
 
-    // キャッシュチェック
-    const cached = await this.cacheStrategy.getCardList(filterHash);
-    if (cached && Array.isArray(cached)) {
-      return cached;
+    const useCache = !options?.heartCollectAnalysis && !options?.unDrawAnalysis;
+    if (useCache) {
+      // キャッシュチェック
+      const cached = await this.cacheStrategy.getCardList(filterHash);
+      if (cached && Array.isArray(cached)) {
+        return cached;
+      }
     }
 
     // DBから取得
-    const cards = await this.cardRepository.findAll(filter);
+    const cards = await this.cardRepository.findAll(filter, options);
 
-    // キャッシュに保存
-    await this.cacheStrategy.setCardList(filterHash, cards);
+    if (useCache) {
+      // キャッシュに保存
+      await this.cacheStrategy.setCardList(filterHash, cards);
+    }
 
     return cards;
   }

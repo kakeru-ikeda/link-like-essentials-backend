@@ -92,9 +92,6 @@ class FailoverRedisClient implements IRedisClient {
         this.current = 'fallback';
         if (!this.hasReportedPrimaryFailure) {
           this.hasReportedPrimaryFailure = true;
-          SentryService.captureException(
-            error instanceof Error ? error : new Error(errorMsg)
-          );
           SentryService.captureMessage(
             'Primary Redis unreachable, switched to fallback (sukisuki-club-http-redis)',
             'warning'
@@ -102,9 +99,6 @@ class FailoverRedisClient implements IRedisClient {
         }
         logger.error('Primary Redis unreachable, switched to fallback', {
           error: errorMsg,
-          errorType:
-            error instanceof Error ? error.constructor.name : typeof error,
-          stack: error instanceof Error ? error.stack : undefined,
         });
       }
     }
@@ -169,9 +163,6 @@ class FailoverRedisClient implements IRedisClient {
       const errorMsg = getErrorMessage(error);
       logger.error('Primary Redis handshake failed', {
         error: errorMsg,
-        errorType:
-          error instanceof Error ? error.constructor.name : typeof error,
-        stack: error instanceof Error ? error.stack : undefined,
       });
       return false;
     }

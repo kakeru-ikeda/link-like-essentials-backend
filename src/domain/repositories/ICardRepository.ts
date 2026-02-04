@@ -19,13 +19,22 @@ export interface CardStats {
   byCharacter: Array<{ characterName: string; count: number }>;
 }
 
+export interface CardIncludeOptions {
+  heartCollectAnalysis?: boolean;
+  unDrawAnalysis?: boolean;
+}
+
 export interface ICardRepository {
-  findById(id: number): Promise<Card | null>;
+  findById(id: number, options?: CardIncludeOptions): Promise<Card | null>;
   findByCardNameAndCharacter(
     cardName: string,
-    characterName: string
+    characterName: string,
+    options?: CardIncludeOptions
   ): Promise<Card | null>;
-  findAll(filter?: CardFilterInput): Promise<Card[]>;
-  findByIds(ids: number[]): Promise<Card[]>;
+  findAll(
+    filter?: CardFilterInput,
+    options?: CardIncludeOptions
+  ): Promise<Card[]>;
+  findByIds(ids: number[], options?: CardIncludeOptions): Promise<Card[]>;
   getStats(): Promise<CardStats>;
 }
