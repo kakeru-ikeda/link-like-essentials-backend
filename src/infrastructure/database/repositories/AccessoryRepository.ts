@@ -91,7 +91,11 @@ export class AccessoryRepository implements IAccessoryRepository {
   }
 
   private mapToEntity(
-    accessory: PrismaAccessory & { card?: unknown }
+    accessory: PrismaAccessory & {
+      card?: unknown;
+      heartCollectAnalysis?: unknown;
+      unDrawAnalysis?: unknown;
+    }
   ): Accessory {
     return {
       id: accessory.id,
@@ -107,6 +111,9 @@ export class AccessoryRepository implements IAccessoryRepository {
       createdAt: accessory.createdAt,
       updatedAt: accessory.updatedAt,
       card: accessory.card as Accessory['card'],
+      heartCollectAnalysis:
+        accessory.heartCollectAnalysis as Accessory['heartCollectAnalysis'],
+      unDrawAnalysis: accessory.unDrawAnalysis as Accessory['unDrawAnalysis'],
     };
   }
 }

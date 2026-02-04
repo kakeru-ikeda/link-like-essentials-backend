@@ -2,8 +2,10 @@ import type { AccessoryService } from '../../../../src/application/services/Acce
 import type { CardDetailService } from '../../../../src/application/services/CardDetailService';
 import type { CardService } from '../../../../src/application/services/CardService';
 import type { GradeChallengeService } from '../../../../src/application/services/GradeChallengeService';
+import type { HeartCollectAnalysisService } from '../../../../src/application/services/HeartCollectAnalysisService';
 import type { LiveGrandPrixService } from '../../../../src/application/services/LiveGrandPrixService';
 import type { SongService } from '../../../../src/application/services/SongService';
+import type { UnDrawAnalysisService } from '../../../../src/application/services/UnDrawAnalysisService';
 import type { AuthUser } from '../../../../src/infrastructure/auth/AuthService';
 import type { GraphQLContext } from '../../../../src/presentation/graphql/context';
 
@@ -16,6 +18,8 @@ describe('AuthGuard', () => {
     cardService: {} as CardService,
     cardDetailService: {} as CardDetailService,
     accessoryService: {} as AccessoryService,
+    heartCollectAnalysisService: {} as HeartCollectAnalysisService,
+    unDrawAnalysisService: {} as UnDrawAnalysisService,
     songService: {} as SongService,
     liveGrandPrixService: {} as LiveGrandPrixService,
     gradeChallengeService: {} as GradeChallengeService,

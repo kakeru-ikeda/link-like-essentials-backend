@@ -1,4 +1,4 @@
-import { DateTimeResolver } from 'graphql-scalars';
+import { DateTimeResolver, JSONResolver } from 'graphql-scalars';
 
 import { accessoryResolvers } from './accessoryResolver';
 import { cardDetailResolvers } from './cardDetailResolver';
@@ -9,6 +9,7 @@ import { songResolvers } from './songResolver';
 
 export const resolvers = {
   DateTime: DateTimeResolver,
+  JSON: JSONResolver,
   Query: {
     ...cardResolvers.Query,
     ...cardDetailResolvers.Query,

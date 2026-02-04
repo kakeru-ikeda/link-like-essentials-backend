@@ -97,7 +97,7 @@ class FailoverRedisClient implements IRedisClient {
             'warning'
           );
         }
-        logger.warn('Primary Redis unreachable, switched to fallback', {
+        logger.error('Primary Redis unreachable, switched to fallback', {
           error: errorMsg,
         });
       }
@@ -160,8 +160,9 @@ class FailoverRedisClient implements IRedisClient {
       }
       return true;
     } catch (error) {
-      logger.warn('Primary Redis handshake failed', {
-        error: getErrorMessage(error),
+      const errorMsg = getErrorMessage(error);
+      logger.error('Primary Redis handshake failed', {
+        error: errorMsg,
       });
       return false;
     }

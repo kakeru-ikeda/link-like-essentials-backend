@@ -1,3 +1,5 @@
+import { Kind, type GraphQLResolveInfo, type SelectionNode } from 'graphql';
+
 import type { CardFilterInput } from '@/application/dto/CardDTO';
 import { EnumMapper } from '@/infrastructure/mappers/EnumMapper';
 import { requireAuth } from '@/presentation/middleware/authGuard';
@@ -10,17 +12,20 @@ interface QueryResolvers {
     args: {
       filter?: CardFilterInput;
     },
-    context: GraphQLContext
+    context: GraphQLContext,
+    info: GraphQLResolveInfo
   ) => Promise<unknown>;
   card: (
     parent: unknown,
     args: { id: string },
-    context: GraphQLContext
+    context: GraphQLContext,
+    info: GraphQLResolveInfo
   ) => Promise<unknown>;
   cardByName: (
     parent: unknown,
     args: { cardName: string; characterName: string },
-    context: GraphQLContext
+    context: GraphQLContext,
+    info: GraphQLResolveInfo
   ) => Promise<unknown>;
   cardStats: (
     parent: unknown,
@@ -40,6 +45,16 @@ export interface CardResolvers {
     args: Record<string, never>,
     context: GraphQLContext
   ) => Promise<unknown>;
+  heartCollectAnalysis: (
+    parent: { id: number; heartCollectAnalysis?: unknown },
+    args: Record<string, never>,
+    context: GraphQLContext
+  ) => Promise<unknown>;
+  unDrawAnalysis: (
+    parent: { id: number; unDrawAnalysis?: unknown },
+    args: Record<string, never>,
+    context: GraphQLContext
+  ) => Promise<unknown>;
   rarity: (parent: { rarity: string | null }) => string | null;
   limited: (parent: { limited: string | null }) => string | null;
   styleType: (parent: { styleType: string | null }) => string | null;
@@ -50,28 +65,37 @@ export const cardResolvers: {
   Card: CardResolvers;
 } = {
   Query: {
-    cards: async (_, args, context) => {
+    cards: async (_, args, context, info) => {
       requireAuth(context);
 
       const { filter } = args;
 
-      const result = await context.dataSources.cardService.findAll(filter);
+      const includeOptions = getCardIncludeOptions(info);
+      const result = await context.dataSources.cardService.findAll(
+        filter,
+        includeOptions
+      );
 
       return result;
     },
 
-    card: async (_, { id }, context) => {
+    card: async (_, { id }, context, info) => {
       requireAuth(context);
 
-      return await context.dataSources.cardService.findById(parseInt(id, 10));
+      const includeOptions = getCardIncludeOptions(info);
+      return await context.dataSources.cardService.findById(
+        parseInt(id, 10),
+        includeOptions
+      );
     },
 
-    cardByName: async (_, { cardName, characterName }, context) => {
+    cardByName: async (_, { cardName, characterName }, context, info) => {
       requireAuth(context);
 
       return await context.dataSources.cardService.findByName(
         cardName,
-        characterName
+        characterName,
+        getCardIncludeOptions(info)
       );
     },
 
@@ -99,6 +123,22 @@ export const cardResolvers: {
       return await context.dataSources.accessoryService.findByCardId(parent.id);
     },
 
+    heartCollectAnalysis: async (parent, _, context) => {
+      if (parent.heartCollectAnalysis) return parent.heartCollectAnalysis;
+
+      return await context.dataSources.heartCollectAnalysisService.findByCardId(
+        parent.id
+      );
+    },
+
+    unDrawAnalysis: async (parent, _, context) => {
+      if (parent.unDrawAnalysis) return parent.unDrawAnalysis;
+
+      return await context.dataSources.unDrawAnalysisService.findByCardId(
+        parent.id
+      );
+    },
+
     rarity: (parent) => {
       return parent.rarity;
     },
@@ -111,4 +151,84 @@ export const cardResolvers: {
       return EnumMapper.toStyleTypeEnum(parent.styleType);
     },
   },
+};
+
+const getCardIncludeOptions = (
+  info: GraphQLResolveInfo
+): {
+  heartCollectAnalysis: boolean;
+  unDrawAnalysis: boolean;
+} => {
+  return {
+    heartCollectAnalysis: hasSelectedField(info, 'heartCollectAnalysis'),
+    unDrawAnalysis: hasSelectedField(info, 'unDrawAnalysis'),
+  };
+};
+
+const hasSelectedField = (
+  info: GraphQLResolveInfo,
+  fieldName: string
+): boolean => {
+  const selections = info.fieldNodes.flatMap(
+    (node) => node.selectionSet?.selections ?? []
+  );
+  return selectionsContainField(
+    selections,
+    fieldName,
+    info.fragments,
+    new Set<string>()
+  );
+};
+
+const selectionsContainField = (
+  selections: readonly SelectionNode[],
+  fieldName: string,
+  fragments: GraphQLResolveInfo['fragments'],
+  visitedFragments: Set<string>
+): boolean => {
+  for (const selection of selections) {
+    if (selection.kind === Kind.FIELD) {
+      if (selection.name.value === fieldName) {
+        return true;
+      }
+      continue;
+    }
+
+    if (selection.kind === Kind.INLINE_FRAGMENT) {
+      if (
+        selection.selectionSet &&
+        selectionsContainField(
+          selection.selectionSet.selections,
+          fieldName,
+          fragments,
+          visitedFragments
+        )
+      ) {
+        return true;
+      }
+      continue;
+    }
+
+    if (selection.kind === Kind.FRAGMENT_SPREAD) {
+      const fragmentName = selection.name.value;
+      if (visitedFragments.has(fragmentName)) {
+        continue;
+      }
+      visitedFragments.add(fragmentName);
+      const fragment = fragments[fragmentName];
+      if (
+        fragment?.selectionSet &&
+        selectionsContainField(
+          fragment.selectionSet.selections,
+          fieldName,
+          fragments,
+          visitedFragments
+        )
+      ) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 };

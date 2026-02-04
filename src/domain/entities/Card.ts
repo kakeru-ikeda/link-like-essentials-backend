@@ -1,5 +1,6 @@
 import type { Accessory } from './Accessory';
 import type { CardDetail } from './CardDetail';
+import type { HeartCollectAnalysis, UnDrawAnalysis } from './TraitAnalysis';
 
 export interface Card {
   id: number;
@@ -15,4 +16,6 @@ export interface Card {
   updatedAt: Date | null;
   detail?: CardDetail;
   accessories?: Accessory[];
+  heartCollectAnalysis?: HeartCollectAnalysis;
+  unDrawAnalysis?: UnDrawAnalysis;
 }
