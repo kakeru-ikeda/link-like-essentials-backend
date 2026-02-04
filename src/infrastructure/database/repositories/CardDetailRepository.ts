@@ -4,7 +4,10 @@ import type {
 } from '@prisma/client';
 
 import type { CardDetail } from '@/domain/entities/CardDetail';
-import type { ICardDetailRepository } from '@/domain/repositories/ICardDetailRepository';
+import type {
+  ICardDetailRepository,
+  UpsertCardDetailData,
+} from '@/domain/repositories/ICardDetailRepository';
 
 export class CardDetailRepository implements ICardDetailRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -71,5 +74,89 @@ export class CardDetailRepository implements ICardDetailRepository {
       card: detail.card as CardDetail['card'],
       accessories: detail.card?.accessories as CardDetail['accessories'],
     };
+  }
+
+  async upsert(data: UpsertCardDetailData): Promise<CardDetail> {
+    const detail = await this.prisma.cardDetail.upsert({
+      where: { cardId: data.cardId },
+      create: {
+        cardId: data.cardId,
+        favoriteMode: data.favoriteMode,
+        acquisitionMethod: data.acquisitionMethod,
+        awakeBeforeUrl: data.awakeBeforeUrl,
+        awakeAfterUrl: data.awakeAfterUrl,
+        awakeBeforeStorageUrl: data.awakeBeforeStorageUrl,
+        awakeAfterStorageUrl: data.awakeAfterStorageUrl,
+        smileMaxLevel: data.smileMaxLevel,
+        pureMaxLevel: data.pureMaxLevel,
+        coolMaxLevel: data.coolMaxLevel,
+        mentalMaxLevel: data.mentalMaxLevel,
+        specialAppealName: data.specialAppealName,
+        specialAppealAp: data.specialAppealAp,
+        specialAppealEffect: data.specialAppealEffect,
+        skillName: data.skillName,
+        skillAp: data.skillAp,
+        skillEffect: data.skillEffect,
+        traitName: data.traitName,
+        traitEffect: data.traitEffect,
+        isLocked: data.isLocked ?? false,
+      },
+      update: {
+        ...(data.favoriteMode !== undefined && {
+          favoriteMode: data.favoriteMode,
+        }),
+        ...(data.acquisitionMethod !== undefined && {
+          acquisitionMethod: data.acquisitionMethod,
+        }),
+        ...(data.awakeBeforeUrl !== undefined && {
+          awakeBeforeUrl: data.awakeBeforeUrl,
+        }),
+        ...(data.awakeAfterUrl !== undefined && {
+          awakeAfterUrl: data.awakeAfterUrl,
+        }),
+        ...(data.awakeBeforeStorageUrl !== undefined && {
+          awakeBeforeStorageUrl: data.awakeBeforeStorageUrl,
+        }),
+        ...(data.awakeAfterStorageUrl !== undefined && {
+          awakeAfterStorageUrl: data.awakeAfterStorageUrl,
+        }),
+        ...(data.smileMaxLevel !== undefined && {
+          smileMaxLevel: data.smileMaxLevel,
+        }),
+        ...(data.pureMaxLevel !== undefined && {
+          pureMaxLevel: data.pureMaxLevel,
+        }),
+        ...(data.coolMaxLevel !== undefined && {
+          coolMaxLevel: data.coolMaxLevel,
+        }),
+        ...(data.mentalMaxLevel !== undefined && {
+          mentalMaxLevel: data.mentalMaxLevel,
+        }),
+        ...(data.specialAppealName !== undefined && {
+          specialAppealName: data.specialAppealName,
+        }),
+        ...(data.specialAppealAp !== undefined && {
+          specialAppealAp: data.specialAppealAp,
+        }),
+        ...(data.specialAppealEffect !== undefined && {
+          specialAppealEffect: data.specialAppealEffect,
+        }),
+        ...(data.skillName !== undefined && { skillName: data.skillName }),
+        ...(data.skillAp !== undefined && { skillAp: data.skillAp }),
+        ...(data.skillEffect !== undefined && { skillEffect: data.skillEffect }),
+        ...(data.traitName !== undefined && { traitName: data.traitName }),
+        ...(data.traitEffect !== undefined && { traitEffect: data.traitEffect }),
+        ...(data.isLocked !== undefined && { isLocked: data.isLocked }),
+      },
+      include: {
+        card: {
+          include: {
+            accessories: true,
+          },
+        },
+      },
+    });
+
+    return this.mapToEntity(detail);
   }
 }

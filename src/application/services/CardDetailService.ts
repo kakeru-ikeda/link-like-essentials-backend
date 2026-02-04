@@ -4,6 +4,8 @@ import type { ICardDetailRepository } from '@/domain/repositories/ICardDetailRep
 import type { Stats, Skill, Trait } from '@/domain/valueObjects/Stats';
 import type { DetailCacheStrategy } from '@/infrastructure/cache/strategies/DetailCacheStrategy';
 
+import type { UpsertCardDetailInput } from '../dto/MutationDTO';
+
 export class CardDetailService {
   constructor(
     private readonly detailRepository: ICardDetailRepository,
@@ -105,5 +107,14 @@ export class CardDetailService {
     if (!value) return null;
     const parsed = parseInt(value, 10);
     return isNaN(parsed) ? null : parsed;
+  }
+
+  async upsert(input: UpsertCardDetailInput): Promise<CardDetail> {
+    const detail = await this.detailRepository.upsert(input);
+
+    // キャッシュをクリア・更新
+    await this.cacheStrategy.setDetail(detail);
+
+    return detail;
   }
 }

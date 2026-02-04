@@ -24,6 +24,28 @@ export interface CardIncludeOptions {
   unDrawAnalysis?: boolean;
 }
 
+export interface CreateCardData {
+  cardName: string;
+  characterName: string;
+  rarity?: string;
+  limited?: string;
+  styleType?: string;
+  cardUrl?: string;
+  releaseDate?: Date;
+  isLocked?: boolean;
+}
+
+export interface UpdateCardData {
+  cardName?: string;
+  characterName?: string;
+  rarity?: string;
+  limited?: string;
+  styleType?: string;
+  cardUrl?: string;
+  releaseDate?: Date;
+  isLocked?: boolean;
+}
+
 export interface ICardRepository {
   findById(id: number, options?: CardIncludeOptions): Promise<Card | null>;
   findByCardNameAndCharacter(
@@ -37,4 +59,7 @@ export interface ICardRepository {
   ): Promise<Card[]>;
   findByIds(ids: number[], options?: CardIncludeOptions): Promise<Card[]>;
   getStats(): Promise<CardStats>;
+  create(data: CreateCardData): Promise<Card>;
+  update(id: number, data: UpdateCardData): Promise<Card>;
+  delete(id: number): Promise<void>;
 }
