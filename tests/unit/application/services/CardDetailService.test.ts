@@ -39,6 +39,7 @@ describe('CardDetailService', () => {
     mockRepository = {
       findByCardId: jest.fn(),
       findByCardIds: jest.fn(),
+      upsert: jest.fn(),
     } as unknown as jest.Mocked<ICardDetailRepository>;
 
     mockCacheStrategy = {
@@ -309,6 +310,31 @@ describe('CardDetailService', () => {
       expect(mockCacheStrategy.getDetail).toHaveBeenCalledWith(1);
       expect(mockRepository.findByCardIds).toHaveBeenCalledWith([1]);
       expect(mockCacheStrategy.setDetail).toHaveBeenCalledWith(mockDetail);
+    });
+  });
+
+  describe('upsert', () => {
+    it('should upsert card detail and update cache', async () => {
+      const upsertInput = {
+        cardId: 1,
+        favoriteMode: 'ハッピー',
+        skillName: 'New Skill',
+        skillEffect: 'New Effect',
+      };
+
+      const upsertedDetail = {
+        ...mockDetail,
+        skillName: 'New Skill',
+        skillEffect: 'New Effect',
+      };
+
+      mockRepository.upsert.mockResolvedValue(upsertedDetail);
+
+      const result = await cardDetailService.upsert(upsertInput);
+
+      expect(result).toEqual(upsertedDetail);
+      expect(mockRepository.upsert).toHaveBeenCalledWith(upsertInput);
+      expect(mockCacheStrategy.setDetail).toHaveBeenCalledWith(upsertedDetail);
     });
   });
 });
