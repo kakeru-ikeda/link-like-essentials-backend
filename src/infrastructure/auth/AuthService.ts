@@ -9,6 +9,7 @@ export interface AuthUser {
   email?: string;
   emailVerified: boolean;
   displayName?: string;
+  customClaims?: Record<string, unknown>;
 }
 
 export class AuthService {
@@ -27,6 +28,7 @@ export class AuthService {
         email: decodedToken.email,
         emailVerified: decodedToken.email_verified || false,
         displayName: (decodedToken.name as string | undefined) || undefined,
+        customClaims: decodedToken,
       };
     } catch (error: unknown) {
       throw new AuthenticationError('Invalid or expired token');

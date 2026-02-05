@@ -19,7 +19,11 @@ const isDevelopment = process.env.NODE_ENV === 'development';
 // CORS_ORIGINをカンマ区切りで配列に変換
 const getAllowedOrigins = (): string[] => {
   if (isDevelopment) {
-    return ['http://localhost:3000', 'https://studio.apollographql.com'];
+    return [
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'https://studio.apollographql.com',
+    ];
   }
   return LLES_CORS_ORIGIN.split(',').map((origin) => origin.trim());
 };

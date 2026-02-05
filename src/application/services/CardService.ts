@@ -9,6 +9,10 @@ import type {
 import type { CardCacheStrategy } from '@/infrastructure/cache/strategies/CardCacheStrategy';
 
 import type { CardFilterInput, CardStatsResult } from '../dto/CardDTO';
+import type {
+  CreateCardInput as MutationCreateCardInput,
+  UpdateCardInput as MutationUpdateCardInput,
+} from '../dto/MutationDTO';
 
 export class CardService {
   constructor(
@@ -125,5 +129,43 @@ export class CardService {
   private generateFilterHash(filter?: CardFilterInput): string {
     const data = JSON.stringify({ filter });
     return crypto.createHash('md5').update(data).digest('hex');
+  }
+
+  async create(input: MutationCreateCardInput): Promise<Card> {
+    const card = await this.cardRepository.create(input);
+
+    // キャッシュをクリア
+    await this.cacheStrategy.invalidateAll();
+
+    // 新規作成されたカードをキャッシュに保存
+    await this.cacheStrategy.setCard(card);
+    await this.cacheStrategy.setCardByName(card);
+
+    return card;
+  }
+
+  async update(id: number, input: MutationUpdateCardInput): Promise<Card> {
+    const card = await this.cardRepository.update(id, input);
+
+    // キャッシュをクリア
+    await this.cacheStrategy.invalidateAll();
+
+    // 更新されたカードをキャッシュに保存
+    await this.cacheStrategy.setCard(card);
+    await this.cacheStrategy.setCardByName(card);
+
+    return card;
+  }
+
+  async delete(id: number): Promise<{ success: boolean; message: string }> {
+    await this.cardRepository.delete(id);
+
+    // キャッシュをクリア
+    await this.cacheStrategy.invalidateAll();
+
+    return {
+      success: true,
+      message: `Card with id ${id} successfully deleted`,
+    };
   }
 }

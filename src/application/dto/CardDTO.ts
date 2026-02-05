@@ -1,3 +1,8 @@
+import type {
+  CreateCardInput as MutationCreateCardInput,
+  UpdateCardInput as MutationUpdateCardInput,
+} from './MutationDTO';
+
 export interface CardFilterInput {
   rarity?: string;
   limited?: string;
@@ -31,3 +36,11 @@ export interface CharacterCount {
   characterName: string;
   count: number;
 }
+
+export interface DeleteResponse {
+  success: boolean;
+  message: string;
+}
+
+export type CreateCardInput = MutationCreateCardInput;
+export type UpdateCardInput = MutationUpdateCardInput;

@@ -1,10 +1,13 @@
 import type { Card as PrismaCard, PrismaClient } from '@prisma/client';
 
 import type { Card } from '@/domain/entities/Card';
+import { NotFoundError } from '@/domain/errors/AppError';
 import type {
   CardIncludeOptions,
   CardFilterInput,
   CardStats,
+  CreateCardData,
+  UpdateCardData,
   ICardRepository,
 } from '@/domain/repositories/ICardRepository';
 
@@ -257,5 +260,69 @@ export class CardRepository implements ICardRepository {
     }
 
     return mappedCard;
+  }
+
+  async create(data: CreateCardData): Promise<Card> {
+    const card = await this.prisma.card.create({
+      data: {
+        cardName: data.cardName,
+        characterName: data.characterName,
+        rarity: data.rarity,
+        limited: data.limited,
+        styleType: data.styleType,
+        cardUrl: data.cardUrl,
+        releaseDate: data.releaseDate,
+        isLocked: data.isLocked ?? false,
+      },
+      include: {
+        detail: true,
+        accessories: true,
+      },
+    });
+
+    return this.mapToEntity(card);
+  }
+
+  async update(id: number, data: UpdateCardData): Promise<Card> {
+    // 存在チェック（deleteメソッドとの一貫性のため）
+    const existing = await this.prisma.card.findUnique({ where: { id } });
+    if (!existing) {
+      throw new NotFoundError(`Card with id ${id} not found`);
+    }
+
+    const card = await this.prisma.card.update({
+      where: { id },
+      data: {
+        ...(data.cardName !== undefined && { cardName: data.cardName }),
+        ...(data.characterName !== undefined && {
+          characterName: data.characterName,
+        }),
+        ...(data.rarity !== undefined && { rarity: data.rarity }),
+        ...(data.limited !== undefined && { limited: data.limited }),
+        ...(data.styleType !== undefined && { styleType: data.styleType }),
+        ...(data.cardUrl !== undefined && { cardUrl: data.cardUrl }),
+        ...(data.releaseDate !== undefined && {
+          releaseDate: data.releaseDate,
+        }),
+        ...(data.isLocked !== undefined && { isLocked: data.isLocked }),
+      },
+      include: {
+        detail: true,
+        accessories: true,
+      },
+    });
+
+    return this.mapToEntity(card);
+  }
+
+  async delete(id: number): Promise<void> {
+    const card = await this.prisma.card.findUnique({ where: { id } });
+    if (!card) {
+      throw new NotFoundError(`Card with id ${id} not found`);
+    }
+
+    await this.prisma.card.delete({
+      where: { id },
+    });
   }
 }

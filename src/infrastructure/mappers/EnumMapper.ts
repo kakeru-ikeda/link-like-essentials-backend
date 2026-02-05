@@ -1,6 +1,7 @@
 import { FavoriteMode } from '@/domain/valueObjects/FavoriteMode';
 import { LimitedType } from '@/domain/valueObjects/LimitedType';
 import { ParentType } from '@/domain/valueObjects/ParentType';
+import { Rarity } from '@/domain/valueObjects/Rarity';
 import { StyleType } from '@/domain/valueObjects/StyleType';
 
 export class EnumMapper {
@@ -134,5 +135,41 @@ export class EnumMapper {
     );
 
     return reverseMapping[value] || null;
+  }
+
+  // Rarityのマッピング (GraphQL ENUM → Database)
+  // Rarityは両方とも同じ値なのでそのまま返す
+  static toRarityString(value: string | null): string | null {
+    if (!value) return null;
+    // バリデーション
+    return Object.values(Rarity).includes(value as Rarity) ? value : null;
+  }
+
+  // LimitedTypeのマッピング (GraphQL ENUM → 日本語)
+  static toLimitedTypeString(value: string | null): string | null {
+    if (!value) return null;
+    const enumValue = LimitedType[value as keyof typeof LimitedType];
+    return enumValue || null;
+  }
+
+  // StyleTypeのマッピング (GraphQL ENUM → 日本語)
+  static toStyleTypeString(value: string | null): string | null {
+    if (!value) return null;
+    const enumValue = StyleType[value as keyof typeof StyleType];
+    return enumValue || null;
+  }
+
+  // FavoriteModeのマッピング (GraphQL ENUM → 日本語)
+  static toFavoriteModeString(value: string | null): string | null {
+    if (!value) return null;
+    const enumValue = FavoriteMode[value as keyof typeof FavoriteMode];
+    return enumValue || null;
+  }
+
+  // ParentTypeのマッピング (GraphQL ENUM → Database)
+  static toParentTypeString(value: string | null): string | null {
+    if (!value) return null;
+    const enumValue = ParentType[value as keyof typeof ParentType];
+    return enumValue || null;
   }
 }

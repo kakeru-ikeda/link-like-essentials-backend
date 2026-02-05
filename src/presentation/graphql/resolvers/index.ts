@@ -5,6 +5,7 @@ import { cardDetailResolvers } from './cardDetailResolver';
 import { cardResolvers } from './cardResolver';
 import { gradeChallengeResolvers } from './gradeChallengeResolver';
 import { liveGrandPrixResolvers } from './liveGrandPrixResolver';
+import { mutationResolvers } from './mutationResolver';
 import { songResolvers } from './songResolver';
 
 export const resolvers = {
@@ -17,6 +18,9 @@ export const resolvers = {
     ...songResolvers.Query,
     ...liveGrandPrixResolvers.Query,
     ...gradeChallengeResolvers.Query,
+  },
+  Mutation: {
+    ...mutationResolvers.Mutation,
   },
   Card: cardResolvers.Card,
   CardDetail: cardDetailResolvers.CardDetail,
