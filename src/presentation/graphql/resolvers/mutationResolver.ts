@@ -5,10 +5,28 @@ import type {
   CreateAccessoryInput,
   UpdateAccessoryInput,
 } from '@/application/dto/MutationDTO';
+import { ValidationError } from '@/domain/errors/AppError';
 import { EnumMapper } from '@/infrastructure/mappers/EnumMapper';
 import { requireAdmin } from '@/presentation/middleware/adminGuard';
 
 import type { GraphQLContext } from '../context';
+
+/**
+ * IDをパースして検証する
+ * @param id - パース対象のID文字列
+ * @param fieldName - フィールド名（エラーメッセージ用）
+ * @returns パースされた数値ID
+ * @throws {ValidationError} IDが無効な場合
+ */
+function parseAndValidateId(id: string, fieldName: string = 'id'): number {
+  const parsedId = parseInt(id, 10);
+  if (isNaN(parsedId)) {
+    throw new ValidationError(
+      `Invalid ${fieldName}: "${id}" is not a valid number`
+    );
+  }
+  return parsedId;
+}
 
 interface MutationResolvers {
   createCard: (
@@ -83,7 +101,7 @@ export const mutationResolvers: {
       requireAdmin(context); // 管理者権限必須
 
       const { id, input } = args;
-      const cardId = parseInt(id, 10);
+      const cardId = parseAndValidateId(id, 'cardId');
 
       // ENUM変換（GraphQL ENUM → 日本語）
       const cardInput = {
@@ -114,7 +132,7 @@ export const mutationResolvers: {
       requireAdmin(context); // 管理者権限必須
 
       const { id } = args;
-      const cardId = parseInt(id, 10);
+      const cardId = parseAndValidateId(id, 'cardId');
 
       const result = await context.dataSources.cardService.delete(cardId);
 
@@ -125,7 +143,7 @@ export const mutationResolvers: {
       requireAdmin(context); // 管理者権限必須
 
       const { input } = args;
-      const cardId = parseInt(input.cardId.toString(), 10);
+      const cardId = parseAndValidateId(input.cardId.toString(), 'cardId');
 
       // ENUM変換（GraphQL ENUM → 日本語）
       const detailInput = {
@@ -147,7 +165,7 @@ export const mutationResolvers: {
       requireAdmin(context); // 管理者権限必須
 
       const { input } = args;
-      const cardId = parseInt(input.cardId.toString(), 10);
+      const cardId = parseAndValidateId(input.cardId.toString(), 'cardId');
 
       // ENUM変換（GraphQL ENUM → 日本語）
       const accessoryInput = {
@@ -167,7 +185,7 @@ export const mutationResolvers: {
       requireAdmin(context); // 管理者権限必須
 
       const { id, input } = args;
-      const accessoryId = parseInt(id, 10);
+      const accessoryId = parseAndValidateId(id, 'accessoryId');
 
       // ENUM変換（GraphQL ENUM → 日本語）
       const accessoryInput = {
@@ -190,7 +208,7 @@ export const mutationResolvers: {
       requireAdmin(context); // 管理者権限必須
 
       const { id } = args;
-      const accessoryId = parseInt(id, 10);
+      const accessoryId = parseAndValidateId(id, 'accessoryId');
 
       const result =
         await context.dataSources.accessoryService.delete(accessoryId);
