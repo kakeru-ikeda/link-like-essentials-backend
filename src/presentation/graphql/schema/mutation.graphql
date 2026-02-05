@@ -1,0 +1,101 @@
+type Mutation {
+  # カード作成
+  createCard(input: CreateCardInput!): Card!
+
+  # カード更新
+  updateCard(id: ID!, input: UpdateCardInput!): Card!
+
+  # カード削除
+  deleteCard(id: ID!): DeleteResponse!
+
+  # カード詳細作成・更新
+  upsertCardDetail(input: UpsertCardDetailInput!): CardDetail!
+
+  # アクセサリー作成
+  createAccessory(input: CreateAccessoryInput!): Accessory!
+
+  # アクセサリー更新
+  updateAccessory(id: ID!, input: UpdateAccessoryInput!): Accessory!
+
+  # アクセサリー削除
+  deleteAccessory(id: ID!): DeleteResponse!
+}
+
+# カード作成用Input
+input CreateCardInput {
+  cardName: String!
+  characterName: String!
+  rarity: Rarity
+  limited: LimitedType
+  styleType: StyleType
+  cardUrl: String
+  releaseDate: DateTime
+  isLocked: Boolean
+}
+
+# カード更新用Input
+input UpdateCardInput {
+  cardName: String
+  characterName: String
+  rarity: Rarity
+  limited: LimitedType
+  styleType: StyleType
+  cardUrl: String
+  releaseDate: DateTime
+  isLocked: Boolean
+}
+
+# カード詳細作成・更新用Input
+input UpsertCardDetailInput {
+  cardId: ID!
+  favoriteMode: FavoriteMode
+  acquisitionMethod: String
+  awakeBeforeUrl: String
+  awakeAfterUrl: String
+  awakeBeforeStorageUrl: String
+  awakeAfterStorageUrl: String
+  smileMaxLevel: String
+  pureMaxLevel: String
+  coolMaxLevel: String
+  mentalMaxLevel: String
+  specialAppealName: String
+  specialAppealAp: String
+  specialAppealEffect: String
+  skillName: String
+  skillAp: String
+  skillEffect: String
+  traitName: String
+  traitEffect: String
+  isLocked: Boolean
+}
+
+# アクセサリー作成用Input
+input CreateAccessoryInput {
+  cardId: ID!
+  parentType: ParentType!
+  name: String!
+  ap: String
+  effect: String
+  traitName: String
+  traitEffect: String
+  displayOrder: Int
+  isLocked: Boolean
+}
+
+# アクセサリー更新用Input
+input UpdateAccessoryInput {
+  parentType: ParentType
+  name: String
+  ap: String
+  effect: String
+  traitName: String
+  traitEffect: String
+  displayOrder: Int
+  isLocked: Boolean
+}
+
+# 削除レスポンス
+type DeleteResponse {
+  success: Boolean!
+  message: String!
+}

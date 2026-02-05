@@ -31,6 +31,10 @@ const gradeChallengeTypeDefs = readFileSync(
   'utf-8'
 );
 const queryTypeDefs = readFileSync(join(schemaDir, 'query.graphql'), 'utf-8');
+const mutationTypeDefs = readFileSync(
+  join(schemaDir, 'mutation.graphql'),
+  'utf-8'
+);
 
 const typeDefs = [
   commonTypeDefs,
@@ -42,6 +46,7 @@ const typeDefs = [
   liveGrandPrixTypeDefs,
   gradeChallengeTypeDefs,
   queryTypeDefs,
+  mutationTypeDefs,
 ];
 
 export const schema = makeExecutableSchema({

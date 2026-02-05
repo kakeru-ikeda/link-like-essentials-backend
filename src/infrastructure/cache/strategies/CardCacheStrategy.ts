@@ -59,4 +59,9 @@ export class CardCacheStrategy {
   async setStats<T>(stats: T): Promise<void> {
     await this.cache.set('cards:stats', stats, TTL.STATS);
   }
+
+  async invalidateAll(): Promise<void> {
+    await this.invalidateAllCards();
+    await this.cache.del('cards:stats');
+  }
 }

@@ -30,6 +30,9 @@ describe('CardService', () => {
       findByCardNameAndCharacter: jest.fn(),
       findAll: jest.fn(),
       getStats: jest.fn(),
+      create: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
     } as unknown as jest.Mocked<ICardRepository>;
 
     // モックキャッシュの作成
@@ -42,6 +45,7 @@ describe('CardService', () => {
       setCardList: jest.fn(),
       getStats: jest.fn(),
       setStats: jest.fn(),
+      invalidateAll: jest.fn(),
     } as unknown as jest.Mocked<CardCacheStrategy>;
 
     cardService = new CardService(mockRepository, mockCacheStrategy);
@@ -244,6 +248,75 @@ describe('CardService', () => {
       const secondCall = mockCacheStrategy.getCardList.mock.calls[1]?.[0];
 
       expect(firstCall).toBe(secondCall);
+    });
+  });
+
+  describe('create', () => {
+    it('should create a new card and invalidate cache', async () => {
+      const createInput = {
+        cardName: 'New Card',
+        characterName: 'New Character',
+        rarity: 'SR',
+        limited: 'LIMITED',
+      };
+
+      const createdCard = {
+        ...mockCard,
+        id: 2,
+        cardName: 'New Card',
+        characterName: 'New Character',
+        rarity: 'SR',
+      };
+
+      mockRepository.create.mockResolvedValue(createdCard);
+
+      const result = await cardService.create(createInput);
+
+      expect(result).toEqual(createdCard);
+      expect(mockRepository.create).toHaveBeenCalledWith(createInput);
+      expect(mockCacheStrategy.invalidateAll).toHaveBeenCalled();
+      expect(mockCacheStrategy.setCard).toHaveBeenCalledWith(createdCard);
+      expect(mockCacheStrategy.setCardByName).toHaveBeenCalledWith(createdCard);
+    });
+  });
+
+  describe('update', () => {
+    it('should update a card and invalidate cache', async () => {
+      const updateInput = {
+        cardName: 'Updated Card',
+        rarity: 'UR',
+      };
+
+      const updatedCard = {
+        ...mockCard,
+        cardName: 'Updated Card',
+        rarity: 'UR',
+      };
+
+      mockRepository.update.mockResolvedValue(updatedCard);
+
+      const result = await cardService.update(1, updateInput);
+
+      expect(result).toEqual(updatedCard);
+      expect(mockRepository.update).toHaveBeenCalledWith(1, updateInput);
+      expect(mockCacheStrategy.invalidateAll).toHaveBeenCalled();
+      expect(mockCacheStrategy.setCard).toHaveBeenCalledWith(updatedCard);
+      expect(mockCacheStrategy.setCardByName).toHaveBeenCalledWith(updatedCard);
+    });
+  });
+
+  describe('delete', () => {
+    it('should delete a card and invalidate cache', async () => {
+      mockRepository.delete.mockResolvedValue();
+
+      const result = await cardService.delete(1);
+
+      expect(result).toEqual({
+        success: true,
+        message: 'Card with id 1 successfully deleted',
+      });
+      expect(mockRepository.delete).toHaveBeenCalledWith(1);
+      expect(mockCacheStrategy.invalidateAll).toHaveBeenCalled();
     });
   });
 });
