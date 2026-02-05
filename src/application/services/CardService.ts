@@ -13,6 +13,7 @@ import type {
   CreateCardInput as MutationCreateCardInput,
   UpdateCardInput as MutationUpdateCardInput,
 } from '../dto/MutationDTO';
+import type { CardConnection, PaginationInput } from '../dto/PaginationDTO';
 
 export class CardService {
   constructor(
@@ -103,6 +104,67 @@ export class CardService {
     return cards;
   }
 
+  async findAllPaginated(
+    filter?: CardFilterInput,
+    pagination?: PaginationInput,
+    options?: CardIncludeOptions
+  ): Promise<CardConnection> {
+    const { first = 20, after } = pagination ?? {};
+
+    // フィルター条件からハッシュを生成
+    const filterHash = this.generateFilterHash({ filter, first, after });
+
+    const useCache = !options?.heartCollectAnalysis && !options?.unDrawAnalysis;
+    if (useCache) {
+      // キャッシュチェック
+      const cached =
+        await this.cacheStrategy.getCardList<CardConnection>(filterHash);
+      if (cached) {
+        return cached;
+      }
+    }
+
+    // DBから取得
+    const result = await this.cardRepository.findAllPaginated(
+      filter,
+      first,
+      after,
+      options
+    );
+
+    const edges = result.cards.map((card) => ({
+      node: card,
+      cursor: this.encodeCursor(card.id, card.releaseDate),
+    }));
+
+    const connection: CardConnection = {
+      edges,
+      pageInfo: {
+        hasNextPage: result.hasNextPage,
+        hasPreviousPage: !!after,
+        startCursor: edges[0]?.cursor ?? null,
+        endCursor: edges[edges.length - 1]?.cursor ?? null,
+      },
+      totalCount: result.totalCount,
+    };
+
+    if (useCache) {
+      // キャッシュに保存
+      await this.cacheStrategy.setCardList<CardConnection>(
+        filterHash,
+        connection
+      );
+    }
+
+    return connection;
+  }
+
+  private encodeCursor(id: number, releaseDate: Date | null): string {
+    return Buffer.from(
+      JSON.stringify({ id, releaseDate: releaseDate?.toISOString() })
+    ).toString('base64');
+  }
+
   async getStats(): Promise<CardStatsResult> {
     // キャッシュチェック
     const cached = await this.cacheStrategy.getStats<CardStatsResult>();
@@ -126,7 +188,9 @@ export class CardService {
     return result;
   }
 
-  private generateFilterHash(filter?: CardFilterInput): string {
+  private generateFilterHash(
+    filter?: CardFilterInput | Record<string, unknown>
+  ): string {
     const data = JSON.stringify({ filter });
     return crypto.createHash('md5').update(data).digest('hex');
   }

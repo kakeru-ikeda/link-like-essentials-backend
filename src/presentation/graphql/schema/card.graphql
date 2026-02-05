@@ -49,3 +49,21 @@ type CharacterCount {
   characterName: String!
   count: Int!
 }
+
+type CardConnection {
+  edges: [CardEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type CardEdge {
+  node: Card!
+  cursor: String!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}

@@ -9,6 +9,7 @@ import type {
   CreateCardData,
   UpdateCardData,
   ICardRepository,
+  PaginationResult,
 } from '@/domain/repositories/ICardRepository';
 
 export class CardRepository implements ICardRepository {
@@ -61,6 +62,61 @@ export class CardRepository implements ICardRepository {
     });
 
     return cards.map((card) => this.mapToEntity(card));
+  }
+
+  async findAllPaginated(
+    filter?: CardFilterInput,
+    first: number = 20,
+    after?: string,
+    options?: CardIncludeOptions
+  ): Promise<PaginationResult> {
+    const where = this.buildWhereClause(filter);
+
+    // Cursor decoding
+    const cursor = after ? this.decodeCursor(after) : null;
+
+    // totalCount取得（並列実行）
+    const [totalCount, cards] = await Promise.all([
+      this.prisma.card.count({ where }),
+      this.prisma.card.findMany({
+        where,
+        include: this.buildInclude(options),
+        orderBy: [
+          { releaseDate: { sort: 'desc', nulls: 'last' } },
+          { id: 'asc' },
+        ],
+        take: first + 1, // hasNextPage判定用に+1
+        ...(cursor && {
+          cursor: { id: cursor.id },
+          skip: 1, // cursor自体をスキップ
+        }),
+      }),
+    ]);
+
+    // hasNextPage判定
+    const hasNextPage = cards.length > first;
+    const edges = (hasNextPage ? cards.slice(0, first) : cards).map((card) =>
+      this.mapToEntity(card)
+    );
+
+    return {
+      cards: edges,
+      totalCount,
+      hasNextPage,
+    };
+  }
+
+  private decodeCursor(cursor: string): {
+    id: number;
+    releaseDate: string | null;
+  } {
+    const decoded = JSON.parse(
+      Buffer.from(cursor, 'base64').toString('utf-8')
+    ) as {
+      id: number;
+      releaseDate: string | null;
+    };
+    return decoded;
   }
 
   async findByIds(
