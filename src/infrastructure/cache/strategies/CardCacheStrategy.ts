@@ -33,12 +33,12 @@ export class CardCacheStrategy {
     await this.cache.set(key, card, TTL.CARD);
   }
 
-  async getCardList(filterHash: string): Promise<Card[] | null> {
-    return await this.cache.get<Card[]>(`cards:list:${filterHash}`);
+  async getCardList<T = Card[]>(filterHash: string): Promise<T | null> {
+    return await this.cache.get<T>(`cards:list:${filterHash}`);
   }
 
-  async setCardList(filterHash: string, cards: Card[]): Promise<void> {
-    await this.cache.set(`cards:list:${filterHash}`, cards, TTL.CARD_LIST);
+  async setCardList<T = Card[]>(filterHash: string, data: T): Promise<void> {
+    await this.cache.set(`cards:list:${filterHash}`, data, TTL.CARD_LIST);
   }
 
   async invalidateCard(id: number): Promise<void> {

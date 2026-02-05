@@ -12,6 +12,12 @@ export interface CardFilterInput {
   accessoryEffectContains?: string;
 }
 
+export interface PaginationResult {
+  cards: Card[];
+  totalCount: number;
+  hasNextPage: boolean;
+}
+
 export interface CardStats {
   totalCards: number;
   byRarity: Array<{ rarity: string; count: number }>;
@@ -57,6 +63,12 @@ export interface ICardRepository {
     filter?: CardFilterInput,
     options?: CardIncludeOptions
   ): Promise<Card[]>;
+  findAllPaginated(
+    filter?: CardFilterInput,
+    first?: number,
+    after?: string,
+    options?: CardIncludeOptions
+  ): Promise<PaginationResult>;
   findByIds(ids: number[], options?: CardIncludeOptions): Promise<Card[]>;
   getStats(): Promise<CardStats>;
   create(data: CreateCardData): Promise<Card>;

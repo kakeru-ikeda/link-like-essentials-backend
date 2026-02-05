@@ -2,6 +2,13 @@ type Query {
   # カード一覧取得（レアリティ優先: LR→UR→SR→R→BR→DR、ID降順）
   cards(filter: CardFilterInput): [Card!]!
 
+  # カード一覧取得（ページネーション対応）
+  cardsConnection(
+    filter: CardFilterInput
+    first: Int
+    after: String
+  ): CardConnection!
+
   # 単一カード取得
   card(id: ID!): Card
   cardByName(cardName: String!, characterName: String!): Card

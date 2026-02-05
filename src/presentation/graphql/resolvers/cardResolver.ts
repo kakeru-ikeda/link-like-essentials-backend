@@ -1,6 +1,7 @@
 import { Kind, type GraphQLResolveInfo, type SelectionNode } from 'graphql';
 
 import type { CardFilterInput } from '@/application/dto/CardDTO';
+import type { PaginationInput } from '@/application/dto/PaginationDTO';
 import { EnumMapper } from '@/infrastructure/mappers/EnumMapper';
 import { requireAuth } from '@/presentation/middleware/authGuard';
 
@@ -11,6 +12,16 @@ interface QueryResolvers {
     parent: unknown,
     args: {
       filter?: CardFilterInput;
+    },
+    context: GraphQLContext,
+    info: GraphQLResolveInfo
+  ) => Promise<unknown>;
+  cardsConnection: (
+    parent: unknown,
+    args: {
+      filter?: CardFilterInput;
+      first?: number;
+      after?: string;
     },
     context: GraphQLContext,
     info: GraphQLResolveInfo
@@ -73,6 +84,22 @@ export const cardResolvers: {
       const includeOptions = getCardIncludeOptions(info);
       const result = await context.dataSources.cardService.findAll(
         filter,
+        includeOptions
+      );
+
+      return result;
+    },
+
+    cardsConnection: async (_, args, context, info) => {
+      requireAuth(context);
+
+      const { filter, first, after } = args;
+      const pagination: PaginationInput = { first, after };
+
+      const includeOptions = getCardIncludeOptions(info);
+      const result = await context.dataSources.cardService.findAllPaginated(
+        filter,
+        pagination,
         includeOptions
       );
 
