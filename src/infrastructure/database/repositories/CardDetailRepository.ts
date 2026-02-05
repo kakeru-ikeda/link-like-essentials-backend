@@ -143,9 +143,13 @@ export class CardDetailRepository implements ICardDetailRepository {
         }),
         ...(data.skillName !== undefined && { skillName: data.skillName }),
         ...(data.skillAp !== undefined && { skillAp: data.skillAp }),
-        ...(data.skillEffect !== undefined && { skillEffect: data.skillEffect }),
+        ...(data.skillEffect !== undefined && {
+          skillEffect: data.skillEffect,
+        }),
         ...(data.traitName !== undefined && { traitName: data.traitName }),
-        ...(data.traitEffect !== undefined && { traitEffect: data.traitEffect }),
+        ...(data.traitEffect !== undefined && {
+          traitEffect: data.traitEffect,
+        }),
         ...(data.isLocked !== undefined && { isLocked: data.isLocked }),
       },
       include: {

@@ -8,7 +8,6 @@ import type { Trait } from '@/domain/valueObjects/Stats';
 import type {
   CreateAccessoryInput,
   UpdateAccessoryInput,
-  DeleteResponse,
 } from '../dto/MutationDTO';
 
 export class AccessoryService {
@@ -38,7 +37,7 @@ export class AccessoryService {
     return await this.accessoryRepository.update(id, input);
   }
 
-  async delete(id: number): Promise<DeleteResponse> {
+  async delete(id: number): Promise<{ success: boolean; message: string }> {
     await this.accessoryRepository.delete(id);
 
     return {

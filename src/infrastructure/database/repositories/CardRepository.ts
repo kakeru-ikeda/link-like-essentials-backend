@@ -295,7 +295,9 @@ export class CardRepository implements ICardRepository {
         ...(data.limited !== undefined && { limited: data.limited }),
         ...(data.styleType !== undefined && { styleType: data.styleType }),
         ...(data.cardUrl !== undefined && { cardUrl: data.cardUrl }),
-        ...(data.releaseDate !== undefined && { releaseDate: data.releaseDate }),
+        ...(data.releaseDate !== undefined && {
+          releaseDate: data.releaseDate,
+        }),
         ...(data.isLocked !== undefined && { isLocked: data.isLocked }),
       },
       include: {

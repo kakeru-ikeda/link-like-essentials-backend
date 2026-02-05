@@ -161,7 +161,9 @@ export class AccessoryRepository implements IAccessoryRepository {
         ...(data.ap !== undefined && { ap: data.ap }),
         ...(data.effect !== undefined && { effect: data.effect }),
         ...(data.traitName !== undefined && { traitName: data.traitName }),
-        ...(data.traitEffect !== undefined && { traitEffect: data.traitEffect }),
+        ...(data.traitEffect !== undefined && {
+          traitEffect: data.traitEffect,
+        }),
         ...(data.displayOrder !== undefined && {
           displayOrder: data.displayOrder,
         }),

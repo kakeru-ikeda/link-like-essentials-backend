@@ -62,15 +62,15 @@ export const mutationResolvers: {
         ...input,
         rarity:
           input.rarity !== undefined
-            ? EnumMapper.toRarityString(input.rarity) ?? undefined
+            ? (EnumMapper.toRarityString(input.rarity) ?? undefined)
             : undefined,
         limited:
           input.limited !== undefined
-            ? EnumMapper.toLimitedTypeString(input.limited) ?? undefined
+            ? (EnumMapper.toLimitedTypeString(input.limited) ?? undefined)
             : undefined,
         styleType:
           input.styleType !== undefined
-            ? EnumMapper.toStyleTypeString(input.styleType) ?? undefined
+            ? (EnumMapper.toStyleTypeString(input.styleType) ?? undefined)
             : undefined,
       };
 
@@ -90,15 +90,15 @@ export const mutationResolvers: {
         ...input,
         rarity:
           input.rarity !== undefined
-            ? EnumMapper.toRarityString(input.rarity) ?? undefined
+            ? (EnumMapper.toRarityString(input.rarity) ?? undefined)
             : undefined,
         limited:
           input.limited !== undefined
-            ? EnumMapper.toLimitedTypeString(input.limited) ?? undefined
+            ? (EnumMapper.toLimitedTypeString(input.limited) ?? undefined)
             : undefined,
         styleType:
           input.styleType !== undefined
-            ? EnumMapper.toStyleTypeString(input.styleType) ?? undefined
+            ? (EnumMapper.toStyleTypeString(input.styleType) ?? undefined)
             : undefined,
       };
 
@@ -133,7 +133,7 @@ export const mutationResolvers: {
         cardId,
         favoriteMode:
           input.favoriteMode !== undefined
-            ? EnumMapper.toFavoriteModeString(input.favoriteMode) ?? undefined
+            ? (EnumMapper.toFavoriteModeString(input.favoriteMode) ?? undefined)
             : undefined,
       };
 
@@ -174,7 +174,7 @@ export const mutationResolvers: {
         ...input,
         parentType:
           input.parentType !== undefined
-            ? EnumMapper.toParentTypeString(input.parentType) ?? undefined
+            ? (EnumMapper.toParentTypeString(input.parentType) ?? undefined)
             : undefined,
       };
 

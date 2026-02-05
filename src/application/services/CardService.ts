@@ -8,13 +8,7 @@ import type {
 } from '@/domain/repositories/ICardRepository';
 import type { CardCacheStrategy } from '@/infrastructure/cache/strategies/CardCacheStrategy';
 
-import type {
-  CardFilterInput,
-  CardStatsResult,
-  CreateCardInput,
-  UpdateCardInput,
-  DeleteResponse,
-} from '../dto/CardDTO';
+import type { CardFilterInput, CardStatsResult } from '../dto/CardDTO';
 import type {
   CreateCardInput as MutationCreateCardInput,
   UpdateCardInput as MutationUpdateCardInput,
@@ -163,7 +157,7 @@ export class CardService {
     return card;
   }
 
-  async delete(id: number): Promise<DeleteResponse> {
+  async delete(id: number): Promise<{ success: boolean; message: string }> {
     await this.cardRepository.delete(id);
 
     // キャッシュをクリア
