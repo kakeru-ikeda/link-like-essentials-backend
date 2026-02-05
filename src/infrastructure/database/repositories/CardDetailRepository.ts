@@ -4,6 +4,7 @@ import type {
 } from '@prisma/client';
 
 import type { CardDetail } from '@/domain/entities/CardDetail';
+import { NotFoundError } from '@/domain/errors/AppError';
 import type {
   ICardDetailRepository,
   UpsertCardDetailData,
@@ -77,6 +78,14 @@ export class CardDetailRepository implements ICardDetailRepository {
   }
 
   async upsert(data: UpsertCardDetailData): Promise<CardDetail> {
+    // カードの存在確認（外部キー制約エラーを防ぐため）
+    const card = await this.prisma.card.findUnique({
+      where: { id: data.cardId },
+    });
+    if (!card) {
+      throw new NotFoundError(`Card with id ${data.cardId} not found`);
+    }
+
     const detail = await this.prisma.cardDetail.upsert({
       where: { cardId: data.cardId },
       create: {

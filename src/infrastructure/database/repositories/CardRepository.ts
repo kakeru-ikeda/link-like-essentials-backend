@@ -284,6 +284,12 @@ export class CardRepository implements ICardRepository {
   }
 
   async update(id: number, data: UpdateCardData): Promise<Card> {
+    // 存在チェック（deleteメソッドとの一貫性のため）
+    const existing = await this.prisma.card.findUnique({ where: { id } });
+    if (!existing) {
+      throw new NotFoundError(`Card with id ${id} not found`);
+    }
+
     const card = await this.prisma.card.update({
       where: { id },
       data: {

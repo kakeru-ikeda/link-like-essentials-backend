@@ -78,9 +78,13 @@ export async function createContext(req: Request): Promise<GraphQLContext> {
   const cardService = new CardService(cardRepository, cardCacheStrategy);
   const cardDetailService = new CardDetailService(
     cardDetailRepository,
-    detailCacheStrategy
+    detailCacheStrategy,
+    cardCacheStrategy
   );
-  const accessoryService = new AccessoryService(accessoryRepository);
+  const accessoryService = new AccessoryService(
+    accessoryRepository,
+    cardCacheStrategy
+  );
   const heartCollectAnalysisService = new HeartCollectAnalysisService(
     heartCollectAnalysisRepository,
     heartCollectAnalysisCacheStrategy

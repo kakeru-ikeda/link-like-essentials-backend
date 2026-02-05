@@ -132,6 +132,14 @@ export class AccessoryRepository implements IAccessoryRepository {
   }
 
   async create(data: CreateAccessoryData): Promise<Accessory> {
+    // カードの存在確認（外部キー制約エラーを防ぐため）
+    const card = await this.prisma.card.findUnique({
+      where: { id: data.cardId },
+    });
+    if (!card) {
+      throw new NotFoundError(`Card with id ${data.cardId} not found`);
+    }
+
     const accessory = await this.prisma.cardAccessory.create({
       data: {
         cardId: data.cardId,
@@ -153,6 +161,14 @@ export class AccessoryRepository implements IAccessoryRepository {
   }
 
   async update(id: number, data: UpdateAccessoryData): Promise<Accessory> {
+    // 存在チェック（deleteメソッドとの一貫性のため）
+    const existing = await this.prisma.cardAccessory.findUnique({
+      where: { id },
+    });
+    if (!existing) {
+      throw new NotFoundError(`Accessory with id ${id} not found`);
+    }
+
     const accessory = await this.prisma.cardAccessory.update({
       where: { id },
       data: {

@@ -2,6 +2,7 @@ import type { CardDetail } from '@/domain/entities/CardDetail';
 import { NotFoundError } from '@/domain/errors/AppError';
 import type { ICardDetailRepository } from '@/domain/repositories/ICardDetailRepository';
 import type { Stats, Skill, Trait } from '@/domain/valueObjects/Stats';
+import type { CardCacheStrategy } from '@/infrastructure/cache/strategies/CardCacheStrategy';
 import type { DetailCacheStrategy } from '@/infrastructure/cache/strategies/DetailCacheStrategy';
 
 import type { UpsertCardDetailInput } from '../dto/MutationDTO';
@@ -9,7 +10,8 @@ import type { UpsertCardDetailInput } from '../dto/MutationDTO';
 export class CardDetailService {
   constructor(
     private readonly detailRepository: ICardDetailRepository,
-    private readonly cacheStrategy: DetailCacheStrategy
+    private readonly cacheStrategy: DetailCacheStrategy,
+    private readonly cardCacheStrategy: CardCacheStrategy
   ) {}
 
   async findByCardId(cardId: number): Promise<CardDetail> {
@@ -112,8 +114,11 @@ export class CardDetailService {
   async upsert(input: UpsertCardDetailInput): Promise<CardDetail> {
     const detail = await this.detailRepository.upsert(input);
 
-    // キャッシュをクリア・更新
+    // CardDetailキャッシュを更新
     await this.cacheStrategy.setDetail(detail);
+
+    // 親カードのキャッシュも無効化（CardDetailはCardエンティティの一部）
+    await this.cardCacheStrategy.invalidateCard(input.cardId);
 
     return detail;
   }
