@@ -6,7 +6,7 @@ import type {
   UpdateAccessoryInput,
 } from '@/application/dto/MutationDTO';
 import { EnumMapper } from '@/infrastructure/mappers/EnumMapper';
-import { requireAuth } from '@/presentation/middleware/authGuard';
+import { requireAdmin } from '@/presentation/middleware/adminGuard';
 
 import type { GraphQLContext } from '../context';
 
@@ -53,7 +53,7 @@ export const mutationResolvers: {
 } = {
   Mutation: {
     createCard: async (_, args, context) => {
-      requireAuth(context);
+      requireAdmin(context); // 管理者権限必須
 
       const { input } = args;
 
@@ -80,7 +80,7 @@ export const mutationResolvers: {
     },
 
     updateCard: async (_, args, context) => {
-      requireAuth(context);
+      requireAdmin(context); // 管理者権限必須
 
       const { id, input } = args;
       const cardId = parseInt(id, 10);
@@ -111,7 +111,7 @@ export const mutationResolvers: {
     },
 
     deleteCard: async (_, args, context) => {
-      requireAuth(context);
+      requireAdmin(context); // 管理者権限必須
 
       const { id } = args;
       const cardId = parseInt(id, 10);
@@ -122,7 +122,7 @@ export const mutationResolvers: {
     },
 
     upsertCardDetail: async (_, args, context) => {
-      requireAuth(context);
+      requireAdmin(context); // 管理者権限必須
 
       const { input } = args;
       const cardId = parseInt(input.cardId.toString(), 10);
@@ -144,7 +144,7 @@ export const mutationResolvers: {
     },
 
     createAccessory: async (_, args, context) => {
-      requireAuth(context);
+      requireAdmin(context); // 管理者権限必須
 
       const { input } = args;
       const cardId = parseInt(input.cardId.toString(), 10);
@@ -164,7 +164,7 @@ export const mutationResolvers: {
     },
 
     updateAccessory: async (_, args, context) => {
-      requireAuth(context);
+      requireAdmin(context); // 管理者権限必須
 
       const { id, input } = args;
       const accessoryId = parseInt(id, 10);
@@ -187,7 +187,7 @@ export const mutationResolvers: {
     },
 
     deleteAccessory: async (_, args, context) => {
-      requireAuth(context);
+      requireAdmin(context); // 管理者権限必須
 
       const { id } = args;
       const accessoryId = parseInt(id, 10);

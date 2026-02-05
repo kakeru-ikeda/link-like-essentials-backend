@@ -2,12 +2,43 @@
 
 このドキュメントは、管理画面から使用できるGraphQL Mutation操作の例を示します。
 
-## 認証
+## 認証・認可
 
-すべてのMutation操作には認証が必要です。リクエストヘッダーに有効なFirebase IDトークンを含める必要があります：
+すべてのMutation操作には**管理者権限**が必要です。
+
+### 要件
+1. **認証**: 有効なFirebase IDトークンをリクエストヘッダーに含める
+2. **認可**: Firebase Authのカスタムクレームで `admin: true` が設定されている必要があります
 
 ```
 Authorization: Bearer <Firebase-ID-Token>
+```
+
+### 管理者権限の設定
+
+Firebase Authのカスタムクレームで管理者権限を設定する必要があります：
+
+```javascript
+// Firebase Admin SDK を使用して管理者権限を設定
+admin.auth().setCustomUserClaims(uid, { admin: true });
+```
+
+### エラーレスポンス
+
+- **認証エラー (401)**: トークンが無効または欠落している場合
+- **認可エラー (403)**: 管理者権限がない場合
+
+```json
+{
+  "errors": [
+    {
+      "message": "管理者権限が必要です。この操作は管理者のみ実行できます。",
+      "extensions": {
+        "code": "FORBIDDEN"
+      }
+    }
+  ]
+}
 ```
 
 ---
