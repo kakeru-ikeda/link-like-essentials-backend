@@ -60,4 +60,7 @@ type Query {
 
   # グレードチャレンジ統計情報
   gradeChallengeStats: GradeChallengeStats!
+
+  # 複数カードの特性分析データを一括取得
+  traitAnalysisBatch(inputs: [TraitAnalysisInput!]!): [TraitAnalysisResult!]!
 }

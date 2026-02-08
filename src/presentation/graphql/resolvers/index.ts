@@ -7,6 +7,7 @@ import { gradeChallengeResolvers } from './gradeChallengeResolver';
 import { liveGrandPrixResolvers } from './liveGrandPrixResolver';
 import { mutationResolvers } from './mutationResolver';
 import { songResolvers } from './songResolver';
+import { traitAnalysisResolvers } from './traitAnalysisResolver';
 
 export const resolvers = {
   DateTime: DateTimeResolver,
@@ -18,6 +19,7 @@ export const resolvers = {
     ...songResolvers.Query,
     ...liveGrandPrixResolvers.Query,
     ...gradeChallengeResolvers.Query,
+    ...traitAnalysisResolvers.Query,
   },
   Mutation: {
     ...mutationResolvers.Mutation,
@@ -30,4 +32,6 @@ export const resolvers = {
   LiveGrandPrixDetail: liveGrandPrixResolvers.LiveGrandPrixDetail,
   GradeChallenge: gradeChallengeResolvers.GradeChallenge,
   GradeChallengeDetail: gradeChallengeResolvers.GradeChallengeDetail,
+  HeartCollectAnalysis: traitAnalysisResolvers.HeartCollectAnalysis,
+  UnDrawAnalysis: traitAnalysisResolvers.UnDrawAnalysis,
 } as const;

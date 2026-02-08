@@ -11,7 +11,7 @@ type HeartCollectAnalysis {
   id: ID!
   cardId: Int
   accessoryId: Int
-  sections: SectionActivation!
+  sections: SectionActivation
   conditionDetail: JSON
   analyzedAt: DateTime
 }
@@ -20,7 +20,22 @@ type UnDrawAnalysis {
   id: ID!
   cardId: Int
   accessoryId: Int
-  sections: SectionActivation!
+  sections: SectionActivation
   conditionDetail: JSON
   analyzedAt: DateTime
+}
+
+type TraitAnalysisResult {
+  cardId: Int!
+  heartCollect: HeartCollectAnalysis
+  unDraw: UnDrawAnalysis
+}
+
+input TraitAnalysisInput {
+  cardId: Int!
+}
+
+type Query {
+  # 複数カードの特性分析データを一括取得
+  traitAnalysisBatch(inputs: [TraitAnalysisInput!]!): [TraitAnalysisResult!]!
 }
