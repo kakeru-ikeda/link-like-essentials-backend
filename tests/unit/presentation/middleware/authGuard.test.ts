@@ -91,4 +91,35 @@ describe('AuthGuard', () => {
       expect(() => getAuthenticatedUser(context)).toThrow('認証が必要です');
     });
   });
+
+  describe('production environment behavior', () => {
+    const originalEnv = process.env.NODE_ENV;
+
+    afterEach(() => {
+      process.env.NODE_ENV = originalEnv;
+    });
+
+    it('本番環境では未認証時にエラーをスローする', async () => {
+      // Set to production environment
+      process.env.NODE_ENV = 'production';
+
+      // Reset modules to pick up new NODE_ENV
+      jest.resetModules();
+      const authGuardModule = await import(
+        '../../../../src/presentation/middleware/authGuard'
+      );
+
+      const context: GraphQLContext = {
+        user: undefined,
+        dataSources: mockDataSources,
+      };
+
+      expect(() => authGuardModule.requireAuth(context)).toThrow(
+        '認証が必要です'
+      );
+      expect(() => authGuardModule.getAuthenticatedUser(context)).toThrow(
+        '認証が必要です'
+      );
+    });
+  });
 });

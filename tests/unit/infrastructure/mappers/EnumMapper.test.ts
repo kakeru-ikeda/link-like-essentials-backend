@@ -151,4 +151,93 @@ describe('EnumMapper', () => {
       expect(EnumMapper.fromParentTypeEnum('UNKNOWN')).toBeNull();
     });
   });
+
+  describe('toRarityString', () => {
+    it('should validate and return valid rarity values', () => {
+      expect(EnumMapper.toRarityString('UR')).toBe('UR');
+      expect(EnumMapper.toRarityString('SR')).toBe('SR');
+      expect(EnumMapper.toRarityString('R')).toBe('R');
+      expect(EnumMapper.toRarityString('DR')).toBe('DR');
+      expect(EnumMapper.toRarityString('BR')).toBe('BR');
+      expect(EnumMapper.toRarityString('LR')).toBe('LR');
+    });
+
+    it('should return null for null input', () => {
+      expect(EnumMapper.toRarityString(null)).toBeNull();
+    });
+
+    it('should return null for invalid rarity values', () => {
+      expect(EnumMapper.toRarityString('INVALID')).toBeNull();
+      expect(EnumMapper.toRarityString('SSR')).toBeNull();
+    });
+  });
+
+  describe('toLimitedTypeString', () => {
+    it('should map GraphQL enum to Japanese values', () => {
+      expect(EnumMapper.toLimitedTypeString('PERMANENT')).toBe('恒常');
+      expect(EnumMapper.toLimitedTypeString('LIMITED')).toBe('限定');
+      expect(EnumMapper.toLimitedTypeString('SPRING_LIMITED')).toBe('春限定');
+      expect(EnumMapper.toLimitedTypeString('LOGIN_BONUS')).toBe('ログボ');
+    });
+
+    it('should return null for null input', () => {
+      expect(EnumMapper.toLimitedTypeString(null)).toBeNull();
+    });
+
+    it('should return null for invalid values', () => {
+      expect(EnumMapper.toLimitedTypeString('INVALID')).toBeNull();
+    });
+  });
+
+  describe('toStyleTypeString', () => {
+    it('should map GraphQL enum to Japanese values', () => {
+      expect(EnumMapper.toStyleTypeString('CHEERLEADER')).toBe('チアリーダー');
+      expect(EnumMapper.toStyleTypeString('TRICKSTER')).toBe('トリックスター');
+      expect(EnumMapper.toStyleTypeString('PERFORMER')).toBe('パフォーマー');
+      expect(EnumMapper.toStyleTypeString('MOODMAKER')).toBe('ムードメーカー');
+    });
+
+    it('should return null for null input', () => {
+      expect(EnumMapper.toStyleTypeString(null)).toBeNull();
+    });
+
+    it('should return null for invalid values', () => {
+      expect(EnumMapper.toStyleTypeString('INVALID')).toBeNull();
+    });
+  });
+
+  describe('toFavoriteModeString', () => {
+    it('should map GraphQL enum to Japanese values', () => {
+      expect(EnumMapper.toFavoriteModeString('HAPPY')).toBe('ハッピー');
+      expect(EnumMapper.toFavoriteModeString('MELLOW')).toBe('メロウ');
+      expect(EnumMapper.toFavoriteModeString('NEUTRAL')).toBe('ニュートラル');
+      expect(EnumMapper.toFavoriteModeString('NONE')).toBe('--');
+    });
+
+    it('should return null for null input', () => {
+      expect(EnumMapper.toFavoriteModeString(null)).toBeNull();
+    });
+
+    it('should return null for invalid values', () => {
+      expect(EnumMapper.toFavoriteModeString('INVALID')).toBeNull();
+    });
+  });
+
+  describe('toParentTypeString', () => {
+    it('should map GraphQL enum to database values', () => {
+      expect(EnumMapper.toParentTypeString('SPECIAL_APPEAL')).toBe(
+        'special_appeal'
+      );
+      expect(EnumMapper.toParentTypeString('SKILL')).toBe('skill');
+      expect(EnumMapper.toParentTypeString('TRAIT')).toBe('trait');
+    });
+
+    it('should return null for null input', () => {
+      expect(EnumMapper.toParentTypeString(null)).toBeNull();
+    });
+
+    it('should return null for invalid values', () => {
+      expect(EnumMapper.toParentTypeString('INVALID')).toBeNull();
+    });
+  });
 });
