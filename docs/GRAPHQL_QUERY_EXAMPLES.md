@@ -1000,6 +1000,171 @@ query GetAccessoryWithAnalysis {
 }
 ```
 
+### 複数カードの特性分析データを一括取得（バッチクエリ）
+
+編成されている複数のカードに対して、特性分析データを効率的に一括取得できます。
+フロントエンドでカード編成画面などを表示する際に有用です。
+
+**使用例：編成されている5枚のカードの特性分析を取得**
+
+```graphql
+query GetTraitAnalysisBatch {
+  traitAnalysisBatch(
+    inputs: [
+      { cardId: 422 }
+      { cardId: 423 }
+      { cardId: 424 }
+      { cardId: 104 }
+      { cardId: 105 }
+    ]
+  ) {
+    cardId
+    heartCollect {
+      id
+      cardId
+      sections {
+        section1
+        section2
+        section3
+        section4
+        section5
+        sectionFever
+      }
+      conditionDetail
+      analyzedAt
+    }
+    unDraw {
+      id
+      cardId
+      sections {
+        section1
+        section2
+        section3
+        section4
+        section5
+        sectionFever
+      }
+      conditionDetail
+      analyzedAt
+    }
+  }
+}
+```
+
+**レスポンス例:**
+
+```json
+{
+  "data": {
+    "traitAnalysisBatch": [
+      {
+        "cardId": 422,
+        "heartCollect": {
+          "id": "1",
+          "cardId": 422,
+          "sections": {
+            "section1": true,
+            "section2": false,
+            "section3": true,
+            "section4": false,
+            "section5": true,
+            "sectionFever": false
+          },
+          "conditionDetail": { "condition": "..." },
+          "analyzedAt": "2024-01-01T00:00:00.000Z"
+        },
+        "unDraw": {
+          "id": "2",
+          "cardId": 422,
+          "sections": {
+            "section1": false,
+            "section2": true,
+            "section3": false,
+            "section4": true,
+            "section5": false,
+            "sectionFever": true
+          },
+          "conditionDetail": { "condition": "..." },
+          "analyzedAt": "2024-01-01T00:00:00.000Z"
+        }
+      },
+      {
+        "cardId": 423,
+        "heartCollect": null,
+        "unDraw": {
+          "id": "3",
+          "cardId": 423,
+          "sections": {
+            "section1": true,
+            "section2": true,
+            "section3": false,
+            "section4": false,
+            "section5": true,
+            "sectionFever": false
+          },
+          "conditionDetail": null,
+          "analyzedAt": "2024-01-01T00:00:00.000Z"
+        }
+      },
+      {
+        "cardId": 104,
+        "heartCollect": null,
+        "unDraw": null
+      }
+    ]
+  }
+}
+```
+
+**特徴：**
+
+- **並列処理**: 複数カードのデータを効率的に並列取得
+- **Null対応**: 分析データが存在しない場合は`null`を返却
+- **キャッシュ活用**: Redis経由でキャッシュされたデータを優先利用
+- **用途**: カード編成画面、チーム編成シミュレーター、特性効果一覧表示などに最適
+
+**使い方のヒント：**
+
+編成画面では、まず通常のカード情報を`cards`クエリで取得し、その後`traitAnalysisBatch`で特性分析データを追加取得することで、既存のカード取得APIとの分離を保ちつつ、必要に応じて特性分析データを効率的に取得できます。
+
+```graphql
+# 1. カード基本情報を取得
+query GetCards {
+  cards(filter: { rarity: UR }) {
+    id
+    cardName
+    characterName
+  }
+}
+
+# 2. 取得したカードIDで特性分析データを一括取得
+query GetTraitAnalyses {
+  traitAnalysisBatch(inputs: [{ cardId: 1 }, { cardId: 2 }, { cardId: 3 }]) {
+    cardId
+    heartCollect {
+      sections {
+        section1
+        section2
+        section3
+        section4
+        section5
+        sectionFever
+      }
+    }
+    unDraw {
+      sections {
+        section1
+        section2
+        section3
+        section4
+        section5
+        sectionFever
+      }
+    }
+  }
+}
+```
+
 ### 特定セクションで発動する特性を持つカードを検索
 
 Section 3でハート獲得特性が発動するカードを検索する例：

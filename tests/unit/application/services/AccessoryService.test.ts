@@ -184,5 +184,20 @@ describe('AccessoryService', () => {
       expect(mockRepository.delete).toHaveBeenCalledWith(1);
       expect(mockCardCacheStrategy.invalidateCard).toHaveBeenCalledWith(1);
     });
+
+    it('should call delete even when findById returns null', async () => {
+      mockRepository.findById.mockResolvedValue(null);
+      mockRepository.delete.mockResolvedValue();
+
+      const result = await accessoryService.delete(999);
+
+      expect(result).toEqual({
+        success: true,
+        message: 'Accessory with id 999 successfully deleted',
+      });
+      expect(mockRepository.findById).toHaveBeenCalledWith(999);
+      expect(mockRepository.delete).toHaveBeenCalledWith(999);
+      expect(mockCardCacheStrategy.invalidateCard).not.toHaveBeenCalled();
+    });
   });
 });

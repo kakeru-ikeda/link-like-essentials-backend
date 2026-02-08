@@ -161,6 +161,18 @@ describe('CardCacheStrategy', () => {
     });
   });
 
+  describe('invalidateAll', () => {
+    it('should invalidate all cards and stats', async () => {
+      await cardCacheStrategy.invalidateAll();
+
+      expect(mockCacheService.invalidatePattern).toHaveBeenCalledWith('card:*');
+      expect(mockCacheService.invalidatePattern).toHaveBeenCalledWith(
+        'cards:*'
+      );
+      expect(mockCacheService.del).toHaveBeenCalledWith('cards:stats');
+    });
+  });
+
   describe('TTL constants', () => {
     it('should have correct TTL values', () => {
       expect(TTL.CARD).toBe(24 * 60 * 60); // 24 hours
