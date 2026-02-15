@@ -81,6 +81,7 @@ describe('EnumMapper', () => {
       expect(EnumMapper.fromLimitedTypeEnum('WINTER_LIMITED')).toBe('冬限定');
       expect(EnumMapper.fromLimitedTypeEnum('BIRTHDAY_LIMITED')).toBe('誕限定');
       expect(EnumMapper.fromLimitedTypeEnum('LEG_LIMITED')).toBe('LEG限定');
+      expect(EnumMapper.fromLimitedTypeEnum('SHUFFLE_LIMITED')).toBe('混限定');
       expect(EnumMapper.fromLimitedTypeEnum('BATTLE_LIMITED')).toBe('撃限定');
       expect(EnumMapper.fromLimitedTypeEnum('PARTY_LIMITED')).toBe('宴限定');
       expect(EnumMapper.fromLimitedTypeEnum('ACTIVITY_LIMITED')).toBe('活限定');

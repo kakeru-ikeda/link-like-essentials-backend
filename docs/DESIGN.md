@@ -255,6 +255,7 @@ enum LimitedType {
   WINTER_LIMITED # 冬限定
   BIRTHDAY_LIMITED # 誕限定
   LEG_LIMITED # LEG限定
+  SHUFFLE_LIMITED # 混限定
   BATTLE_LIMITED # 撃限定
   PARTY_LIMITED # 宴限定
   ACTIVITY_LIMITED # 活限定
@@ -484,6 +485,7 @@ export enum LimitedType {
   WINTER_LIMITED = '冬限定',
   BIRTHDAY_LIMITED = '誕限定',
   LEG_LIMITED = 'LEG限定',
+  SHUFFLE_LIMITED = '混限定',
   BATTLE_LIMITED = '撃限定',
   PARTY_LIMITED = '宴限定',
   ACTIVITY_LIMITED = '活限定',
@@ -536,6 +538,7 @@ export class EnumMapper {
       冬限定: 'WINTER_LIMITED',
       誕限定: 'BIRTHDAY_LIMITED',
       LEG限定: 'LEG_LIMITED',
+      混限定: 'SHUFFLE_LIMITED',
       撃限定: 'BATTLE_LIMITED',
       宴限定: 'PARTY_LIMITED',
       活限定: 'ACTIVITY_LIMITED',
