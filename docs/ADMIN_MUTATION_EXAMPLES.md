@@ -7,6 +7,7 @@
 すべてのMutation操作には**管理者権限**が必要です。
 
 ### 要件
+
 1. **認証**: 有効なFirebase IDトークンをリクエストヘッダーに含める
 2. **認可**: Firebase Authのカスタムクレームで `admin: true` が設定されている必要があります
 
@@ -82,11 +83,7 @@ mutation CreateCard {
 mutation UpdateCard {
   updateCard(
     id: "1"
-    input: {
-      cardName: "更新されたカード名"
-      rarity: SR
-      isLocked: true
-    }
+    input: { cardName: "更新されたカード名", rarity: SR, isLocked: true }
   ) {
     id
     cardName
@@ -256,6 +253,7 @@ mutation DeleteAccessory {
 ## 利用可能なENUM値
 
 ### Rarity (レアリティ)
+
 - `UR`
 - `SR`
 - `R`
@@ -264,6 +262,7 @@ mutation DeleteAccessory {
 - `LR`
 
 ### LimitedType (限定区分)
+
 - `PERMANENT` (恒常)
 - `LIMITED` (限定)
 - `SPRING_LIMITED` (春限定)
@@ -272,6 +271,7 @@ mutation DeleteAccessory {
 - `WINTER_LIMITED` (冬限定)
 - `BIRTHDAY_LIMITED` (誕限定)
 - `LEG_LIMITED` (LEG限定)
+- `SHUFFLE_LIMITED`（混限定）
 - `BATTLE_LIMITED` (撃限定)
 - `PARTY_LIMITED` (宴限定)
 - `ACTIVITY_LIMITED` (活限定)
@@ -281,6 +281,7 @@ mutation DeleteAccessory {
 - `REWARD` (報酬)
 
 ### StyleType (スタイルタイプ)
+
 - `CHEERLEADER` (チアリーダー)
 - `TRICKSTER` (トリックスター)
 - `PERFORMER` (パフォーマー)
@@ -288,12 +289,14 @@ mutation DeleteAccessory {
 - `MOODOMAKER` (ムードーメーカー - 誤字版)
 
 ### FavoriteMode (お気に入りモード)
+
 - `HAPPY` (ハッピー)
 - `MELLOW` (メロウ)
 - `NEUTRAL` (ニュートラル)
 - `NONE` (--)
 
 ### ParentType (アクセサリーの親タイプ)
+
 - `SPECIAL_APPEAL` (special_appeal)
 - `SKILL` (skill)
 - `TRAIT` (trait)
@@ -303,7 +306,9 @@ mutation DeleteAccessory {
 ## エラーハンドリング
 
 ### 認証エラー
+
 認証トークンが無効または欠落している場合：
+
 ```json
 {
   "errors": [
@@ -318,7 +323,9 @@ mutation DeleteAccessory {
 ```
 
 ### バリデーションエラー
+
 必須フィールドが欠落している場合：
+
 ```json
 {
   "errors": [
@@ -333,7 +340,9 @@ mutation DeleteAccessory {
 ```
 
 ### NotFoundエラー
+
 存在しないIDで更新・削除を試みた場合：
+
 ```json
 {
   "errors": [
@@ -372,7 +381,7 @@ mutation Step1_CreateCard {
 mutation Step2_AddDetail {
   upsertCardDetail(
     input: {
-      cardId: "123"  # Step 1で返されたid
+      cardId: "123" # Step 1で返されたid
       favoriteMode: HAPPY
       skillName: "スキルA"
       skillEffect: "効果A"
@@ -386,7 +395,7 @@ mutation Step2_AddDetail {
 mutation Step3_AddAccessory {
   createAccessory(
     input: {
-      cardId: "123"  # Step 1で返されたid
+      cardId: "123" # Step 1で返されたid
       parentType: SKILL
       name: "スキルアクセサリー"
       effect: "効果説明"
