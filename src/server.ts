@@ -14,6 +14,7 @@ import { requestLogger } from './presentation/middleware/requestLogger';
 const PORT = process.env.PORT || 4000;
 const LLES_CORS_ORIGIN =
   process.env.LLES_CORS_ORIGIN || 'http://localhost:3000';
+const LLES_VERCEL_PROJECT_NAME = process.env.LLES_VERCEL_PROJECT_NAME;
 const isDevelopment = process.env.NODE_ENV === 'development';
 
 // CORS_ORIGINをカンマ区切りで配列に変換
@@ -28,6 +29,33 @@ const getAllowedOrigins = (): string[] => {
   return LLES_CORS_ORIGIN.split(',').map((origin) => origin.trim());
 };
 
+/**
+ * OriginがCORS許可リストに含まれるか、またはVercelプレビュービルドかを判定
+ */
+const isAllowedOrigin = (origin: string | undefined): boolean => {
+  if (!origin) return false;
+
+  const allowedOrigins = getAllowedOrigins();
+
+  // 静的な許可リストに含まれる
+  if (allowedOrigins.includes(origin)) {
+    return true;
+  }
+
+  // Vercelプレビュービルド (https://*-{PROJECT_NAME}.vercel.app)
+  if (LLES_VERCEL_PROJECT_NAME) {
+    const vercelPreviewPattern = new RegExp(
+      `^https:\\/\\/.*-${LLES_VERCEL_PROJECT_NAME.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}\\.vercel\\.app$`
+    );
+    if (vercelPreviewPattern.test(origin)) {
+      logger.info(`CORS: Allowed Vercel preview origin: ${origin}`);
+      return true;
+    }
+  }
+
+  return false;
+};
+
 async function startServer(): Promise<void> {
   try {
     // Sentry初期化（最優先）
@@ -36,12 +64,17 @@ async function startServer(): Promise<void> {
     // Express app作成
     const app = express();
 
-    const allowedOrigins = getAllowedOrigins();
-
     // ミドルウェア
     app.use(
       cors({
-        origin: allowedOrigins,
+        origin: (origin, callback) => {
+          if (isAllowedOrigin(origin)) {
+            callback(null, true);
+          } else {
+            logger.warn(`CORS: Blocked origin: ${origin || 'undefined'}`);
+            callback(null, false);
+          }
+        },
         credentials: true,
       })
     );
