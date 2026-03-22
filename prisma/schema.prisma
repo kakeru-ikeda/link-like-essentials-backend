@@ -304,6 +304,7 @@ model TraitEffectKeyword {
 
 model SkillEffectDefinition {
   effectType  String    @id @map("effect_type") @db.VarChar(50)
+  label       String    @db.VarChar(100)
   description String    @db.Text
   isLocked    Boolean?  @default(false) @map("is_locked")
   createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
@@ -314,6 +315,7 @@ model SkillEffectDefinition {
 
 model TraitEffectDefinition {
   effectType  String    @id @map("effect_type") @db.VarChar(50)
+  label       String    @db.VarChar(100)
   description String    @db.Text
   isLocked    Boolean?  @default(false) @map("is_locked")
   createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(6)

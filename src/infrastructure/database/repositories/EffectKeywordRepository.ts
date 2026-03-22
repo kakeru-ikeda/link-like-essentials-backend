@@ -2,6 +2,7 @@ import type { PrismaClient } from '@prisma/client';
 
 export interface EffectKeywordGroup {
   effectType: string;
+  label: string;
   description: string;
   keywords: string[];
 }
@@ -16,10 +17,13 @@ export class EffectKeywordRepository {
       }),
       this.prisma.skillEffectDefinition.findMany(),
     ]);
-    const descMap = new Map(
-      definitions.map((d) => [d.effectType, d.description])
+    const defMap = new Map(
+      definitions.map((d) => [
+        d.effectType,
+        { label: d.label, description: d.description },
+      ])
     );
-    return this.groupByEffectType(rows, descMap);
+    return this.groupByEffectType(rows, defMap);
   }
 
   async getTraitEffectKeywords(): Promise<EffectKeywordGroup[]> {
@@ -29,15 +33,18 @@ export class EffectKeywordRepository {
       }),
       this.prisma.traitEffectDefinition.findMany(),
     ]);
-    const descMap = new Map(
-      definitions.map((d) => [d.effectType, d.description])
+    const defMap = new Map(
+      definitions.map((d) => [
+        d.effectType,
+        { label: d.label, description: d.description },
+      ])
     );
-    return this.groupByEffectType(rows, descMap);
+    return this.groupByEffectType(rows, defMap);
   }
 
   private groupByEffectType(
     rows: { effectType: string; keyword: string }[],
-    descMap: Map<string, string>
+    defMap: Map<string, { label: string; description: string }>
   ): EffectKeywordGroup[] {
     const map = new Map<string, string[]>();
     for (const row of rows) {
@@ -47,7 +54,8 @@ export class EffectKeywordRepository {
     }
     return Array.from(map.entries()).map(([effectType, keywords]) => ({
       effectType,
-      description: descMap.get(effectType) ?? '',
+      label: defMap.get(effectType)?.label ?? '',
+      description: defMap.get(effectType)?.description ?? '',
       keywords,
     }));
   }
