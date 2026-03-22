@@ -63,4 +63,10 @@ type Query {
 
   # 複数カードの特性分析データを一括取得
   traitAnalysisBatch(inputs: [TraitAnalysisInput!]!): [TraitAnalysisResult!]!
+
+  # スキル効果キーワード一覧（effectType ごとにグループ化）
+  skillEffectKeywords: [SkillEffectKeywordGroup!]!
+
+  # 特性効果キーワード一覧（effectType ごとにグループ化）
+  traitEffectKeywords: [TraitEffectKeywordGroup!]!
 }

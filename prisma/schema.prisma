@@ -275,3 +275,29 @@ model GradeChallengeSectionEffect {
   @@index([isLocked], map: "idx_grade_challenge_section_effects_is_locked")
   @@map("grade_challenge_section_effects")
 }
+
+model SkillEffectKeyword {
+  id           Int       @id @default(autoincrement())
+  effectType   String    @map("effect_type") @db.VarChar(50)
+  keyword      String    @db.Text
+  displayOrder Int       @default(0) @map("display_order")
+  isLocked     Boolean?  @default(false) @map("is_locked")
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@index([effectType], map: "idx_skill_effect_keywords_effect_type")
+  @@map("skill_effect_keywords")
+}
+
+model TraitEffectKeyword {
+  id           Int       @id @default(autoincrement())
+  effectType   String    @map("effect_type") @db.VarChar(50)
+  keyword      String    @db.Text
+  displayOrder Int       @default(0) @map("display_order")
+  isLocked     Boolean?  @default(false) @map("is_locked")
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@index([effectType], map: "idx_trait_effect_keywords_effect_type")
+  @@map("trait_effect_keywords")
+}

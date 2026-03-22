@@ -7,6 +7,7 @@ import type { LiveGrandPrixService } from '../../../../src/application/services/
 import type { SongService } from '../../../../src/application/services/SongService';
 import type { UnDrawAnalysisService } from '../../../../src/application/services/UnDrawAnalysisService';
 import type { AuthUser } from '../../../../src/infrastructure/auth/AuthService';
+import type { EffectKeywordRepository } from '../../../../src/infrastructure/database/repositories/EffectKeywordRepository';
 import type { GraphQLContext } from '../../../../src/presentation/graphql/context';
 
 // Note: authGuard uses module-level isDevelopment constant evaluated at load time
@@ -23,6 +24,7 @@ describe('AuthGuard', () => {
     songService: {} as SongService,
     liveGrandPrixService: {} as LiveGrandPrixService,
     gradeChallengeService: {} as GradeChallengeService,
+    effectKeywordRepository: {} as EffectKeywordRepository,
   };
 
   const mockUser: AuthUser = {

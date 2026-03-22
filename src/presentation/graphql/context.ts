@@ -7,6 +7,7 @@ import type { LiveGrandPrixService } from '@/application/services/LiveGrandPrixS
 import type { SongService } from '@/application/services/SongService';
 import type { UnDrawAnalysisService } from '@/application/services/UnDrawAnalysisService';
 import type { AuthUser } from '@/infrastructure/auth/AuthService';
+import type { EffectKeywordRepository } from '@/infrastructure/database/repositories/EffectKeywordRepository';
 
 export interface GraphQLContext {
   user?: AuthUser;
@@ -19,5 +20,6 @@ export interface GraphQLContext {
     songService: SongService;
     liveGrandPrixService: LiveGrandPrixService;
     gradeChallengeService: GradeChallengeService;
+    effectKeywordRepository: EffectKeywordRepository;
   };
 }

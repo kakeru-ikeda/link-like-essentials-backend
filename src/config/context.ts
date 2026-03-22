@@ -22,6 +22,7 @@ import { prisma } from '@/infrastructure/database/client';
 import { AccessoryRepository } from '@/infrastructure/database/repositories/AccessoryRepository';
 import { CardDetailRepository } from '@/infrastructure/database/repositories/CardDetailRepository';
 import { CardRepository } from '@/infrastructure/database/repositories/CardRepository';
+import { EffectKeywordRepository } from '@/infrastructure/database/repositories/EffectKeywordRepository';
 import { GradeChallengeRepository } from '@/infrastructure/database/repositories/GradeChallengeRepository';
 import { HeartCollectAnalysisRepository } from '@/infrastructure/database/repositories/HeartCollectAnalysisRepository';
 import { LiveGrandPrixRepository } from '@/infrastructure/database/repositories/LiveGrandPrixRepository';
@@ -74,6 +75,7 @@ export async function createContext(req: Request): Promise<GraphQLContext> {
     prisma
   );
   const unDrawAnalysisRepository = new UnDrawAnalysisRepository(prisma);
+  const effectKeywordRepository = new EffectKeywordRepository(prisma);
 
   const cardService = new CardService(cardRepository, cardCacheStrategy);
   const cardDetailService = new CardDetailService(
@@ -114,6 +116,7 @@ export async function createContext(req: Request): Promise<GraphQLContext> {
       songService,
       liveGrandPrixService,
       gradeChallengeService,
+      effectKeywordRepository,
     },
   };
 }
