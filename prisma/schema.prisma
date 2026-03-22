@@ -301,3 +301,23 @@ model TraitEffectKeyword {
   @@index([effectType], map: "idx_trait_effect_keywords_effect_type")
   @@map("trait_effect_keywords")
 }
+
+model SkillEffectDefinition {
+  effectType  String    @id @map("effect_type") @db.VarChar(50)
+  description String    @db.Text
+  isLocked    Boolean?  @default(false) @map("is_locked")
+  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@map("skill_effect_definitions")
+}
+
+model TraitEffectDefinition {
+  effectType  String    @id @map("effect_type") @db.VarChar(50)
+  description String    @db.Text
+  isLocked    Boolean?  @default(false) @map("is_locked")
+  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  @@map("trait_effect_definitions")
+}

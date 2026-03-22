@@ -151,18 +151,70 @@ const traitEffectKeywords: { effectType: string; keyword: string; displayOrder: 
     { effectType: 'UN_DRAW', keyword: 'ドローされず', displayOrder: 1 },
   ];
 
+const skillEffectDefinitions: { effectType: string; description: string }[] = [
+  { effectType: 'HEART_CAPTURE', description: 'スキルハートを生成する。多くのものは、現在の1回あたりビートハート出現個数に比例して効果が増減する。' },
+  { effectType: 'WIDE_HEART', description: '画面上に同時に存在できるハート数の上限を増加させる。' },
+  { effectType: 'LOVE_ATTRACT', description: '回収したビートハートから獲得できるLOVEを増加させる。' },
+  { effectType: 'VOLTAGE_GAIN', description: 'ボルテージPt.を獲得する。' },
+  { effectType: 'HEART_BOOST', description: 'スキルハート獲得効果の獲得数を増加させる。' },
+  { effectType: 'WIDE_HEART_BOOST', description: 'ハート上限個数増加効果の効果量を増加させる。' },
+  { effectType: 'ATTRACT_BOOST', description: 'ラブアトラクト効果の効果量を増加させる。' },
+  { effectType: 'VOLTAGE_BOOST', description: 'ボルテージゲイン効果の効果量を増加させる。' },
+  { effectType: 'VIBES', description: '1回あたりのビートハート出現個数を増加させる。' },
+  { effectType: 'AMBIENCE', description: 'ムード値を変動させる。' },
+  { effectType: 'MENTAL_RECOVER', description: 'メンタルを回復する。' },
+  { effectType: 'MENTAL_PROTECT', description: 'メンタルへのダメージを無効化する。' },
+  { effectType: 'MENTAL_GUARD', description: 'メンタルへの直接ダメージを無効化する。' },
+  { effectType: 'RESHUFFLE', description: '手札を捨てて山札をシャッフルする。' },
+  { effectType: 'EXTEND_HAND', description: '手札の上限枚数を増加させる。' },
+  { effectType: 'SEARCH', description: '特定のカードをドローしやすくする。' },
+  { effectType: 'BLESSING', description: 'デッキ内や手札の特定カードの消費APを減少させる。' },
+  { effectType: 'IMITATION', description: '他のカードの効果をコピーして発動する。' },
+  { effectType: 'AP_GAIN', description: 'APを回復する。' },
+  { effectType: 'HEAT_UP', description: 'AP回復速度を増加させる。' },
+  { effectType: 'BELIEF', description: 'メンタルダウン状態にならなくする。' },
+  { effectType: 'IGNITION', description: 'イグニッションモードを発動する。' },
+];
+
+const traitEffectDefinitions: { effectType: string; description: string }[] = [
+  { effectType: 'HEART_COLLECT', description: 'ハート回収を条件に発動する特性。' },
+  { effectType: 'ENCORE', description: 'スキル使用後に山札へ戻る特性。' },
+  { effectType: 'SHOT', description: 'スキル使用回数を条件に発動する特性。' },
+  { effectType: 'DRAW', description: 'ドロー時に発動する特性。' },
+  { effectType: 'AP_REDUCE', description: 'このスキルの消費APを減少させる特性。' },
+  { effectType: 'AP_SUPPORT', description: 'デッキ内の他カードの消費APを減少させる特性。' },
+  { effectType: 'INSTANCE', description: 'デッキから除外され、一度きりの使用となる特性。' },
+  { effectType: 'IMMORTAL', description: 'デッキから除外されない特性。' },
+  { effectType: 'INTERPRETATION', description: 'ムードによる効果増加量を上昇させる特性。' },
+  { effectType: 'ACCUMULATE', description: '使用するたびに効果が増加する特性。' },
+  { effectType: 'OVER_SECTION', description: '手札にある状態でセクションを跨ぐと発動する特性。' },
+  { effectType: 'ALTERNATE_IGNITION', description: 'オルタネイト：イグニッションを発動する特性。' },
+  { effectType: 'CHAIN', description: 'スキル使用後にドローされやすくなる特性。' },
+  { effectType: 'FAVORITE', description: '特定セクションでドローされやすくなる特性。' },
+  { effectType: 'REINFORCE', description: 'スキル効果値を増加させる特性。' },
+  { effectType: 'UN_DRAW', description: 'ドローされない特性。' },
+];
+
 async function main(): Promise<void> {
   console.log('Seeding effect keywords...');
 
   // 既存データを削除してから挿入（冪等性確保）
   await prisma.skillEffectKeyword.deleteMany({});
   await prisma.traitEffectKeyword.deleteMany({});
+  await prisma.skillEffectDefinition.deleteMany({});
+  await prisma.traitEffectDefinition.deleteMany({});
 
   await prisma.skillEffectKeyword.createMany({ data: skillEffectKeywords });
   console.log(`Inserted ${skillEffectKeywords.length} skill effect keywords`);
 
   await prisma.traitEffectKeyword.createMany({ data: traitEffectKeywords });
   console.log(`Inserted ${traitEffectKeywords.length} trait effect keywords`);
+
+  await prisma.skillEffectDefinition.createMany({ data: skillEffectDefinitions });
+  console.log(`Inserted ${skillEffectDefinitions.length} skill effect definitions`);
+
+  await prisma.traitEffectDefinition.createMany({ data: traitEffectDefinitions });
+  console.log(`Inserted ${traitEffectDefinitions.length} trait effect definitions`);
 
   console.log('Seeding complete.');
 }

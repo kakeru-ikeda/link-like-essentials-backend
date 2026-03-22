@@ -1,9 +1,11 @@
 type SkillEffectKeywordGroup {
   effectType: String!
+  description: String!
   keywords: [String!]!
 }
 
 type TraitEffectKeywordGroup {
   effectType: String!
+  description: String!
   keywords: [String!]!
 }
