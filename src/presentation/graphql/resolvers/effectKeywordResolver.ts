@@ -1,4 +1,4 @@
-import type { EffectKeywordGroup } from '@/infrastructure/database/repositories/EffectKeywordRepository';
+import type { EffectKeywordGroupDTO } from '@/application/dto/EffectKeywordGroupDTO';
 import { requireAuth } from '@/presentation/middleware/authGuard';
 
 import type { GraphQLContext } from '../context';
@@ -9,18 +9,18 @@ export const effectKeywordResolvers = {
       _parent: unknown,
       _args: Record<string, never>,
       context: GraphQLContext
-    ): Promise<EffectKeywordGroup[]> => {
+    ): Promise<EffectKeywordGroupDTO[]> => {
       requireAuth(context);
-      return context.dataSources.effectKeywordRepository.getSkillEffectKeywords();
+      return context.dataSources.effectKeywordService.getSkillEffectKeywords();
     },
 
     traitEffectKeywords: async (
       _parent: unknown,
       _args: Record<string, never>,
       context: GraphQLContext
-    ): Promise<EffectKeywordGroup[]> => {
+    ): Promise<EffectKeywordGroupDTO[]> => {
       requireAuth(context);
-      return context.dataSources.effectKeywordRepository.getTraitEffectKeywords();
+      return context.dataSources.effectKeywordService.getTraitEffectKeywords();
     },
   },
 };

@@ -3,6 +3,7 @@ import type { Request } from 'express';
 import { AccessoryService } from '@/application/services/AccessoryService';
 import { CardDetailService } from '@/application/services/CardDetailService';
 import { CardService } from '@/application/services/CardService';
+import { EffectKeywordService } from '@/application/services/EffectKeywordService';
 import { GradeChallengeService } from '@/application/services/GradeChallengeService';
 import { HeartCollectAnalysisService } from '@/application/services/HeartCollectAnalysisService';
 import { LiveGrandPrixService } from '@/application/services/LiveGrandPrixService';
@@ -104,6 +105,7 @@ export async function createContext(req: Request): Promise<GraphQLContext> {
     gradeChallengeRepository,
     gradeChallengeCacheStrategy
   );
+  const effectKeywordService = new EffectKeywordService(effectKeywordRepository);
 
   return {
     user,
@@ -116,7 +118,7 @@ export async function createContext(req: Request): Promise<GraphQLContext> {
       songService,
       liveGrandPrixService,
       gradeChallengeService,
-      effectKeywordRepository,
+      effectKeywordService,
     },
   };
 }

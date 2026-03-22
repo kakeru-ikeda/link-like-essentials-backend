@@ -5,8 +5,9 @@
 スキル効果・特性効果のヒット条件文言（正規表現キーワード）を、現在のフロントエンド Config ファイルから DB 管理に移行する設計。
 
 **前提条件**
+
 - 検索のリアルタイム性を損なわないこと（カードフィルタリングのレスポンスタイムを変えない）
-- バックエンド: NestJS + Prisma + PostgreSQL (Neon)、GraphQL API
+- バックエンド: Node.js（Express）+ Apollo Server + Prisma + PostgreSQL (Neon)、GraphQL API
 - フロントエンド: Next.js + Apollo Client + Zustand
 
 ---
@@ -36,13 +37,13 @@ keywordMatcher.ts（正規表現 or 部分文字列マッチ）
 
 ### 現在のキーワード管理箇所
 
-| ファイル | 内容 | 影響範囲 |
-|---|---|---|
-| `config/skillEffects.ts` | `SKILL_EFFECT_KEYWORDS` | CardFilter, DeckAnalyzer |
-| `config/traitEffects.ts` | `TRAIT_EFFECT_KEYWORDS` | CardFilter, DeckAnalyzer, traitConditions |
-| `config/traitConditions.ts` | `TRAIT_CONDITION_PATTERNS` | `TRAIT_EFFECT_KEYWORDS`を参照して生成 |
+| ファイル                              | 内容                       | 影響範囲                                                      |
+| ------------------------------------- | -------------------------- | ------------------------------------------------------------- |
+| `config/skillEffects.ts`              | `SKILL_EFFECT_KEYWORDS`    | CardFilter, DeckAnalyzer                                      |
+| `config/traitEffects.ts`              | `TRAIT_EFFECT_KEYWORDS`    | CardFilter, DeckAnalyzer, traitConditions                     |
+| `config/traitConditions.ts`           | `TRAIT_CONDITION_PATTERNS` | `TRAIT_EFFECT_KEYWORDS`を参照して生成                         |
 | `services/game/skillEffectService.ts` | キーワード取得・マッチング | cardFilterService, deckAnalyzerService, traitConditionService |
-| `services/game/traitEffectService.ts` | キーワード取得・マッチング | cardFilterService, deckAnalyzerService |
+| `services/game/traitEffectService.ts` | キーワード取得・マッチング | cardFilterService, deckAnalyzerService                        |
 
 ---
 
@@ -97,6 +98,7 @@ model TraitEffectKeyword {
 ```
 
 **設計方針**
+
 - `keyword` は正規表現パターン文字列をそのまま格納（現在のConfigと同じ形式）
 - `effectType` には既存の Enum 値をそのまま文字列として格納（例: `"HEART_CAPTURE"`）
 - `displayOrder` で1つの効果タイプ内でのキーワードの順序を管理
@@ -203,7 +205,9 @@ export const effectKeywordResolver = {
     skillEffectKeywords: async (
       _: unknown,
       __: unknown,
-      { effectKeywordRepository }: { effectKeywordRepository: EffectKeywordRepository }
+      {
+        effectKeywordRepository,
+      }: { effectKeywordRepository: EffectKeywordRepository }
     ) => {
       return effectKeywordRepository.getSkillEffectKeywords();
     },
@@ -211,7 +215,9 @@ export const effectKeywordResolver = {
     traitEffectKeywords: async (
       _: unknown,
       __: unknown,
-      { effectKeywordRepository }: { effectKeywordRepository: EffectKeywordRepository }
+      {
+        effectKeywordRepository,
+      }: { effectKeywordRepository: EffectKeywordRepository }
     ) => {
       return effectKeywordRepository.getTraitEffectKeywords();
     },
@@ -228,8 +234,16 @@ export const effectKeywordResolver = {
 ```typescript
 // スキル効果キーワードのシードデータ
 const skillEffectKeywords = [
-  { effectType: 'HEART_CAPTURE', keyword: 'スキルハートを獲得', displayOrder: 0 },
-  { effectType: 'HEART_CAPTURE', keyword: 'ビートハート\\d+回分のスキルハートを獲得', displayOrder: 1 },
+  {
+    effectType: 'HEART_CAPTURE',
+    keyword: 'スキルハートを獲得',
+    displayOrder: 0,
+  },
+  {
+    effectType: 'HEART_CAPTURE',
+    keyword: 'ビートハート\\d+回分のスキルハートを獲得',
+    displayOrder: 1,
+  },
   { effectType: 'WIDE_HEART', keyword: 'ハート上限を\\+\\d+', displayOrder: 0 },
   // ... 全エントリを移行
 ];
@@ -239,7 +253,11 @@ await prisma.skillEffectKeyword.createMany({ data: skillEffectKeywords });
 // 特性効果キーワードのシードデータ
 const traitEffectKeywords = [
   { effectType: 'HEART_COLLECT', keyword: 'ハートコレクト', displayOrder: 0 },
-  { effectType: 'HEART_COLLECT', keyword: 'ハートを\\d+個回収したとき', displayOrder: 1 },
+  {
+    effectType: 'HEART_COLLECT',
+    keyword: 'ハートを\\d+個回収したとき',
+    displayOrder: 1,
+  },
   // ... 全エントリを移行
 ];
 
@@ -314,25 +332,27 @@ interface EffectKeywordsState {
   getTraitKeywords: (effectType: TraitEffectType) => string[];
 }
 
-export const useEffectKeywordsStore = create<EffectKeywordsState>((set, get) => ({
-  skillEffectKeywords: {},
-  traitEffectKeywords: {},
-  isLoaded: false,
+export const useEffectKeywordsStore = create<EffectKeywordsState>(
+  (set, get) => ({
+    skillEffectKeywords: {},
+    traitEffectKeywords: {},
+    isLoaded: false,
 
-  setSkillEffectKeywords: (keywords) =>
-    set({ skillEffectKeywords: keywords }),
+    setSkillEffectKeywords: (keywords) =>
+      set({ skillEffectKeywords: keywords }),
 
-  setTraitEffectKeywords: (keywords) =>
-    set({ traitEffectKeywords: keywords }),
+    setTraitEffectKeywords: (keywords) =>
+      set({ traitEffectKeywords: keywords }),
 
-  setLoaded: () => set({ isLoaded: true }),
+    setLoaded: () => set({ isLoaded: true }),
 
-  getSkillKeywords: (effectType) =>
-    get().skillEffectKeywords[effectType] ?? [],
+    getSkillKeywords: (effectType) =>
+      get().skillEffectKeywords[effectType] ?? [],
 
-  getTraitKeywords: (effectType) =>
-    get().traitEffectKeywords[effectType] ?? [],
-}));
+    getTraitKeywords: (effectType) =>
+      get().traitEffectKeywords[effectType] ?? [],
+  })
+);
 ```
 
 ### 2-4. カスタムフック追加
@@ -386,7 +406,13 @@ export function useEffectKeywordsLoader() {
     setSkillEffectKeywords(skillMap);
     setTraitEffectKeywords(traitMap);
     setLoaded();
-  }, [skillData, traitData, setSkillEffectKeywords, setTraitEffectKeywords, setLoaded]);
+  }, [
+    skillData,
+    traitData,
+    setSkillEffectKeywords,
+    setTraitEffectKeywords,
+    setLoaded,
+  ]);
 }
 ```
 
@@ -395,6 +421,7 @@ export function useEffectKeywordsLoader() {
 **`services/game/skillEffectService.ts`（変更）**
 
 変更前:
+
 ```typescript
 import { SKILL_EFFECT_KEYWORDS } from '@/config/skillEffects';
 
@@ -404,6 +431,7 @@ export function getSkillEffectKeyword(effectType: SkillEffectType): string[] {
 ```
 
 変更後:
+
 ```typescript
 import { useEffectKeywordsStore } from '@/store/effectKeywordsStore';
 
@@ -416,6 +444,7 @@ export function getSkillEffectKeyword(effectType: SkillEffectType): string[] {
 **`services/game/traitEffectService.ts`（変更）**
 
 変更前:
+
 ```typescript
 import { TRAIT_EFFECT_KEYWORDS } from '@/config/traitEffects';
 
@@ -425,6 +454,7 @@ export function getTraitEffectKeyword(effectType: TraitEffectType): string[] {
 ```
 
 変更後:
+
 ```typescript
 import { useEffectKeywordsStore } from '@/store/effectKeywordsStore';
 
@@ -502,6 +532,7 @@ Zustand Store に effectType → keywords[] のマップとして格納
 ```
 
 **ポイント**
+
 - `cache-first` ポリシーなのでページ遷移・コンポーネント再マウントでも再フェッチしない
 - ゲームアップデート時はブラウザのリロードで新しいキーワードが反映される
 - キーワードの変化頻度は低いのでキャッシュ無効化ポリシーは不要
@@ -512,17 +543,18 @@ Zustand Store に effectType → keywords[] のマップとして格納
 
 キーワードDBへの完全移行確認後、以下を削除する。
 
-| ファイル | 削除対象 | 残すもの |
-|---|---|---|
-| `config/skillEffects.ts` | `SKILL_EFFECT_KEYWORDS` | `SKILL_EFFECT_DESCRIPTIONS`（UI表示用）|
-| `config/traitEffects.ts` | `TRAIT_EFFECT_KEYWORDS` | `TRAIT_EFFECT_DESCRIPTIONS`（UI表示用）|
-| `config/traitConditions.ts` | `TRAIT_CONDITION_PATTERNS`（定数）| `TRAIT_CONDITION_LABELS`、`getTraitConditionPatterns`（関数に変換）|
+| ファイル                    | 削除対象                           | 残すもの                                                            |
+| --------------------------- | ---------------------------------- | ------------------------------------------------------------------- |
+| `config/skillEffects.ts`    | `SKILL_EFFECT_KEYWORDS`            | `SKILL_EFFECT_DESCRIPTIONS`（UI表示用）                             |
+| `config/traitEffects.ts`    | `TRAIT_EFFECT_KEYWORDS`            | `TRAIT_EFFECT_DESCRIPTIONS`（UI表示用）                             |
+| `config/traitConditions.ts` | `TRAIT_CONDITION_PATTERNS`（定数） | `TRAIT_CONDITION_LABELS`、`getTraitConditionPatterns`（関数に変換） |
 
 ---
 
 ## 変更ファイル一覧
 
 ### バックエンド（新規）
+
 - `prisma/schema.prisma` — `SkillEffectKeyword` / `TraitEffectKeyword` モデル追加
 - `prisma/migrations/xxx_add_effect_keywords/` — マイグレーション
 - `prisma/seed.ts` — 初期データ
@@ -532,18 +564,21 @@ Zustand Store に effectType → keywords[] のマップとして格納
 - `src/presentation/graphql/resolvers/index.ts` — リゾルバ統合
 
 ### フロントエンド（新規）
+
 - `repositories/graphql/queries/effectKeywords.ts` — クエリ定義
 - `types/graphql/effectKeywords.ts` — 型定義
 - `store/effectKeywordsStore.ts` — Zustandストア
 - `hooks/card/useEffectKeywords.ts` — 初期化フック
 
 ### フロントエンド（変更）
+
 - `services/game/skillEffectService.ts` — Store参照に変更
 - `services/game/traitEffectService.ts` — Store参照に変更
 - `config/traitConditions.ts` — 定数→関数に変更
 - `app/providers.tsx` — 初期化処理追加
 
 ### フロントエンド（削除）
+
 - `config/skillEffects.ts` から `SKILL_EFFECT_KEYWORDS` を削除（`SKILL_EFFECT_DESCRIPTIONS` は残す）
 - `config/traitEffects.ts` から `TRAIT_EFFECT_KEYWORDS` を削除（`TRAIT_EFFECT_DESCRIPTIONS` は残す）
 

@@ -1,13 +1,8 @@
 import type { PrismaClient } from '@prisma/client';
 
-export interface EffectKeywordGroup {
-  effectType: string;
-  label: string;
-  description: string;
-  keywords: string[];
-}
+import type { EffectKeywordGroup, IEffectKeywordRepository } from '@/domain/repositories/IEffectKeywordRepository';
 
-export class EffectKeywordRepository {
+export class EffectKeywordRepository implements IEffectKeywordRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async getSkillEffectKeywords(): Promise<EffectKeywordGroup[]> {
@@ -52,11 +47,19 @@ export class EffectKeywordRepository {
       list.push(row.keyword);
       map.set(row.effectType, list);
     }
-    return Array.from(map.entries()).map(([effectType, keywords]) => ({
-      effectType,
-      label: defMap.get(effectType)?.label ?? '',
-      description: defMap.get(effectType)?.description ?? '',
-      keywords,
-    }));
+    return Array.from(map.entries()).map(([effectType, keywords]) => {
+      const definition = defMap.get(effectType);
+      if (!definition) {
+        throw new Error(
+          `Missing effect definition for effectType "${effectType}" in EffectKeywordRepository.groupByEffectType`
+        );
+      }
+      return {
+        effectType,
+        label: definition.label,
+        description: definition.description,
+        keywords,
+      };
+    });
   }
 }
