@@ -303,23 +303,27 @@ model TraitEffectKeyword {
 }
 
 model SkillEffectDefinition {
-  effectType  String    @id @map("effect_type") @db.VarChar(50)
-  label       String    @db.VarChar(100)
-  description String    @db.Text
-  isLocked    Boolean?  @default(false) @map("is_locked")
-  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt   DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  effectType   String    @id @map("effect_type") @db.VarChar(50)
+  label        String    @db.VarChar(100)
+  description  String    @db.Text
+  displayOrder Int       @default(0) @map("display_order")
+  isLocked     Boolean?  @default(false) @map("is_locked")
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
 
+  @@index([displayOrder], map: "idx_skill_effect_definitions_display_order")
   @@map("skill_effect_definitions")
 }
 
 model TraitEffectDefinition {
-  effectType  String    @id @map("effect_type") @db.VarChar(50)
-  label       String    @db.VarChar(100)
-  description String    @db.Text
-  isLocked    Boolean?  @default(false) @map("is_locked")
-  createdAt   DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt   DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
+  effectType   String    @id @map("effect_type") @db.VarChar(50)
+  label        String    @db.VarChar(100)
+  description  String    @db.Text
+  displayOrder Int       @default(0) @map("display_order")
+  isLocked     Boolean?  @default(false) @map("is_locked")
+  createdAt    DateTime? @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime? @default(now()) @updatedAt @map("updated_at") @db.Timestamp(6)
 
+  @@index([displayOrder], map: "idx_trait_effect_definitions_display_order")
   @@map("trait_effect_definitions")
 }

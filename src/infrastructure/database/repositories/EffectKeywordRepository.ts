@@ -13,15 +13,11 @@ export class EffectKeywordRepository implements IEffectKeywordRepository {
       this.prisma.skillEffectKeyword.findMany({
         orderBy: [{ effectType: 'asc' }, { displayOrder: 'asc' }],
       }),
-      this.prisma.skillEffectDefinition.findMany(),
+      this.prisma.skillEffectDefinition.findMany({
+        orderBy: { displayOrder: 'asc' },
+      }),
     ]);
-    const defMap = new Map(
-      definitions.map((d) => [
-        d.effectType,
-        { label: d.label, description: d.description },
-      ])
-    );
-    return this.groupByEffectType(rows, defMap);
+    return this.groupByEffectType(rows, definitions);
   }
 
   async getTraitEffectKeywords(): Promise<EffectKeywordGroup[]> {
@@ -29,40 +25,28 @@ export class EffectKeywordRepository implements IEffectKeywordRepository {
       this.prisma.traitEffectKeyword.findMany({
         orderBy: [{ effectType: 'asc' }, { displayOrder: 'asc' }],
       }),
-      this.prisma.traitEffectDefinition.findMany(),
+      this.prisma.traitEffectDefinition.findMany({
+        orderBy: { displayOrder: 'asc' },
+      }),
     ]);
-    const defMap = new Map(
-      definitions.map((d) => [
-        d.effectType,
-        { label: d.label, description: d.description },
-      ])
-    );
-    return this.groupByEffectType(rows, defMap);
+    return this.groupByEffectType(rows, definitions);
   }
 
   private groupByEffectType(
     rows: { effectType: string; keyword: string }[],
-    defMap: Map<string, { label: string; description: string }>
+    definitions: { effectType: string; label: string; description: string }[]
   ): EffectKeywordGroup[] {
-    const map = new Map<string, string[]>();
+    const keywordsMap = new Map<string, string[]>();
     for (const row of rows) {
-      const list = map.get(row.effectType) ?? [];
+      const list = keywordsMap.get(row.effectType) ?? [];
       list.push(row.keyword);
-      map.set(row.effectType, list);
+      keywordsMap.set(row.effectType, list);
     }
-    return Array.from(map.entries()).map(([effectType, keywords]) => {
-      const definition = defMap.get(effectType);
-      if (!definition) {
-        throw new Error(
-          `Missing effect definition for effectType "${effectType}" in EffectKeywordRepository.groupByEffectType`
-        );
-      }
-      return {
-        effectType,
-        label: definition.label,
-        description: definition.description,
-        keywords,
-      };
-    });
+    return definitions.map(({ effectType, label, description }) => ({
+      effectType,
+      label,
+      description,
+      keywords: keywordsMap.get(effectType) ?? [],
+    }));
   }
 }
