@@ -3,6 +3,7 @@ import { DateTimeResolver, JSONResolver } from 'graphql-scalars';
 import { accessoryResolvers } from './accessoryResolver';
 import { cardDetailResolvers } from './cardDetailResolver';
 import { cardResolvers } from './cardResolver';
+import { effectKeywordResolvers } from './effectKeywordResolver';
 import { gradeChallengeResolvers } from './gradeChallengeResolver';
 import { liveGrandPrixResolvers } from './liveGrandPrixResolver';
 import { mutationResolvers } from './mutationResolver';
@@ -20,6 +21,7 @@ export const resolvers = {
     ...liveGrandPrixResolvers.Query,
     ...gradeChallengeResolvers.Query,
     ...traitAnalysisResolvers.Query,
+    ...effectKeywordResolvers.Query,
   },
   Mutation: {
     ...mutationResolvers.Mutation,

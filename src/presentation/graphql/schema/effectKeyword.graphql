@@ -1,0 +1,13 @@
+type SkillEffectKeywordGroup {
+  effectType: String!
+  label: String!
+  description: String!
+  keywords: [String!]!
+}
+
+type TraitEffectKeywordGroup {
+  effectType: String!
+  label: String!
+  description: String!
+  keywords: [String!]!
+}

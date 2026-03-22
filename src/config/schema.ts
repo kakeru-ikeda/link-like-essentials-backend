@@ -30,6 +30,10 @@ const gradeChallengeTypeDefs = readFileSync(
   join(schemaDir, 'gradeChallenge.graphql'),
   'utf-8'
 );
+const effectKeywordTypeDefs = readFileSync(
+  join(schemaDir, 'effectKeyword.graphql'),
+  'utf-8'
+);
 const queryTypeDefs = readFileSync(join(schemaDir, 'query.graphql'), 'utf-8');
 const mutationTypeDefs = readFileSync(
   join(schemaDir, 'mutation.graphql'),
@@ -45,6 +49,7 @@ const typeDefs = [
   songTypeDefs,
   liveGrandPrixTypeDefs,
   gradeChallengeTypeDefs,
+  effectKeywordTypeDefs,
   queryTypeDefs,
   mutationTypeDefs,
 ];

@@ -1,6 +1,7 @@
 import type { AccessoryService } from '../../../../src/application/services/AccessoryService';
 import type { CardDetailService } from '../../../../src/application/services/CardDetailService';
 import type { CardService } from '../../../../src/application/services/CardService';
+import type { EffectKeywordService } from '../../../../src/application/services/EffectKeywordService';
 import type { GradeChallengeService } from '../../../../src/application/services/GradeChallengeService';
 import type { HeartCollectAnalysisService } from '../../../../src/application/services/HeartCollectAnalysisService';
 import type { LiveGrandPrixService } from '../../../../src/application/services/LiveGrandPrixService';
@@ -23,6 +24,7 @@ describe('AuthGuard', () => {
     songService: {} as SongService,
     liveGrandPrixService: {} as LiveGrandPrixService,
     gradeChallengeService: {} as GradeChallengeService,
+    effectKeywordService: {} as EffectKeywordService,
   };
 
   const mockUser: AuthUser = {
