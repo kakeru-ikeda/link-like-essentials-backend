@@ -1,6 +1,9 @@
 import type { PrismaClient } from '@prisma/client';
 
-import type { EffectKeywordGroup, IEffectKeywordRepository } from '@/domain/repositories/IEffectKeywordRepository';
+import type {
+  EffectKeywordGroup,
+  IEffectKeywordRepository,
+} from '@/domain/repositories/IEffectKeywordRepository';
 
 export class EffectKeywordRepository implements IEffectKeywordRepository {
   constructor(private readonly prisma: PrismaClient) {}

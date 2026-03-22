@@ -105,7 +105,9 @@ export async function createContext(req: Request): Promise<GraphQLContext> {
     gradeChallengeRepository,
     gradeChallengeCacheStrategy
   );
-  const effectKeywordService = new EffectKeywordService(effectKeywordRepository);
+  const effectKeywordService = new EffectKeywordService(
+    effectKeywordRepository
+  );
 
   return {
     user,
