@@ -8,30 +8,6 @@ import { serialize } from '../serializers';
 
 export const gradeChallengeRouter = Router();
 
-/**
- * @openapi
- * /grade-challenges:
- *   get:
- *     summary: グレードチャレンジ一覧取得
- *     description: フィルター条件を指定してグレードチャレンジイベント一覧を取得します。
- *     tags:
- *       - GradeChallenges
- *     parameters:
- *       - in: query
- *         name: termName
- *         schema:
- *           type: string
- *         description: ターム名でフィルター
- *     responses:
- *       200:
- *         description: グレードチャレンジ一覧
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/GradeChallenge'
- */
 gradeChallengeRouter.get(
   '/',
   asyncHandler(async (req, res, next) => {
@@ -53,24 +29,6 @@ gradeChallengeRouter.get(
   })
 );
 
-/**
- * @openapi
- * /grade-challenges/ongoing:
- *   get:
- *     summary: 開催中のグレードチャレンジ取得
- *     description: 現在開催中のグレードチャレンジイベントを取得します。
- *     tags:
- *       - GradeChallenges
- *     responses:
- *       200:
- *         description: 開催中イベント一覧
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/GradeChallenge'
- */
 gradeChallengeRouter.get(
   '/ongoing',
   asyncHandler(async (req, res, next) => {
@@ -84,22 +42,6 @@ gradeChallengeRouter.get(
   })
 );
 
-/**
- * @openapi
- * /grade-challenges/stats:
- *   get:
- *     summary: グレードチャレンジ統計情報
- *     description: グレードチャレンジイベントの統計情報を取得します。
- *     tags:
- *       - GradeChallenges
- *     responses:
- *       200:
- *         description: 統計情報
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- */
 gradeChallengeRouter.get(
   '/stats',
   asyncHandler(async (req, res, next) => {
@@ -113,35 +55,6 @@ gradeChallengeRouter.get(
   })
 );
 
-/**
- * @openapi
- * /grade-challenges/{id}:
- *   get:
- *     summary: グレードチャレンジ取得（ID指定）
- *     description: IDを指定してグレードチャレンジイベントを取得します。
- *     tags:
- *       - GradeChallenges
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: イベントID
- *     responses:
- *       200:
- *         description: グレードチャレンジイベント情報
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/GradeChallenge'
- *       404:
- *         description: 見つかりません
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
 gradeChallengeRouter.get(
   '/:id',
   asyncHandler(async (req, res, next) => {
@@ -162,35 +75,6 @@ gradeChallengeRouter.get(
   })
 );
 
-/**
- * @openapi
- * /grade-challenges/title/{title}:
- *   get:
- *     summary: グレードチャレンジ取得（タイトル指定）
- *     description: タイトルを指定してグレードチャレンジイベントを取得します。
- *     tags:
- *       - GradeChallenges
- *     parameters:
- *       - in: path
- *         name: title
- *         required: true
- *         schema:
- *           type: string
- *         description: タイトル
- *     responses:
- *       200:
- *         description: グレードチャレンジイベント情報
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/GradeChallenge'
- *       404:
- *         description: 見つかりません
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
 export const gradeChallengeByTitleRouter = Router();
 
 gradeChallengeByTitleRouter.get(
