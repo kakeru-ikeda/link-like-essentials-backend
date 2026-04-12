@@ -3,7 +3,6 @@ import { Kind, type GraphQLResolveInfo, type SelectionNode } from 'graphql';
 import type { CardFilterInput } from '@/application/dto/CardDTO';
 import type { PaginationInput } from '@/application/dto/PaginationDTO';
 import { EnumMapper } from '@/infrastructure/mappers/EnumMapper';
-import { requireAuth } from '@/presentation/middleware/authGuard';
 
 import type { GraphQLContext } from '../context';
 
@@ -77,7 +76,6 @@ export const cardResolvers: {
 } = {
   Query: {
     cards: async (_, args, context, info) => {
-      requireAuth(context);
 
       const { filter } = args;
 
@@ -91,7 +89,6 @@ export const cardResolvers: {
     },
 
     cardsConnection: async (_, args, context, info) => {
-      requireAuth(context);
 
       const { filter, first, after } = args;
       const pagination: PaginationInput = { first, after };
@@ -107,7 +104,6 @@ export const cardResolvers: {
     },
 
     card: async (_, { id }, context, info) => {
-      requireAuth(context);
 
       const includeOptions = getCardIncludeOptions(info);
       return await context.dataSources.cardService.findById(
@@ -117,7 +113,6 @@ export const cardResolvers: {
     },
 
     cardByName: async (_, { cardName, characterName }, context, info) => {
-      requireAuth(context);
 
       return await context.dataSources.cardService.findByName(
         cardName,
@@ -127,7 +122,6 @@ export const cardResolvers: {
     },
 
     cardStats: async (_, __, context) => {
-      requireAuth(context);
 
       return await context.dataSources.cardService.getStats();
     },

@@ -2,7 +2,6 @@ import type {
   HeartCollectAnalysis,
   UnDrawAnalysis,
 } from '@/domain/entities/TraitAnalysis';
-import { requireAuth } from '@/presentation/middleware/authGuard';
 
 import type { GraphQLContext } from '../context';
 
@@ -32,7 +31,6 @@ export const traitAnalysisResolvers = {
       args: { inputs: TraitAnalysisInput[] },
       context: GraphQLContext
     ): Promise<TraitAnalysisResult[]> => {
-      requireAuth(context);
 
       const { inputs } = args;
 

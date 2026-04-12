@@ -1,5 +1,4 @@
 import type { LiveGrandPrixFilterInput } from '@/application/dto/LiveGrandPrixDTO';
-import { requireAuth } from '@/presentation/middleware/authGuard';
 
 import type { GraphQLContext } from '../context';
 
@@ -61,7 +60,6 @@ export const liveGrandPrixResolvers: {
 } = {
   Query: {
     liveGrandPrix: async (_, args, context) => {
-      requireAuth(context);
 
       const { filter } = args;
 
@@ -72,7 +70,6 @@ export const liveGrandPrixResolvers: {
     },
 
     liveGrandPrixById: async (_, { id }, context) => {
-      requireAuth(context);
 
       return await context.dataSources.liveGrandPrixService.findById(
         parseInt(id, 10)
@@ -80,7 +77,6 @@ export const liveGrandPrixResolvers: {
     },
 
     liveGrandPrixByEventName: async (_, { eventName }, context) => {
-      requireAuth(context);
 
       return await context.dataSources.liveGrandPrixService.findByEventName(
         eventName
@@ -88,13 +84,11 @@ export const liveGrandPrixResolvers: {
     },
 
     liveGrandPrixStats: async (_, __, context) => {
-      requireAuth(context);
 
       return await context.dataSources.liveGrandPrixService.getStats();
     },
 
     ongoingLiveGrandPrix: async (_, __, context) => {
-      requireAuth(context);
 
       return await context.dataSources.liveGrandPrixService.findOngoing();
     },
