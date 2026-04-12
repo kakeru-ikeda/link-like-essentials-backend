@@ -40,7 +40,7 @@ export class EnumMapper {
       トリックスター: 'TRICKSTER',
       パフォーマー: 'PERFORMER',
       ムードメーカー: 'MOODMAKER',
-      ムードーメーカー: 'MOODOMAKER', // 誤字版も対応
+      ムードーメーカー: 'MOODMAKER',
     };
 
     return mapping[value] || null;

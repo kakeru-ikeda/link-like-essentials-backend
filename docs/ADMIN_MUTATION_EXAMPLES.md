@@ -286,7 +286,6 @@ mutation DeleteAccessory {
 - `TRICKSTER` (トリックスター)
 - `PERFORMER` (パフォーマー)
 - `MOODMAKER` (ムードメーカー)
-- `MOODOMAKER` (ムードーメーカー - 誤字版)
 
 ### FavoriteMode (お気に入りモード)
 

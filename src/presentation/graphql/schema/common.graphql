@@ -37,7 +37,6 @@ enum StyleType {
   TRICKSTER
   PERFORMER
   MOODMAKER
-  MOODOMAKER
 }
 
 # お気に入りモード

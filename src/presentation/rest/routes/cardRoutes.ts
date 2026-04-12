@@ -27,17 +27,19 @@ export const cardRouter = Router();
  *         name: limited
  *         schema:
  *           type: string
+ *           enum: [PERMANENT, LIMITED, SPRING_LIMITED, SUMMER_LIMITED, AUTUMN_LIMITED, WINTER_LIMITED, BIRTHDAY_LIMITED, LEG_LIMITED, SHUFFLE_LIMITED, BATTLE_LIMITED, PARTY_LIMITED, ACTIVITY_LIMITED, BANGDREAM_LIMITED, GRADUATE_LIMITED, LOGIN_BONUS, REWARD]
  *         description: 限定種別でフィルター
  *       - in: query
  *         name: characterName
  *         schema:
  *           type: string
+ *           enum: [日野下花帆, 村野さやか, 乙宗梢, 夕霧綴理, 大沢瑠璃乃, 藤島慈, 徒町小鈴, 百生吟子, 安養寺姫芽, 桂城泉, セラス, 大賀美沙知]
  *         description: キャラクター名でフィルター
  *       - in: query
  *         name: styleType
  *         schema:
  *           type: string
- *           enum: [CHEERLEADER, TRICKSTER, PERFORMER, MOODMAKER, MOODOMAKER]
+ *           enum: [CHEERLEADER, TRICKSTER, PERFORMER, MOODMAKER]
  *         description: スタイルタイプでフィルター
  *       - in: query
  *         name: cardName
@@ -156,6 +158,7 @@ cardRouter.get(
  *         name: characterName
  *         schema:
  *           type: string
+ *           enum: [日野下花帆, 村野さやか, 乙宗梢, 夕霧綴理, 大沢瑠璃乃, 藤島慈, 徒町小鈴, 百生吟子, 安養寺姫芽, 桂城泉, セラス, 大賀美沙知]
  *         description: キャラクター名でフィルター
  *     responses:
  *       200:
@@ -332,6 +335,7 @@ cardRouter.get(
  *         required: true
  *         schema:
  *           type: string
+ *           enum: [日野下花帆, 村野さやか, 乙宗梢, 夕霧綴理, 大沢瑠璃乃, 藤島慈, 徒町小鈴, 百生吟子, 安養寺姫芽, 桂城泉, セラス, 大賀美沙知]
  *         description: キャラクター名
  *     responses:
  *       200:
