@@ -72,45 +72,25 @@ describe('EnumMapper', () => {
 
   // Reverse mapping tests
   describe('fromLimitedTypeEnum', () => {
-    it('should map English enum keys to English enum values', () => {
-      expect(EnumMapper.fromLimitedTypeEnum('PERMANENT')).toBe('PERMANENT');
-      expect(EnumMapper.fromLimitedTypeEnum('LIMITED')).toBe('LIMITED');
-      expect(EnumMapper.fromLimitedTypeEnum('SPRING_LIMITED')).toBe(
-        'SPRING_LIMITED'
-      );
-      expect(EnumMapper.fromLimitedTypeEnum('SUMMER_LIMITED')).toBe(
-        'SUMMER_LIMITED'
-      );
-      expect(EnumMapper.fromLimitedTypeEnum('AUTUMN_LIMITED')).toBe(
-        'AUTUMN_LIMITED'
-      );
-      expect(EnumMapper.fromLimitedTypeEnum('WINTER_LIMITED')).toBe(
-        'WINTER_LIMITED'
-      );
-      expect(EnumMapper.fromLimitedTypeEnum('BIRTHDAY_LIMITED')).toBe(
-        'BIRTHDAY_LIMITED'
-      );
-      expect(EnumMapper.fromLimitedTypeEnum('LEG_LIMITED')).toBe('LEG_LIMITED');
-      expect(EnumMapper.fromLimitedTypeEnum('SHUFFLE_LIMITED')).toBe(
-        'SHUFFLE_LIMITED'
-      );
-      expect(EnumMapper.fromLimitedTypeEnum('BATTLE_LIMITED')).toBe(
-        'BATTLE_LIMITED'
-      );
-      expect(EnumMapper.fromLimitedTypeEnum('PARTY_LIMITED')).toBe(
-        'PARTY_LIMITED'
-      );
-      expect(EnumMapper.fromLimitedTypeEnum('ACTIVITY_LIMITED')).toBe(
-        'ACTIVITY_LIMITED'
-      );
+    it('should map English enum keys to Japanese enum values', () => {
+      expect(EnumMapper.fromLimitedTypeEnum('PERMANENT')).toBe('恒常');
+      expect(EnumMapper.fromLimitedTypeEnum('LIMITED')).toBe('限定');
+      expect(EnumMapper.fromLimitedTypeEnum('SPRING_LIMITED')).toBe('春限定');
+      expect(EnumMapper.fromLimitedTypeEnum('SUMMER_LIMITED')).toBe('夏限定');
+      expect(EnumMapper.fromLimitedTypeEnum('AUTUMN_LIMITED')).toBe('秋限定');
+      expect(EnumMapper.fromLimitedTypeEnum('WINTER_LIMITED')).toBe('冬限定');
+      expect(EnumMapper.fromLimitedTypeEnum('BIRTHDAY_LIMITED')).toBe('誕限定');
+      expect(EnumMapper.fromLimitedTypeEnum('LEG_LIMITED')).toBe('LEG限定');
+      expect(EnumMapper.fromLimitedTypeEnum('SHUFFLE_LIMITED')).toBe('混限定');
+      expect(EnumMapper.fromLimitedTypeEnum('BATTLE_LIMITED')).toBe('撃限定');
+      expect(EnumMapper.fromLimitedTypeEnum('PARTY_LIMITED')).toBe('宴限定');
+      expect(EnumMapper.fromLimitedTypeEnum('ACTIVITY_LIMITED')).toBe('活限定');
       expect(EnumMapper.fromLimitedTypeEnum('BANGDREAM_LIMITED')).toBe(
-        'BANGDREAM_LIMITED'
+        'バンドリ限定'
       );
-      expect(EnumMapper.fromLimitedTypeEnum('GRADUATE_LIMITED')).toBe(
-        'GRADUATE_LIMITED'
-      );
-      expect(EnumMapper.fromLimitedTypeEnum('LOGIN_BONUS')).toBe('LOGIN_BONUS');
-      expect(EnumMapper.fromLimitedTypeEnum('REWARD')).toBe('REWARD');
+      expect(EnumMapper.fromLimitedTypeEnum('GRADUATE_LIMITED')).toBe('卒限定');
+      expect(EnumMapper.fromLimitedTypeEnum('LOGIN_BONUS')).toBe('ログボ');
+      expect(EnumMapper.fromLimitedTypeEnum('REWARD')).toBe('報酬');
     });
 
     it('should return null for null input', () => {
@@ -195,13 +175,11 @@ describe('EnumMapper', () => {
   });
 
   describe('toLimitedTypeString', () => {
-    it('should map GraphQL enum to English enum values', () => {
-      expect(EnumMapper.toLimitedTypeString('PERMANENT')).toBe('PERMANENT');
-      expect(EnumMapper.toLimitedTypeString('LIMITED')).toBe('LIMITED');
-      expect(EnumMapper.toLimitedTypeString('SPRING_LIMITED')).toBe(
-        'SPRING_LIMITED'
-      );
-      expect(EnumMapper.toLimitedTypeString('LOGIN_BONUS')).toBe('LOGIN_BONUS');
+    it('should map GraphQL enum to Japanese values', () => {
+      expect(EnumMapper.toLimitedTypeString('PERMANENT')).toBe('恒常');
+      expect(EnumMapper.toLimitedTypeString('LIMITED')).toBe('限定');
+      expect(EnumMapper.toLimitedTypeString('SPRING_LIMITED')).toBe('春限定');
+      expect(EnumMapper.toLimitedTypeString('LOGIN_BONUS')).toBe('ログボ');
     });
 
     it('should return null for null input', () => {
