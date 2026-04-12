@@ -8,34 +8,6 @@ import { serialize } from '../serializers';
 
 export const traitAnalysisRouter = Router();
 
-/**
- * @openapi
- * /trait-analysis/batch:
- *   post:
- *     summary: 特性分析バッチ取得
- *     description: 複数のカードIDを指定してハートコレクト分析・アンドロー分析データをまとめて取得します。
- *     tags:
- *       - TraitAnalysis
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/TraitAnalysisBatchRequest'
- *     responses:
- *       200:
- *         description: バッチ分析結果
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/TraitAnalysisBatchResponse'
- *       400:
- *         description: バリデーションエラー
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
 traitAnalysisRouter.post(
   '/batch',
   asyncHandler(async (req, res, next) => {

@@ -8,40 +8,6 @@ import { serialize } from '../serializers';
 
 export const songRouter = Router();
 
-/**
- * @openapi
- * /songs:
- *   get:
- *     summary: 楽曲一覧取得
- *     description: フィルター条件を指定して楽曲の一覧を取得します。
- *     tags:
- *       - Songs
- *     parameters:
- *       - in: query
- *         name: category
- *         schema:
- *           type: string
- *         description: カテゴリでフィルター
- *       - in: query
- *         name: attribute
- *         schema:
- *           type: string
- *         description: 属性でフィルター
- *       - in: query
- *         name: centerCharacter
- *         schema:
- *           type: string
- *         description: センターキャラクターでフィルター
- *     responses:
- *       200:
- *         description: 楽曲一覧
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Song'
- */
 songRouter.get(
   '/',
   asyncHandler(async (req, res, next) => {
@@ -65,22 +31,6 @@ songRouter.get(
   })
 );
 
-/**
- * @openapi
- * /songs/stats:
- *   get:
- *     summary: 楽曲統計情報
- *     description: 楽曲の統計情報を取得します。
- *     tags:
- *       - Songs
- *     responses:
- *       200:
- *         description: 統計情報
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- */
 songRouter.get(
   '/stats',
   asyncHandler(async (req, res, next) => {
@@ -94,35 +44,6 @@ songRouter.get(
   })
 );
 
-/**
- * @openapi
- * /songs/{id}:
- *   get:
- *     summary: 楽曲取得（ID指定）
- *     description: IDを指定して楽曲を取得します。
- *     tags:
- *       - Songs
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: 楽曲ID
- *     responses:
- *       200:
- *         description: 楽曲情報
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Song'
- *       404:
- *         description: 見つかりません
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
 songRouter.get(
   '/:id',
   asyncHandler(async (req, res, next) => {
@@ -143,35 +64,6 @@ songRouter.get(
   })
 );
 
-/**
- * @openapi
- * /songs/name/{songName}:
- *   get:
- *     summary: 楽曲取得（楽曲名指定）
- *     description: 楽曲名を指定して楽曲を取得します。
- *     tags:
- *       - Songs
- *     parameters:
- *       - in: path
- *         name: songName
- *         required: true
- *         schema:
- *           type: string
- *         description: 楽曲名
- *     responses:
- *       200:
- *         description: 楽曲情報
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Song'
- *       404:
- *         description: 見つかりません
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
 export const songByNameRouter = Router();
 
 songByNameRouter.get(

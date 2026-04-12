@@ -8,80 +8,6 @@ import { serializeCard } from '../serializers';
 
 export const cardRouter = Router();
 
-/**
- * @openapi
- * /cards:
- *   get:
- *     summary: カード一覧取得
- *     description: フィルター条件を指定してカードの一覧を取得します。
- *     tags:
- *       - Cards
- *     parameters:
- *       - in: query
- *         name: rarity
- *         schema:
- *           type: string
- *           enum: [UR, SR, R, DR, BR, LR]
- *         description: レアリティでフィルター
- *       - in: query
- *         name: limited
- *         schema:
- *           type: string
- *           enum: [PERMANENT, LIMITED, SPRING_LIMITED, SUMMER_LIMITED, AUTUMN_LIMITED, WINTER_LIMITED, BIRTHDAY_LIMITED, LEG_LIMITED, SHUFFLE_LIMITED, BATTLE_LIMITED, PARTY_LIMITED, ACTIVITY_LIMITED, BANGDREAM_LIMITED, GRADUATE_LIMITED, LOGIN_BONUS, REWARD]
- *         description: 限定種別でフィルター
- *       - in: query
- *         name: characterName
- *         schema:
- *           type: string
- *           enum: [日野下花帆, 村野さやか, 乙宗梢, 夕霧綴理, 大沢瑠璃乃, 藤島慈, 徒町小鈴, 百生吟子, 安養寺姫芽, 桂城泉, セラス, 大賀美沙知]
- *         description: キャラクター名でフィルター
- *       - in: query
- *         name: styleType
- *         schema:
- *           type: string
- *           enum: [CHEERLEADER, TRICKSTER, PERFORMER, MOODMAKER]
- *         description: スタイルタイプでフィルター
- *       - in: query
- *         name: cardName
- *         schema:
- *           type: string
- *         description: カード名でフィルター
- *       - in: query
- *         name: skillEffectContains
- *         schema:
- *           type: string
- *         description: スキル効果テキストの部分一致
- *       - in: query
- *         name: traitEffectContains
- *         schema:
- *           type: string
- *         description: 特性効果テキストの部分一致
- *       - in: query
- *         name: specialAppealEffectContains
- *         schema:
- *           type: string
- *         description: スペシャルアピール効果テキストの部分一致
- *       - in: query
- *         name: accessoryEffectContains
- *         schema:
- *           type: string
- *         description: アクセサリー効果テキストの部分一致
- *     responses:
- *       200:
- *         description: カード一覧
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Card'
- *       500:
- *         description: サーバーエラー
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
 cardRouter.get(
   '/',
   asyncHandler(async (req, res, next) => {
@@ -129,45 +55,6 @@ cardRouter.get(
   })
 );
 
-/**
- * @openapi
- * /cards/connection:
- *   get:
- *     summary: カード一覧（ページネーション）
- *     description: カーソルベースのページネーションでカード一覧を取得します。
- *     tags:
- *       - Cards
- *     parameters:
- *       - in: query
- *         name: first
- *         schema:
- *           type: integer
- *           default: 20
- *         description: 取得件数
- *       - in: query
- *         name: after
- *         schema:
- *           type: string
- *         description: ページネーションカーソル
- *       - in: query
- *         name: rarity
- *         schema:
- *           type: string
- *         description: レアリティでフィルター
- *       - in: query
- *         name: characterName
- *         schema:
- *           type: string
- *           enum: [日野下花帆, 村野さやか, 乙宗梢, 夕霧綴理, 大沢瑠璃乃, 藤島慈, 徒町小鈴, 百生吟子, 安養寺姫芽, 桂城泉, セラス, 大賀美沙知]
- *         description: キャラクター名でフィルター
- *     responses:
- *       200:
- *         description: ページネーション付きカード一覧
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/CardConnection'
- */
 cardRouter.get(
   '/connection',
   asyncHandler(async (req, res, next) => {
@@ -207,52 +94,6 @@ cardRouter.get(
   })
 );
 
-/**
- * @openapi
- * /cards/stats:
- *   get:
- *     summary: カード統計情報
- *     description: カードの統計情報（総数、レアリティ別、スタイル別、キャラクター別）を取得します。
- *     tags:
- *       - Cards
- *     responses:
- *       200:
- *         description: 統計情報
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 totalCards:
- *                   type: integer
- *                 byRarity:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       rarity:
- *                         type: string
- *                       count:
- *                         type: integer
- *                 byStyleType:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       styleType:
- *                         type: string
- *                       count:
- *                         type: integer
- *                 byCharacter:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       characterName:
- *                         type: string
- *                       count:
- *                         type: integer
- */
 cardRouter.get(
   '/stats',
   asyncHandler(async (req, res, next) => {
@@ -266,35 +107,6 @@ cardRouter.get(
   })
 );
 
-/**
- * @openapi
- * /cards/{id}:
- *   get:
- *     summary: カード取得（ID指定）
- *     description: IDを指定してカードを取得します。
- *     tags:
- *       - Cards
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *         description: カードID
- *     responses:
- *       200:
- *         description: カード情報
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Card'
- *       404:
- *         description: 見つかりません
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
 cardRouter.get(
   '/:id',
   asyncHandler(async (req, res, next) => {
@@ -315,42 +127,6 @@ cardRouter.get(
   })
 );
 
-/**
- * @openapi
- * /cards/name/{cardName}/{characterName}:
- *   get:
- *     summary: カード取得（カード名・キャラクター名指定）
- *     description: カード名とキャラクター名の組み合わせでカードを取得します。
- *     tags:
- *       - Cards
- *     parameters:
- *       - in: path
- *         name: cardName
- *         required: true
- *         schema:
- *           type: string
- *         description: カード名
- *       - in: path
- *         name: characterName
- *         required: true
- *         schema:
- *           type: string
- *           enum: [日野下花帆, 村野さやか, 乙宗梢, 夕霧綴理, 大沢瑠璃乃, 藤島慈, 徒町小鈴, 百生吟子, 安養寺姫芽, 桂城泉, セラス, 大賀美沙知]
- *         description: キャラクター名
- *     responses:
- *       200:
- *         description: カード情報
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Card'
- *       404:
- *         description: 見つかりません
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
 cardRouter.get(
   '/name/:cardName/:characterName',
   asyncHandler(async (req, res, next) => {
@@ -382,35 +158,6 @@ cardRouter.get(
   })
 );
 
-/**
- * @openapi
- * /card-details/{cardId}:
- *   get:
- *     summary: カード詳細取得（カードID指定）
- *     description: カードIDを指定してカード詳細情報を取得します。
- *     tags:
- *       - Cards
- *     parameters:
- *       - in: path
- *         name: cardId
- *         required: true
- *         schema:
- *           type: integer
- *         description: カードID
- *     responses:
- *       200:
- *         description: カード詳細情報
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *       404:
- *         description: 見つかりません
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
- */
 export const cardDetailRouter = Router();
 
 cardDetailRouter.get(
@@ -434,31 +181,6 @@ cardDetailRouter.get(
   })
 );
 
-/**
- * @openapi
- * /accessories/{cardId}:
- *   get:
- *     summary: アクセサリー一覧取得（カードID指定）
- *     description: カードIDを指定してアクセサリー一覧を取得します。
- *     tags:
- *       - Cards
- *     parameters:
- *       - in: path
- *         name: cardId
- *         required: true
- *         schema:
- *           type: integer
- *         description: カードID
- *     responses:
- *       200:
- *         description: アクセサリー一覧
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- */
 export const accessoryRouter = Router();
 
 accessoryRouter.get(
