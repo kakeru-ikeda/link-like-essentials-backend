@@ -58,7 +58,7 @@ export const cardRouter = Router();
  *         name: specialAppealEffectContains
  *         schema:
  *           type: string
- *         description: 必殺技効果テキストの部分一致
+ *         description: スペシャルアピール効果テキストの部分一致
  *       - in: query
  *         name: accessoryEffectContains
  *         schema:
