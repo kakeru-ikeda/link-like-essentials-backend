@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from 'express';
 
 import { createContext } from '@/config/context';
 import { NotFoundError } from '@/domain/errors/AppError';
+import { serialize } from '../serializers';
 
 export const songRouter = Router();
 
@@ -56,7 +57,7 @@ songRouter.get(
       const songs = await ctx.dataSources.songService.findAll(
         Object.keys(filter).length > 0 ? filter : undefined
       );
-      res.json(songs);
+      res.json(serialize(songs));
     } catch (err) {
       next(err);
     }
@@ -85,7 +86,7 @@ songRouter.get(
     try {
       const ctx = await createContext(req);
       const stats = await ctx.dataSources.songService.getStats();
-      res.json(stats);
+      res.json(serialize(stats));
     } catch (err) {
       next(err);
     }
@@ -134,7 +135,7 @@ songRouter.get(
         return;
       }
       const song = await ctx.dataSources.songService.findById(id);
-      res.json(song);
+      res.json(serialize(song));
     } catch (err) {
       next(err);
     }
@@ -179,18 +180,16 @@ songByNameRouter.get(
       const ctx = await createContext(req);
       const { songName } = req.params;
       if (!songName) {
-        res
-          .status(400)
-          .json({
-            error: { code: 'BAD_USER_INPUT', message: '楽曲名は必須です' },
-          });
+        res.status(400).json({
+          error: { code: 'BAD_USER_INPUT', message: '楽曲名は必須です' },
+        });
         return;
       }
       const song = await ctx.dataSources.songService.findBySongName(songName);
       if (!song) {
         throw new NotFoundError(`Song "${songName}" not found`);
       }
-      res.json(song);
+      res.json(serialize(song));
     } catch (err) {
       next(err);
     }

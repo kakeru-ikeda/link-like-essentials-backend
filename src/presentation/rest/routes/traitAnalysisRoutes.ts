@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from 'express';
 
 import { createContext } from '@/config/context';
 import { ValidationError } from '@/domain/errors/AppError';
+import { serialize } from '../serializers';
 
 export const traitAnalysisRouter = Router();
 
@@ -70,7 +71,7 @@ traitAnalysisRouter.post(
         })
       );
 
-      res.json({ results });
+      res.json(serialize({ results }));
     } catch (err) {
       next(err);
     }

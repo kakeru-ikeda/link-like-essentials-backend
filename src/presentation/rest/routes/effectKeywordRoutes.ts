@@ -2,6 +2,7 @@ import { Router } from 'express';
 import type { Request, Response, NextFunction } from 'express';
 
 import { createContext } from '@/config/context';
+import { serialize } from '../serializers';
 
 export const effectKeywordRouter = Router();
 
@@ -30,7 +31,7 @@ effectKeywordRouter.get(
       const ctx = await createContext(req);
       const keywords =
         await ctx.dataSources.effectKeywordService.getSkillEffectKeywords();
-      res.json(keywords);
+      res.json(serialize(keywords));
     } catch (err) {
       next(err);
     }
@@ -62,7 +63,7 @@ effectKeywordRouter.get(
       const ctx = await createContext(req);
       const keywords =
         await ctx.dataSources.effectKeywordService.getTraitEffectKeywords();
-      res.json(keywords);
+      res.json(serialize(keywords));
     } catch (err) {
       next(err);
     }

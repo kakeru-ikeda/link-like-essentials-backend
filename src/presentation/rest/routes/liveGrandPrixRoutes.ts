@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from 'express';
 
 import { createContext } from '@/config/context';
 import { NotFoundError } from '@/domain/errors/AppError';
+import { serialize } from '../serializers';
 
 export const liveGrandPrixRouter = Router();
 
@@ -44,7 +45,7 @@ liveGrandPrixRouter.get(
       const events = await ctx.dataSources.liveGrandPrixService.findAll(
         Object.keys(filter).length > 0 ? filter : undefined
       );
-      res.json(events);
+      res.json(serialize(events));
     } catch (err) {
       next(err);
     }
@@ -75,7 +76,7 @@ liveGrandPrixRouter.get(
     try {
       const ctx = await createContext(req);
       const events = await ctx.dataSources.liveGrandPrixService.findOngoing();
-      res.json(events);
+      res.json(serialize(events));
     } catch (err) {
       next(err);
     }
@@ -104,7 +105,7 @@ liveGrandPrixRouter.get(
     try {
       const ctx = await createContext(req);
       const stats = await ctx.dataSources.liveGrandPrixService.getStats();
-      res.json(stats);
+      res.json(serialize(stats));
     } catch (err) {
       next(err);
     }
@@ -153,7 +154,7 @@ liveGrandPrixRouter.get(
         return;
       }
       const event = await ctx.dataSources.liveGrandPrixService.findById(id);
-      res.json(event);
+      res.json(serialize(event));
     } catch (err) {
       next(err);
     }
@@ -198,11 +199,9 @@ liveGrandPrixByNameRouter.get(
       const ctx = await createContext(req);
       const { eventName } = req.params;
       if (!eventName) {
-        res
-          .status(400)
-          .json({
-            error: { code: 'BAD_USER_INPUT', message: 'イベント名は必須です' },
-          });
+        res.status(400).json({
+          error: { code: 'BAD_USER_INPUT', message: 'イベント名は必須です' },
+        });
         return;
       }
       const event =
@@ -210,7 +209,7 @@ liveGrandPrixByNameRouter.get(
       if (!event) {
         throw new NotFoundError(`LiveGrandPrix "${eventName}" not found`);
       }
-      res.json(event);
+      res.json(serialize(event));
     } catch (err) {
       next(err);
     }
