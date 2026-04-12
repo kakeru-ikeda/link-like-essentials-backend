@@ -94,7 +94,12 @@ const options: swaggerJSDoc.Options = {
             },
             styleType: {
               type: 'string',
-              enum: ['CHEERLEADER', 'TRICKSTER', 'PERFORMER', 'MOODMAKER'],
+              enum: [
+                'チアリーダー',
+                'トリックスター',
+                'パフォーマー',
+                'ムードメーカー',
+              ],
               nullable: true,
             },
             cardUrl: { type: 'string', nullable: true },
@@ -281,7 +286,12 @@ const options: swaggerJSDoc.Options = {
               name: 'styleType',
               schema: {
                 type: 'string',
-                enum: ['CHEERLEADER', 'TRICKSTER', 'PERFORMER', 'MOODMAKER'],
+                enum: [
+                  'チアリーダー',
+                  'トリックスター',
+                  'パフォーマー',
+                  'ムードメーカー',
+                ],
               },
               description: 'スタイルタイプでフィルター',
             },
