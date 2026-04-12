@@ -1,16 +1,16 @@
 export const CHARACTERS = [
-  '日野下花傘',
+  '日野下花帆',
   '村野さやか',
-  '乙宗椋',
-  '夕霧織理',
-  '大沢琥珀乃',
-  '藤島恵',
-  '徃町小鈴',
-  '百生朔子',
-  '安養寺岬茄',
-  '柊城泉',
+  '乙宗梢',
+  '夕霧綴理',
+  '大沢瑠璃乃',
+  '藤島慈',
+  '徒町小鈴',
+  '百生吟子',
+  '安養寺姫芽',
+  '桂城泉',
   'セラス',
-  '大貝美沙知',
+  '大賀美沙知',
 ] as const;
 
-export type CharacterName = (typeof CHARACTERS)[number] | 'フリー' | 'フレンド';
+export type CharacterName = (typeof CHARACTERS)[number];
