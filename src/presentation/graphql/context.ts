@@ -7,10 +7,8 @@ import type { HeartCollectAnalysisService } from '@/application/services/HeartCo
 import type { LiveGrandPrixService } from '@/application/services/LiveGrandPrixService';
 import type { SongService } from '@/application/services/SongService';
 import type { UnDrawAnalysisService } from '@/application/services/UnDrawAnalysisService';
-import type { AuthUser } from '@/infrastructure/auth/AuthService';
 
 export interface GraphQLContext {
-  user?: AuthUser;
   dataSources: {
     cardService: CardService;
     cardDetailService: CardDetailService;

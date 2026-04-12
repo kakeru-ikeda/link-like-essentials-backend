@@ -9,6 +9,7 @@ import { RedisClient } from './infrastructure/cache/RedisClient';
 import { prisma } from './infrastructure/database/client';
 import { logger } from './infrastructure/logger/Logger';
 import { SentryService } from './infrastructure/monitoring/SentryService';
+import { createRateLimitMiddleware } from './presentation/middleware/rateLimitMiddleware';
 import { requestLogger } from './presentation/middleware/requestLogger';
 
 const PORT = process.env.PORT || 4000;
@@ -93,9 +94,10 @@ async function startServer(): Promise<void> {
     // Redisフェイルオーバーのポーリング開始
     RedisClient.startPolling();
 
-    // GraphQLエンドポイント
+    // GraphQLエンドポイント（レートリミット → Apollo）
     app.use(
       '/graphql',
+      createRateLimitMiddleware(),
       expressMiddleware(apolloServer, {
         context: async ({ req }) => await createContext(req),
       })
