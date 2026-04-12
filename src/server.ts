@@ -17,49 +17,6 @@ import { restErrorHandler } from './presentation/rest/middleware/restErrorHandle
 import { apiRouter } from './presentation/rest/routes';
 
 const PORT = process.env.PORT || 4000;
-const LLES_CORS_ORIGIN =
-  process.env.LLES_CORS_ORIGIN || 'http://localhost:3000';
-const LLES_VERCEL_PROJECT_NAME = process.env.LLES_VERCEL_PROJECT_NAME;
-const isDevelopment = process.env.NODE_ENV === 'development';
-
-// CORS_ORIGINをカンマ区切りで配列に変換
-const getAllowedOrigins = (): string[] => {
-  if (isDevelopment) {
-    return [
-      'http://localhost:3000',
-      'http://localhost:5173',
-      'https://studio.apollographql.com',
-    ];
-  }
-  return LLES_CORS_ORIGIN.split(',').map((origin) => origin.trim());
-};
-
-/**
- * OriginがCORS許可リストに含まれるか、またはVercelプレビュービルドかを判定
- */
-const isAllowedOrigin = (origin: string | undefined): boolean => {
-  if (!origin) return false;
-
-  const allowedOrigins = getAllowedOrigins();
-
-  // 静的な許可リストに含まれる
-  if (allowedOrigins.includes(origin)) {
-    return true;
-  }
-
-  // Vercelプレビュービルド (https://*-{PROJECT_NAME}.vercel.app)
-  if (LLES_VERCEL_PROJECT_NAME) {
-    const vercelPreviewPattern = new RegExp(
-      `^https:\\/\\/.*-${LLES_VERCEL_PROJECT_NAME.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')}\\.vercel\\.app$`
-    );
-    if (vercelPreviewPattern.test(origin)) {
-      logger.info(`CORS: Allowed Vercel preview origin: ${origin}`);
-      return true;
-    }
-  }
-
-  return false;
-};
 
 async function startServer(): Promise<void> {
   try {
@@ -70,19 +27,7 @@ async function startServer(): Promise<void> {
     const app = express();
 
     // ミドルウェア
-    app.use(
-      cors({
-        origin: (origin, callback) => {
-          if (isAllowedOrigin(origin)) {
-            callback(null, true);
-          } else {
-            logger.warn(`CORS: Blocked origin: ${origin || 'undefined'}`);
-            callback(null, false);
-          }
-        },
-        credentials: true,
-      })
-    );
+    app.use(cors());
     app.use(express.json());
     app.use(requestLogger);
 
