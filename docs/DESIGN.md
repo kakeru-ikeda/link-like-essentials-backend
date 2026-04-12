@@ -501,7 +501,6 @@ export enum StyleType {
   TRICKSTER = 'トリックスター',
   PERFORMER = 'パフォーマー',
   MOODMAKER = 'ムードメーカー',
-  MOODOMAKER = 'ムードーメーカー', // 誤字版も対応
 }
 
 // domain/valueObjects/FavoriteMode.ts
@@ -560,7 +559,7 @@ export class EnumMapper {
       トリックスター: 'TRICKSTER',
       パフォーマー: 'PERFORMER',
       ムードメーカー: 'MOODMAKER',
-      ムードーメーカー: 'MOODOMAKER',
+      ムードーメーカー: 'MOODMAKER',
     };
 
     return mapping[value] || null;

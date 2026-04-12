@@ -57,13 +57,7 @@ const options: swaggerJSDoc.Options = {
             limited: { type: 'string', nullable: true },
             styleType: {
               type: 'string',
-              enum: [
-                'CHEERLEADER',
-                'TRICKSTER',
-                'PERFORMER',
-                'MOODMAKER',
-                'MOODOMAKER',
-              ],
+              enum: ['CHEERLEADER', 'TRICKSTER', 'PERFORMER', 'MOODMAKER'],
               nullable: true,
             },
             cardUrl: { type: 'string', nullable: true },

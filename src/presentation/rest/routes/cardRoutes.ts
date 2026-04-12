@@ -37,7 +37,7 @@ export const cardRouter = Router();
  *         name: styleType
  *         schema:
  *           type: string
- *           enum: [CHEERLEADER, TRICKSTER, PERFORMER, MOODMAKER, MOODOMAKER]
+ *           enum: [CHEERLEADER, TRICKSTER, PERFORMER, MOODMAKER]
  *         description: スタイルタイプでフィルター
  *       - in: query
  *         name: cardName

@@ -119,7 +119,6 @@ enum StyleType {
   TRICKSTER
   PERFORMER
   MOODMAKER
-  MOODOMAKER
 }
 enum ParentType {
   SPECIAL_APPEAL

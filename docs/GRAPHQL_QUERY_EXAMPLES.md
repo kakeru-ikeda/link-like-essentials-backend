@@ -255,7 +255,7 @@ query SearchByStyleType {
 }
 ```
 
-**利用可能なスタイルタイプ**: `CHEERLEADER`, `TRICKSTER`, `PERFORMER`, `MOODMAKER`, `MOODOMAKER`
+**利用可能なスタイルタイプ**: `CHEERLEADER`, `TRICKSTER`, `PERFORMER`, `MOODMAKER`
 
 ### 限定区分で検索
 
