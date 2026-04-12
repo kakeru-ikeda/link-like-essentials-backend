@@ -4,12 +4,10 @@ import type {
   AccessoryFilterInput,
   IAccessoryRepository,
 } from '@/domain/repositories/IAccessoryRepository';
-import type { CardCacheStrategy } from '@/infrastructure/cache/strategies/CardCacheStrategy';
 
 describe('AccessoryService', () => {
   let accessoryService: AccessoryService;
   let mockRepository: jest.Mocked<IAccessoryRepository>;
-  let mockCardCacheStrategy: jest.Mocked<CardCacheStrategy>;
 
   const mockAccessory: Accessory = {
     id: 1,
@@ -31,19 +29,9 @@ describe('AccessoryService', () => {
       findByCardId: jest.fn(),
       findByCardIds: jest.fn(),
       findById: jest.fn(),
-      create: jest.fn(),
-      update: jest.fn(),
-      delete: jest.fn(),
     } as unknown as jest.Mocked<IAccessoryRepository>;
 
-    mockCardCacheStrategy = {
-      invalidateCard: jest.fn(),
-    } as unknown as jest.Mocked<CardCacheStrategy>;
-
-    accessoryService = new AccessoryService(
-      mockRepository,
-      mockCardCacheStrategy
-    );
+    accessoryService = new AccessoryService(mockRepository);
   });
 
   describe('findByCardId', () => {
@@ -114,90 +102,6 @@ describe('AccessoryService', () => {
         name: 'Partial Trait',
         effect: null,
       });
-    });
-  });
-
-  describe('create', () => {
-    it('should create a new accessory and invalidate parent card cache', async () => {
-      const createInput = {
-        cardId: 1,
-        parentType: 'skill',
-        name: 'New Accessory',
-        ap: '5',
-        effect: 'New Effect',
-      };
-
-      const createdAccessory = {
-        ...mockAccessory,
-        id: 2,
-        parentType: 'skill',
-        name: 'New Accessory',
-        ap: '5',
-        effect: 'New Effect',
-      };
-
-      mockRepository.create.mockResolvedValue(createdAccessory);
-
-      const result = await accessoryService.create(createInput);
-
-      expect(result).toEqual(createdAccessory);
-      expect(mockRepository.create).toHaveBeenCalledWith(createInput);
-      expect(mockCardCacheStrategy.invalidateCard).toHaveBeenCalledWith(1);
-    });
-  });
-
-  describe('update', () => {
-    it('should update an accessory and invalidate parent card cache', async () => {
-      const updateInput = {
-        name: 'Updated Accessory',
-        effect: 'Updated Effect',
-      };
-
-      const updatedAccessory = {
-        ...mockAccessory,
-        name: 'Updated Accessory',
-        effect: 'Updated Effect',
-      };
-
-      mockRepository.update.mockResolvedValue(updatedAccessory);
-
-      const result = await accessoryService.update(1, updateInput);
-
-      expect(result).toEqual(updatedAccessory);
-      expect(mockRepository.update).toHaveBeenCalledWith(1, updateInput);
-      expect(mockCardCacheStrategy.invalidateCard).toHaveBeenCalledWith(1);
-    });
-  });
-
-  describe('delete', () => {
-    it('should delete an accessory and invalidate parent card cache', async () => {
-      mockRepository.findById.mockResolvedValue(mockAccessory);
-      mockRepository.delete.mockResolvedValue();
-
-      const result = await accessoryService.delete(1);
-
-      expect(result).toEqual({
-        success: true,
-        message: 'Accessory with id 1 successfully deleted',
-      });
-      expect(mockRepository.findById).toHaveBeenCalledWith(1);
-      expect(mockRepository.delete).toHaveBeenCalledWith(1);
-      expect(mockCardCacheStrategy.invalidateCard).toHaveBeenCalledWith(1);
-    });
-
-    it('should call delete even when findById returns null', async () => {
-      mockRepository.findById.mockResolvedValue(null);
-      mockRepository.delete.mockResolvedValue();
-
-      const result = await accessoryService.delete(999);
-
-      expect(result).toEqual({
-        success: true,
-        message: 'Accessory with id 999 successfully deleted',
-      });
-      expect(mockRepository.findById).toHaveBeenCalledWith(999);
-      expect(mockRepository.delete).toHaveBeenCalledWith(999);
-      expect(mockCardCacheStrategy.invalidateCard).not.toHaveBeenCalled();
     });
   });
 });

@@ -4,9 +4,7 @@ import type { CardConnection } from '@/application/dto/PaginationDTO';
 import { cardResolvers } from '@/presentation/graphql/resolvers/cardResolver';
 import type { GraphQLContext } from '@/presentation/graphql/context';
 
-jest.mock('@/presentation/middleware/authGuard', () => ({
-  requireAuth: jest.fn(),
-}));
+
 
 describe('cardResolver - Pagination', () => {
   let mockContext: GraphQLContext;
