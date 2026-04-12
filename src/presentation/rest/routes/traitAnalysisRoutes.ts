@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import type { Request, Response, NextFunction } from 'express';
+
 
 import { createContext } from '@/config/context';
 import { ValidationError } from '@/domain/errors/AppError';
+
+import { asyncHandler } from '../asyncHandler';
 import { serialize } from '../serializers';
 
 export const traitAnalysisRouter = Router();
@@ -37,9 +39,9 @@ export const traitAnalysisRouter = Router();
  */
 traitAnalysisRouter.post(
   '/batch',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const body: unknown = req.body;
 
       if (
@@ -75,5 +77,5 @@ traitAnalysisRouter.post(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );

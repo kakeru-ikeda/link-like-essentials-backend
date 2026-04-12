@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import type { Request, Response, NextFunction } from 'express';
+
 
 import { createContext } from '@/config/context';
 import { NotFoundError } from '@/domain/errors/AppError';
+
+import { asyncHandler } from '../asyncHandler';
 import { serialize } from '../serializers';
 
 export const liveGrandPrixRouter = Router();
@@ -33,9 +35,9 @@ export const liveGrandPrixRouter = Router();
  */
 liveGrandPrixRouter.get(
   '/',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const { yearTerm } = req.query;
 
       const filter = {
@@ -49,7 +51,7 @@ liveGrandPrixRouter.get(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -72,15 +74,15 @@ liveGrandPrixRouter.get(
  */
 liveGrandPrixRouter.get(
   '/ongoing',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const events = await ctx.dataSources.liveGrandPrixService.findOngoing();
       res.json(serialize(events));
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -101,15 +103,15 @@ liveGrandPrixRouter.get(
  */
 liveGrandPrixRouter.get(
   '/stats',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const stats = await ctx.dataSources.liveGrandPrixService.getStats();
       res.json(serialize(stats));
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -143,9 +145,9 @@ liveGrandPrixRouter.get(
  */
 liveGrandPrixRouter.get(
   '/:id',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const id = parseInt(req.params.id ?? '', 10);
       if (isNaN(id)) {
         res
@@ -158,7 +160,7 @@ liveGrandPrixRouter.get(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -194,9 +196,9 @@ export const liveGrandPrixByNameRouter = Router();
 
 liveGrandPrixByNameRouter.get(
   '/:eventName',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const { eventName } = req.params;
       if (!eventName) {
         res.status(400).json({
@@ -213,5 +215,5 @@ liveGrandPrixByNameRouter.get(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );

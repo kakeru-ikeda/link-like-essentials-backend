@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import type { Request, Response, NextFunction } from 'express';
+
 
 import { createContext } from '@/config/context';
 import { NotFoundError } from '@/domain/errors/AppError';
+
+import { asyncHandler } from '../asyncHandler';
 import { serializeCard } from '../serializers';
 
 export const cardRouter = Router();
@@ -81,9 +83,9 @@ export const cardRouter = Router();
  */
 cardRouter.get(
   '/',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const {
         rarity,
         limited,
@@ -123,7 +125,7 @@ cardRouter.get(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -166,9 +168,9 @@ cardRouter.get(
  */
 cardRouter.get(
   '/connection',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const {
         first,
         after,
@@ -200,7 +202,7 @@ cardRouter.get(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -251,15 +253,15 @@ cardRouter.get(
  */
 cardRouter.get(
   '/stats',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const stats = await ctx.dataSources.cardService.getStats();
       res.json(serializeCard(stats));
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -293,9 +295,9 @@ cardRouter.get(
  */
 cardRouter.get(
   '/:id',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const id = parseInt(req.params.id ?? '', 10);
       if (isNaN(id)) {
         res
@@ -308,7 +310,7 @@ cardRouter.get(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -348,9 +350,9 @@ cardRouter.get(
  */
 cardRouter.get(
   '/name/:cardName/:characterName',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const { cardName, characterName } = req.params;
       if (!cardName || !characterName) {
         res.status(400).json({
@@ -374,7 +376,7 @@ cardRouter.get(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -410,9 +412,9 @@ export const cardDetailRouter = Router();
 
 cardDetailRouter.get(
   '/:cardId',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const cardId = parseInt(req.params.cardId ?? '', 10);
       if (isNaN(cardId)) {
         res.status(400).json({
@@ -426,7 +428,7 @@ cardDetailRouter.get(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -458,9 +460,9 @@ export const accessoryRouter = Router();
 
 accessoryRouter.get(
   '/:cardId',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const cardId = parseInt(req.params.cardId ?? '', 10);
       if (isNaN(cardId)) {
         res.status(400).json({
@@ -474,5 +476,5 @@ accessoryRouter.get(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );

@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import type { Request, Response, NextFunction } from 'express';
+
 
 import { createContext } from '@/config/context';
 import { NotFoundError } from '@/domain/errors/AppError';
+
+import { asyncHandler } from '../asyncHandler';
 import { serialize } from '../serializers';
 
 export const songRouter = Router();
@@ -43,9 +45,9 @@ export const songRouter = Router();
  */
 songRouter.get(
   '/',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const { category, attribute, centerCharacter } = req.query;
 
       const filter = {
@@ -61,7 +63,7 @@ songRouter.get(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -82,15 +84,15 @@ songRouter.get(
  */
 songRouter.get(
   '/stats',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const stats = await ctx.dataSources.songService.getStats();
       res.json(serialize(stats));
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -124,9 +126,9 @@ songRouter.get(
  */
 songRouter.get(
   '/:id',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const id = parseInt(req.params.id ?? '', 10);
       if (isNaN(id)) {
         res
@@ -139,7 +141,7 @@ songRouter.get(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -175,9 +177,9 @@ export const songByNameRouter = Router();
 
 songByNameRouter.get(
   '/:songName',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const { songName } = req.params;
       if (!songName) {
         res.status(400).json({
@@ -193,5 +195,5 @@ songByNameRouter.get(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );

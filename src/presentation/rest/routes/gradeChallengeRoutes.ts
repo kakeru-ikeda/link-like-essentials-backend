@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import type { Request, Response, NextFunction } from 'express';
+
 
 import { createContext } from '@/config/context';
 import { NotFoundError } from '@/domain/errors/AppError';
+
+import { asyncHandler } from '../asyncHandler';
 import { serialize } from '../serializers';
 
 export const gradeChallengeRouter = Router();
@@ -33,9 +35,9 @@ export const gradeChallengeRouter = Router();
  */
 gradeChallengeRouter.get(
   '/',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const { termName } = req.query;
 
       const filter = {
@@ -49,7 +51,7 @@ gradeChallengeRouter.get(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -72,15 +74,15 @@ gradeChallengeRouter.get(
  */
 gradeChallengeRouter.get(
   '/ongoing',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const events = await ctx.dataSources.gradeChallengeService.findOngoing();
       res.json(serialize(events));
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -101,15 +103,15 @@ gradeChallengeRouter.get(
  */
 gradeChallengeRouter.get(
   '/stats',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const stats = await ctx.dataSources.gradeChallengeService.getStats();
       res.json(serialize(stats));
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -143,9 +145,9 @@ gradeChallengeRouter.get(
  */
 gradeChallengeRouter.get(
   '/:id',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const id = parseInt(req.params.id ?? '', 10);
       if (isNaN(id)) {
         res
@@ -158,7 +160,7 @@ gradeChallengeRouter.get(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -194,9 +196,9 @@ export const gradeChallengeByTitleRouter = Router();
 
 gradeChallengeByTitleRouter.get(
   '/:title',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const { title } = req.params;
       if (!title) {
         res.status(400).json({
@@ -213,5 +215,5 @@ gradeChallengeByTitleRouter.get(
     } catch (err) {
       next(err);
     }
-  }
+  })
 );

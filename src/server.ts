@@ -11,10 +11,10 @@ import { RedisClient } from './infrastructure/cache/RedisClient';
 import { prisma } from './infrastructure/database/client';
 import { logger } from './infrastructure/logger/Logger';
 import { SentryService } from './infrastructure/monitoring/SentryService';
-import { restErrorHandler } from './presentation/rest/middleware/restErrorHandler';
-import { apiRouter } from './presentation/rest/routes';
 import { createRateLimitMiddleware } from './presentation/middleware/rateLimitMiddleware';
 import { requestLogger } from './presentation/middleware/requestLogger';
+import { restErrorHandler } from './presentation/rest/middleware/restErrorHandler';
+import { apiRouter } from './presentation/rest/routes';
 
 const PORT = process.env.PORT || 4000;
 const LLES_CORS_ORIGIN =
@@ -111,7 +111,7 @@ async function startServer(): Promise<void> {
       '/graphql',
       createRateLimitMiddleware(),
       expressMiddleware(apolloServer, {
-        context: async ({ req }) => await createContext(req),
+        context: ({ req }) => createContext(req),
       })
     );
 

@@ -30,7 +30,7 @@ import { SongRepository } from '@/infrastructure/database/repositories/SongRepos
 import { UnDrawAnalysisRepository } from '@/infrastructure/database/repositories/UnDrawAnalysisRepository';
 import type { GraphQLContext } from '@/presentation/graphql/context';
 
-export async function createContext(_req: Request): Promise<GraphQLContext> {
+export function createContext(_req: Request): GraphQLContext {
   // インスタンス生成
   const redis = RedisClient.getInstance();
   const cacheService = new CacheService(redis);

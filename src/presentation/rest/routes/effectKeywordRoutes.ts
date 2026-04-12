@@ -1,7 +1,8 @@
 import { Router } from 'express';
-import type { Request, Response, NextFunction } from 'express';
 
 import { createContext } from '@/config/context';
+
+import { asyncHandler } from '../asyncHandler';
 import { serialize } from '../serializers';
 
 export const effectKeywordRouter = Router();
@@ -26,16 +27,16 @@ export const effectKeywordRouter = Router();
  */
 effectKeywordRouter.get(
   '/skill',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const keywords =
         await ctx.dataSources.effectKeywordService.getSkillEffectKeywords();
       res.json(serialize(keywords));
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
 
 /**
@@ -58,14 +59,14 @@ effectKeywordRouter.get(
  */
 effectKeywordRouter.get(
   '/trait',
-  async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  asyncHandler(async (req, res, next) => {
     try {
-      const ctx = await createContext(req);
+      const ctx = createContext(req);
       const keywords =
         await ctx.dataSources.effectKeywordService.getTraitEffectKeywords();
       res.json(serialize(keywords));
     } catch (err) {
       next(err);
     }
-  }
+  })
 );
