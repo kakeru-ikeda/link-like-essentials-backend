@@ -35,10 +35,6 @@ const effectKeywordTypeDefs = readFileSync(
   'utf-8'
 );
 const queryTypeDefs = readFileSync(join(schemaDir, 'query.graphql'), 'utf-8');
-const mutationTypeDefs = readFileSync(
-  join(schemaDir, 'mutation.graphql'),
-  'utf-8'
-);
 
 const typeDefs = [
   commonTypeDefs,
@@ -51,7 +47,6 @@ const typeDefs = [
   gradeChallengeTypeDefs,
   effectKeywordTypeDefs,
   queryTypeDefs,
-  mutationTypeDefs,
 ];
 
 export const schema = makeExecutableSchema({

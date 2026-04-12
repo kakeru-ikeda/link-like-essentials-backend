@@ -1,7 +1,6 @@
 import type { Accessory } from '@/domain/entities/Accessory';
 import type { AccessoryFilterInput } from '@/domain/repositories/IAccessoryRepository';
 import { EnumMapper } from '@/infrastructure/mappers/EnumMapper';
-import { requireAuth } from '@/presentation/middleware/authGuard';
 
 import type { GraphQLContext } from '../context';
 
@@ -52,8 +51,6 @@ export const accessoryResolvers: {
 } = {
   Query: {
     accessories: async (_, { cardId, filter }, context) => {
-      requireAuth(context);
-
       const accessoryFilter: AccessoryFilterInput | undefined = filter
         ? {
             parentType: filter.parentType,

@@ -1,5 +1,4 @@
 import type { EffectKeywordGroupDTO } from '@/application/dto/EffectKeywordGroupDTO';
-import { requireAuth } from '@/presentation/middleware/authGuard';
 
 import type { GraphQLContext } from '../context';
 
@@ -10,7 +9,6 @@ export const effectKeywordResolvers = {
       _args: Record<string, never>,
       context: GraphQLContext
     ): Promise<EffectKeywordGroupDTO[]> => {
-      requireAuth(context);
       return context.dataSources.effectKeywordService.getSkillEffectKeywords();
     },
 
@@ -19,7 +17,6 @@ export const effectKeywordResolvers = {
       _args: Record<string, never>,
       context: GraphQLContext
     ): Promise<EffectKeywordGroupDTO[]> => {
-      requireAuth(context);
       return context.dataSources.effectKeywordService.getTraitEffectKeywords();
     },
   },

@@ -6,7 +6,6 @@ import { cardResolvers } from './cardResolver';
 import { effectKeywordResolvers } from './effectKeywordResolver';
 import { gradeChallengeResolvers } from './gradeChallengeResolver';
 import { liveGrandPrixResolvers } from './liveGrandPrixResolver';
-import { mutationResolvers } from './mutationResolver';
 import { songResolvers } from './songResolver';
 import { traitAnalysisResolvers } from './traitAnalysisResolver';
 
@@ -22,9 +21,6 @@ export const resolvers = {
     ...gradeChallengeResolvers.Query,
     ...traitAnalysisResolvers.Query,
     ...effectKeywordResolvers.Query,
-  },
-  Mutation: {
-    ...mutationResolvers.Mutation,
   },
   Card: cardResolvers.Card,
   CardDetail: cardDetailResolvers.CardDetail,

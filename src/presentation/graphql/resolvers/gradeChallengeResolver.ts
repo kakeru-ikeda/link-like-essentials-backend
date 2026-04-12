@@ -1,5 +1,4 @@
 import type { GradeChallengeFilterInput } from '@/application/dto/GradeChallengeDTO';
-import { requireAuth } from '@/presentation/middleware/authGuard';
 
 import type { GraphQLContext } from '../context';
 
@@ -59,36 +58,26 @@ export const gradeChallengeResolvers: {
 } = {
   Query: {
     gradeChallenges: async (_, args, context) => {
-      requireAuth(context);
-
       const { filter } = args;
 
       return await context.dataSources.gradeChallengeService.findAll(filter);
     },
 
     gradeChallengeById: async (_, { id }, context) => {
-      requireAuth(context);
-
       return await context.dataSources.gradeChallengeService.findById(
         parseInt(id, 10)
       );
     },
 
     gradeChallengeByTitle: async (_, { title }, context) => {
-      requireAuth(context);
-
       return await context.dataSources.gradeChallengeService.findByTitle(title);
     },
 
     ongoingGradeChallenges: async (_, __, context) => {
-      requireAuth(context);
-
       return await context.dataSources.gradeChallengeService.findOngoing();
     },
 
     gradeChallengeStats: async (_, __, context) => {
-      requireAuth(context);
-
       return await context.dataSources.gradeChallengeService.getStats();
     },
   },

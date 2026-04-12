@@ -142,6 +142,14 @@ class FailoverRedisClient implements IRedisClient {
     return await this.execute((client) => client.ttl(key));
   }
 
+  async incr(key: string): Promise<number> {
+    return await this.execute((client) => client.incr(key));
+  }
+
+  async expire(key: string, seconds: number): Promise<number> {
+    return await this.execute((client) => client.expire(key, seconds));
+  }
+
   private async handshakePrimary(): Promise<boolean> {
     if (!this.primary) return false;
 

@@ -3,13 +3,11 @@ import type { CardDetail } from '@/domain/entities/CardDetail';
 import { NotFoundError } from '@/domain/errors/AppError';
 import type { ICardDetailRepository } from '@/domain/repositories/ICardDetailRepository';
 import type { DetailCacheStrategy } from '@/infrastructure/cache/strategies/DetailCacheStrategy';
-import type { CardCacheStrategy } from '@/infrastructure/cache/strategies/CardCacheStrategy';
 
 describe('CardDetailService', () => {
   let cardDetailService: CardDetailService;
   let mockRepository: jest.Mocked<ICardDetailRepository>;
   let mockCacheStrategy: jest.Mocked<DetailCacheStrategy>;
-  let mockCardCacheStrategy: jest.Mocked<CardCacheStrategy>;
 
   const mockDetail: CardDetail = {
     id: 1,
@@ -41,7 +39,6 @@ describe('CardDetailService', () => {
     mockRepository = {
       findByCardId: jest.fn(),
       findByCardIds: jest.fn(),
-      upsert: jest.fn(),
     } as unknown as jest.Mocked<ICardDetailRepository>;
 
     mockCacheStrategy = {
@@ -51,14 +48,9 @@ describe('CardDetailService', () => {
       invalidateAllDetails: jest.fn(),
     } as unknown as jest.Mocked<DetailCacheStrategy>;
 
-    mockCardCacheStrategy = {
-      invalidateCard: jest.fn(),
-    } as unknown as jest.Mocked<CardCacheStrategy>;
-
     cardDetailService = new CardDetailService(
       mockRepository,
-      mockCacheStrategy,
-      mockCardCacheStrategy
+      mockCacheStrategy
     );
   });
 
@@ -320,32 +312,6 @@ describe('CardDetailService', () => {
       expect(mockCacheStrategy.getDetail).toHaveBeenCalledWith(1);
       expect(mockRepository.findByCardIds).toHaveBeenCalledWith([1]);
       expect(mockCacheStrategy.setDetail).toHaveBeenCalledWith(mockDetail);
-    });
-  });
-
-  describe('upsert', () => {
-    it('should upsert card detail and update caches', async () => {
-      const upsertInput = {
-        cardId: 1,
-        favoriteMode: 'ハッピー',
-        skillName: 'New Skill',
-        skillEffect: 'New Effect',
-      };
-
-      const upsertedDetail = {
-        ...mockDetail,
-        skillName: 'New Skill',
-        skillEffect: 'New Effect',
-      };
-
-      mockRepository.upsert.mockResolvedValue(upsertedDetail);
-
-      const result = await cardDetailService.upsert(upsertInput);
-
-      expect(result).toEqual(upsertedDetail);
-      expect(mockRepository.upsert).toHaveBeenCalledWith(upsertInput);
-      expect(mockCacheStrategy.setDetail).toHaveBeenCalledWith(upsertedDetail);
-      expect(mockCardCacheStrategy.invalidateCard).toHaveBeenCalledWith(1);
     });
   });
 });

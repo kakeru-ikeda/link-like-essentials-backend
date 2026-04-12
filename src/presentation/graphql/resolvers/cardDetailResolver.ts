@@ -1,6 +1,5 @@
 import type { CardDetail } from '@/domain/entities/CardDetail';
 import { EnumMapper } from '@/infrastructure/mappers/EnumMapper';
-import { requireAuth } from '@/presentation/middleware/authGuard';
 
 import type { GraphQLContext } from '../context';
 
@@ -57,16 +56,12 @@ export const cardDetailResolvers: {
 } = {
   Query: {
     cardDetail: async (_, { cardId }, context) => {
-      requireAuth(context);
-
       return await context.dataSources.cardDetailService.findByCardId(
         parseInt(cardId, 10)
       );
     },
 
     cardDetails: async (_, { cardIds }, context) => {
-      requireAuth(context);
-
       const parsedIds = cardIds.map((id) => parseInt(id, 10));
       return await context.dataSources.cardDetailService.findByCardIds(
         parsedIds

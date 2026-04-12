@@ -1,5 +1,4 @@
 import type { SongFilterInput } from '@/application/dto/SongDTO';
-import { requireAuth } from '@/presentation/middleware/authGuard';
 
 import type { GraphQLContext } from '../context';
 
@@ -47,8 +46,6 @@ export const songResolvers: {
 } = {
   Query: {
     songs: async (_, args, context) => {
-      requireAuth(context);
-
       const { filter } = args;
 
       const result = await context.dataSources.songService.findAll(filter);
@@ -57,20 +54,14 @@ export const songResolvers: {
     },
 
     song: async (_, { id }, context) => {
-      requireAuth(context);
-
       return await context.dataSources.songService.findById(parseInt(id, 10));
     },
 
     songByName: async (_, { songName }, context) => {
-      requireAuth(context);
-
       return await context.dataSources.songService.findBySongName(songName);
     },
 
     songStats: async (_, __, context) => {
-      requireAuth(context);
-
       return await context.dataSources.songService.getStats();
     },
   },

@@ -9,7 +9,6 @@ import { HeartCollectAnalysisService } from '@/application/services/HeartCollect
 import { LiveGrandPrixService } from '@/application/services/LiveGrandPrixService';
 import { SongService } from '@/application/services/SongService';
 import { UnDrawAnalysisService } from '@/application/services/UnDrawAnalysisService';
-import { AuthService } from '@/infrastructure/auth/AuthService';
 import { CacheService } from '@/infrastructure/cache/CacheService';
 import { RedisClient } from '@/infrastructure/cache/RedisClient';
 import { CardCacheStrategy } from '@/infrastructure/cache/strategies/CardCacheStrategy';
@@ -29,25 +28,9 @@ import { HeartCollectAnalysisRepository } from '@/infrastructure/database/reposi
 import { LiveGrandPrixRepository } from '@/infrastructure/database/repositories/LiveGrandPrixRepository';
 import { SongRepository } from '@/infrastructure/database/repositories/SongRepository';
 import { UnDrawAnalysisRepository } from '@/infrastructure/database/repositories/UnDrawAnalysisRepository';
-import { logger } from '@/infrastructure/logger/Logger';
 import type { GraphQLContext } from '@/presentation/graphql/context';
 
-export async function createContext(req: Request): Promise<GraphQLContext> {
-  const token = req.headers.authorization?.replace('Bearer ', '');
-
-  let user: GraphQLContext['user'] | undefined;
-
-  if (token) {
-    try {
-      const authService = new AuthService();
-      user = await authService.verifyAndGetUser(token);
-    } catch (error) {
-      logger.warn('Token verification failed', {
-        error: error instanceof Error ? error.message : 'Unknown error',
-      });
-    }
-  }
-
+export function createContext(_req: Request): GraphQLContext {
   // インスタンス生成
   const redis = RedisClient.getInstance();
   const cacheService = new CacheService(redis);
@@ -81,13 +64,9 @@ export async function createContext(req: Request): Promise<GraphQLContext> {
   const cardService = new CardService(cardRepository, cardCacheStrategy);
   const cardDetailService = new CardDetailService(
     cardDetailRepository,
-    detailCacheStrategy,
-    cardCacheStrategy
+    detailCacheStrategy
   );
-  const accessoryService = new AccessoryService(
-    accessoryRepository,
-    cardCacheStrategy
-  );
+  const accessoryService = new AccessoryService(accessoryRepository);
   const heartCollectAnalysisService = new HeartCollectAnalysisService(
     heartCollectAnalysisRepository,
     heartCollectAnalysisCacheStrategy
@@ -110,7 +89,6 @@ export async function createContext(req: Request): Promise<GraphQLContext> {
   );
 
   return {
-    user,
     dataSources: {
       cardService,
       cardDetailService,
