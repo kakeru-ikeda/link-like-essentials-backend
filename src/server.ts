@@ -2,13 +2,17 @@ import { expressMiddleware } from '@apollo/server/express4';
 import * as Sentry from '@sentry/node';
 import cors from 'cors';
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
 
 import { apolloServer } from './config/apollo';
 import { createContext } from './config/context';
+import { swaggerSpec } from './config/swagger';
 import { RedisClient } from './infrastructure/cache/RedisClient';
 import { prisma } from './infrastructure/database/client';
 import { logger } from './infrastructure/logger/Logger';
 import { SentryService } from './infrastructure/monitoring/SentryService';
+import { restErrorHandler } from './presentation/rest/middleware/restErrorHandler';
+import { apiRouter } from './presentation/rest/routes';
 import { createRateLimitMiddleware } from './presentation/middleware/rateLimitMiddleware';
 import { requestLogger } from './presentation/middleware/requestLogger';
 
@@ -94,7 +98,15 @@ async function startServer(): Promise<void> {
     // Redisフェイルオーバーのポーリング開始
     RedisClient.startPolling();
 
-    // GraphQLエンドポイント（レートリミット → Apollo）
+    app.use('/api', createRateLimitMiddleware(), apiRouter);
+    app.use('/api', restErrorHandler);
+
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+    app.get('/api-docs.json', (_req, res) => {
+      res.setHeader('Content-Type', 'application/json');
+      res.send(swaggerSpec);
+    });
+
     app.use(
       '/graphql',
       createRateLimitMiddleware(),
@@ -103,12 +115,13 @@ async function startServer(): Promise<void> {
       })
     );
 
-    // Sentryエラーハンドラー（GraphQL後に配置）
     Sentry.setupExpressErrorHandler(app);
 
     // サーバー起動
     app.listen(PORT, () => {
       logger.info(`Server running on http://localhost:${PORT}/graphql`);
+      logger.info(`REST API running on http://localhost:${PORT}/api`);
+      logger.info(`Swagger UI running on http://localhost:${PORT}/api-docs`);
     });
 
     // Graceful shutdown
