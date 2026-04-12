@@ -27,6 +27,7 @@ export const cardRouter = Router();
  *         name: limited
  *         schema:
  *           type: string
+ *           enum: [PERMANENT, LIMITED, SPRING_LIMITED, SUMMER_LIMITED, AUTUMN_LIMITED, WINTER_LIMITED, BIRTHDAY_LIMITED, LEG_LIMITED, SHUFFLE_LIMITED, BATTLE_LIMITED, PARTY_LIMITED, ACTIVITY_LIMITED, BANGDREAM_LIMITED, GRADUATE_LIMITED, LOGIN_BONUS, REWARD]
  *         description: 限定種別でフィルター
  *       - in: query
  *         name: characterName
