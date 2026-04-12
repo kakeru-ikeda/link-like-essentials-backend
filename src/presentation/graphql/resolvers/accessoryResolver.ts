@@ -51,7 +51,6 @@ export const accessoryResolvers: {
 } = {
   Query: {
     accessories: async (_, { cardId, filter }, context) => {
-
       const accessoryFilter: AccessoryFilterInput | undefined = filter
         ? {
             parentType: filter.parentType,

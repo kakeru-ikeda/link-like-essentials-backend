@@ -1,6 +1,5 @@
 import { Router } from 'express';
 
-
 import { createContext } from '@/config/context';
 import { NotFoundError } from '@/domain/errors/AppError';
 

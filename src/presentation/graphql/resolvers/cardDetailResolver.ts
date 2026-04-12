@@ -56,14 +56,12 @@ export const cardDetailResolvers: {
 } = {
   Query: {
     cardDetail: async (_, { cardId }, context) => {
-
       return await context.dataSources.cardDetailService.findByCardId(
         parseInt(cardId, 10)
       );
     },
 
     cardDetails: async (_, { cardIds }, context) => {
-
       const parsedIds = cardIds.map((id) => parseInt(id, 10));
       return await context.dataSources.cardDetailService.findByCardIds(
         parsedIds

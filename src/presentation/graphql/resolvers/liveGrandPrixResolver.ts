@@ -60,7 +60,6 @@ export const liveGrandPrixResolvers: {
 } = {
   Query: {
     liveGrandPrix: async (_, args, context) => {
-
       const { filter } = args;
 
       const result =
@@ -70,26 +69,22 @@ export const liveGrandPrixResolvers: {
     },
 
     liveGrandPrixById: async (_, { id }, context) => {
-
       return await context.dataSources.liveGrandPrixService.findById(
         parseInt(id, 10)
       );
     },
 
     liveGrandPrixByEventName: async (_, { eventName }, context) => {
-
       return await context.dataSources.liveGrandPrixService.findByEventName(
         eventName
       );
     },
 
     liveGrandPrixStats: async (_, __, context) => {
-
       return await context.dataSources.liveGrandPrixService.getStats();
     },
 
     ongoingLiveGrandPrix: async (_, __, context) => {
-
       return await context.dataSources.liveGrandPrixService.findOngoing();
     },
   },

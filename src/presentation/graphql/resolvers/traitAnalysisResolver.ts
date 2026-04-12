@@ -31,7 +31,6 @@ export const traitAnalysisResolvers = {
       args: { inputs: TraitAnalysisInput[] },
       context: GraphQLContext
     ): Promise<TraitAnalysisResult[]> => {
-
       const { inputs } = args;
 
       // Promise.allで並列取得

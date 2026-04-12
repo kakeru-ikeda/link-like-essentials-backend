@@ -111,7 +111,7 @@ async function startServer(): Promise<void> {
       '/graphql',
       createRateLimitMiddleware(),
       expressMiddleware(apolloServer, {
-        context: ({ req }) => createContext(req),
+        context: ({ req }) => Promise.resolve(createContext(req)),
       })
     );
 

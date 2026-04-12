@@ -58,31 +58,26 @@ export const gradeChallengeResolvers: {
 } = {
   Query: {
     gradeChallenges: async (_, args, context) => {
-
       const { filter } = args;
 
       return await context.dataSources.gradeChallengeService.findAll(filter);
     },
 
     gradeChallengeById: async (_, { id }, context) => {
-
       return await context.dataSources.gradeChallengeService.findById(
         parseInt(id, 10)
       );
     },
 
     gradeChallengeByTitle: async (_, { title }, context) => {
-
       return await context.dataSources.gradeChallengeService.findByTitle(title);
     },
 
     ongoingGradeChallenges: async (_, __, context) => {
-
       return await context.dataSources.gradeChallengeService.findOngoing();
     },
 
     gradeChallengeStats: async (_, __, context) => {
-
       return await context.dataSources.gradeChallengeService.getStats();
     },
   },

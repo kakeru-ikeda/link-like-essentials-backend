@@ -46,7 +46,6 @@ export const songResolvers: {
 } = {
   Query: {
     songs: async (_, args, context) => {
-
       const { filter } = args;
 
       const result = await context.dataSources.songService.findAll(filter);
@@ -55,17 +54,14 @@ export const songResolvers: {
     },
 
     song: async (_, { id }, context) => {
-
       return await context.dataSources.songService.findById(parseInt(id, 10));
     },
 
     songByName: async (_, { songName }, context) => {
-
       return await context.dataSources.songService.findBySongName(songName);
     },
 
     songStats: async (_, __, context) => {
-
       return await context.dataSources.songService.getStats();
     },
   },

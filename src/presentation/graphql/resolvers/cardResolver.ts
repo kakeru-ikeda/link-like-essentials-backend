@@ -76,7 +76,6 @@ export const cardResolvers: {
 } = {
   Query: {
     cards: async (_, args, context, info) => {
-
       const { filter } = args;
 
       const includeOptions = getCardIncludeOptions(info);
@@ -89,7 +88,6 @@ export const cardResolvers: {
     },
 
     cardsConnection: async (_, args, context, info) => {
-
       const { filter, first, after } = args;
       const pagination: PaginationInput = { first, after };
 
@@ -104,7 +102,6 @@ export const cardResolvers: {
     },
 
     card: async (_, { id }, context, info) => {
-
       const includeOptions = getCardIncludeOptions(info);
       return await context.dataSources.cardService.findById(
         parseInt(id, 10),
@@ -113,7 +110,6 @@ export const cardResolvers: {
     },
 
     cardByName: async (_, { cardName, characterName }, context, info) => {
-
       return await context.dataSources.cardService.findByName(
         cardName,
         characterName,
@@ -122,7 +118,6 @@ export const cardResolvers: {
     },
 
     cardStats: async (_, __, context) => {
-
       return await context.dataSources.cardService.getStats();
     },
   },
