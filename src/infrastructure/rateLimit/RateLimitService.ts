@@ -30,8 +30,7 @@ export class RateLimitService {
       const current = await this.redis.incr(key);
 
       if (current === 1) {
-        // 最初のリクエスト時のみ TTL を設定
-        await this.redis.set(key, String(current), { ex: this.windowSec });
+        await this.redis.expire(key, this.windowSec);
       }
 
       const ttl = await this.redis.ttl(key);

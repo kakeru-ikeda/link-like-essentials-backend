@@ -14,6 +14,7 @@ export interface IRedisClient {
   exists(key: string): Promise<number>;
   ttl(key: string): Promise<number>;
   incr(key: string): Promise<number>;
+  expire(key: string, seconds: number): Promise<number>;
 }
 
 export class CacheService {

@@ -11,15 +11,6 @@ const RATE_LIMIT_WINDOW_SEC = parseInt(
   10
 );
 
-function getClientIp(req: Request): string {
-  const forwarded = req.headers['x-forwarded-for'];
-  if (typeof forwarded === 'string') {
-    const first = forwarded.split(',')[0];
-    return first !== undefined ? first.trim() : (req.ip ?? 'unknown');
-  }
-  return req.ip ?? 'unknown';
-}
-
 export function createRateLimitMiddleware(): RequestHandler {
   const rateLimitService = new RateLimitService(
     RedisClient.getInstance(),
@@ -28,7 +19,7 @@ export function createRateLimitMiddleware(): RequestHandler {
   );
 
   return (req: Request, res: Response, next: NextFunction): void => {
-    const ip = getClientIp(req);
+    const ip = req.ip ?? 'unknown';
     rateLimitService
       .check(ip)
       .then((result) => {
@@ -41,18 +32,30 @@ export function createRateLimitMiddleware(): RequestHandler {
 
           logger.warn('Rate limit exceeded', { ip, limit: result.limit });
 
-          res.status(429).json({
-            errors: [
-              {
+          const isGraphQL = req.path.startsWith('/graphql');
+
+          if (isGraphQL) {
+            res.status(429).json({
+              errors: [
+                {
+                  message:
+                    'リクエスト数の上限に達しました。しばらく待ってから再試行してください。',
+                  extensions: {
+                    code: 'TOO_MANY_REQUESTS',
+                    retryAfter: result.retryAfter,
+                  },
+                },
+              ],
+            });
+          } else {
+            res.status(429).json({
+              error: {
+                code: 'TOO_MANY_REQUESTS',
                 message:
                   'リクエスト数の上限に達しました。しばらく待ってから再試行してください。',
-                extensions: {
-                  code: 'TOO_MANY_REQUESTS',
-                  retryAfter: result.retryAfter,
-                },
               },
-            ],
-          });
+            });
+          }
           return;
         }
 

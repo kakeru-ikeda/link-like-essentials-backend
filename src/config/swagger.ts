@@ -67,7 +67,6 @@ const options: swaggerJSDoc.Options = {
               nullable: true,
             },
             cardUrl: { type: 'string', nullable: true },
-            isLocked: { type: 'boolean' },
             releaseDate: {
               type: 'string',
               format: 'date-time',
