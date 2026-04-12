@@ -10,16 +10,12 @@ import { formatError } from '@/presentation/middleware/errorHandler';
 
 import { schema } from './schema';
 
-const isDevelopment = process.env.NODE_ENV === 'development';
-
 export const apolloServer = new ApolloServer<GraphQLContext>({
   schema,
   formatError,
   plugins: [
-    // Development用のPlayground
-    isDevelopment
-      ? ApolloServerPluginLandingPageLocalDefault({ embed: true })
-      : ApolloServerPluginLandingPageLocalDefault({ embed: false }),
+    // Apollo Sandbox（開発・本番共通で埋め込みPlaygroundを有効化）
+    ApolloServerPluginLandingPageLocalDefault({ embed: true }),
 
     // ログプラグイン
     {
@@ -93,5 +89,5 @@ export const apolloServer = new ApolloServer<GraphQLContext>({
       },
     },
   ],
-  introspection: isDevelopment,
+  introspection: true,
 });
