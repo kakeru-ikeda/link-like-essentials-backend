@@ -1,5 +1,7 @@
 export enum Rarity {
+  mUR = 'mUR',
   UR = 'UR',
+  mSR = 'mSR',
   SR = 'SR',
   R = 'R',
   DR = 'DR',

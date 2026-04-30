@@ -3,7 +3,9 @@ scalar JSON
 
 # レアリティ
 enum Rarity {
+  mUR
   UR
+  mSR
   SR
   R
   DR
