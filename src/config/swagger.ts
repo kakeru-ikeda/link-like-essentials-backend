@@ -67,7 +67,7 @@ const options: swaggerJSDoc.Options = {
             },
             rarity: {
               type: 'string',
-              enum: ['UR', 'SR', 'R', 'DR', 'BR', 'LR'],
+              enum: ['mUR', 'UR', 'mSR', 'SR', 'R', 'DR', 'BR', 'LR'],
               nullable: true,
             },
             limited: {
@@ -229,7 +229,7 @@ const options: swaggerJSDoc.Options = {
               name: 'rarity',
               schema: {
                 type: 'string',
-                enum: ['UR', 'SR', 'R', 'DR', 'BR', 'LR'],
+                enum: ['mUR', 'UR', 'mSR', 'SR', 'R', 'DR', 'BR', 'LR'],
               },
               description: 'レアリティでフィルター',
             },
