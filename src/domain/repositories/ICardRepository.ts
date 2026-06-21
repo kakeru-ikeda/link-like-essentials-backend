@@ -10,6 +10,8 @@ export interface CardFilterInput {
   traitEffectContains?: string;
   specialAppealEffectContains?: string;
   accessoryEffectContains?: string;
+  releaseDateFrom?: Date;
+  releaseDateTo?: Date;
 }
 
 export interface PaginationResult {
