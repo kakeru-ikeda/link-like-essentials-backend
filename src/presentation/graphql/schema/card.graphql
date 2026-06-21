@@ -26,6 +26,8 @@ input CardFilterInput {
   traitEffectContains: String
   specialAppealEffectContains: String
   accessoryEffectContains: String
+  releaseDateFrom: DateTime
+  releaseDateTo: DateTime
 }
 
 type CardStats {
