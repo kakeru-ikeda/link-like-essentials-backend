@@ -198,6 +198,7 @@ export class CardRepository implements ICardRepository {
           }>;
         };
       };
+      releaseDate?: { gte?: Date; lte?: Date };
     };
 
     const conditions: WhereCondition = {
@@ -261,6 +262,13 @@ export class CardRepository implements ICardRepository {
           ],
         },
       };
+    }
+
+    if (filter.releaseDateFrom || filter.releaseDateTo) {
+      const dateCondition: { gte?: Date; lte?: Date } = {};
+      if (filter.releaseDateFrom) dateCondition.gte = filter.releaseDateFrom;
+      if (filter.releaseDateTo) dateCondition.lte = filter.releaseDateTo;
+      conditions.releaseDate = dateCondition;
     }
 
     return conditions;
